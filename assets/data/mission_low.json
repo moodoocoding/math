@@ -1,16 +1,18 @@
-{
+﻿{
   "mission_id": "cb_math_low_01",
   "title": "챕터1 문제 1",
-  "grade": "초등저학년",
+  "grade": "초등 저학년",
   "steps": [
     {
       "type": "quiz",
       "quiz_type": "mcq",
       "question_no": 1,
-      "question": "풍선은 모두 몇 개일까?",
-      "choices": ["5개", "6개", "7개", "8개"],
-      "answer": 1,
-      "hint": "왼쪽부터 하나씩 세어봐!"
+      "question": "빈칸 없이 바닥을 채울 수 있는 모양은 무엇일까요?",
+      "choices": ["네모", "동그라미", "별", "하트"],
+      "answer": 0,
+      "hint": "타일처럼 서로 빈틈 없이 딱 맞게 반복되는 모양을 찾아보세요.",
+      "choices_as_shapes": true,
+      "choices_layout": "4x1"
     }
   ]
 }

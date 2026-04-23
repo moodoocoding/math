@@ -11,6 +11,36 @@ String randomCharacterAsset(String mood) {
   return 'assets/images/chr_${prefix}_$mood.png';
 }
 
+enum _ShapeChoiceType { square, circle, star, heart, unknown }
+
+_ShapeChoiceType _parseShapeChoiceType(dynamic raw) {
+  final value = raw?.toString().trim().toLowerCase() ?? '';
+  switch (value) {
+    case '네모':
+    case '사각형':
+    case 'square':
+      return _ShapeChoiceType.square;
+    case '동그라미':
+    case '원':
+    case 'circle':
+      return _ShapeChoiceType.circle;
+    case '별':
+    case 'star':
+      return _ShapeChoiceType.star;
+    case '하트':
+    case 'heart':
+      return _ShapeChoiceType.heart;
+    default:
+      return _ShapeChoiceType.unknown;
+  }
+}
+
+bool _asTrue(dynamic value) {
+  if (value is bool) return value;
+  if (value == null) return false;
+  return value.toString().trim().toLowerCase() == 'true';
+}
+
 class MissionLowScreen extends StatefulWidget {
   const MissionLowScreen({
     super.key,
@@ -30,7 +60,7 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
 
   int currentStep = 0;
   List<dynamic> steps = [];
-  String missionTitle = _defaultMissionTitle;
+  String? _loadError;
 
   final AudioPlayer _bgmPlayer = AudioPlayer();
   String? _currentBgmAsset;
@@ -63,15 +93,41 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
   }
 
   Future<void> loadMissionData() async {
-    final jsonString = await DefaultAssetBundle.of(context).loadString(widget.missionDataPath);
-    final data = json.decode(jsonString) as Map<String, dynamic>;
+    try {
+      final jsonString = await DefaultAssetBundle.of(context).loadString(widget.missionDataPath);
+      final data = json.decode(jsonString) as Map<String, dynamic>;
 
+      setState(() {
+        steps = data['steps'] as List<dynamic>;
+        _loadError = null;
+      });
+
+      await _syncBgmForCurrentStep();
+      return;
+    } catch (_) {
+      // Fallback for stale asset cache / old builds.
+    }
+
+    if (widget.missionDataPath == 'assets/data/mission_chapter1_q2_hanoi.json') {
+      try {
+        final fallbackJson = await DefaultAssetBundle.of(context).loadString('assets/data/mission_chapter1_q2.json');
+        final data = json.decode(fallbackJson) as Map<String, dynamic>;
+        setState(() {
+          steps = data['steps'] as List<dynamic>;
+          _loadError = null;
+        });
+        await _syncBgmForCurrentStep();
+        return;
+      } catch (_) {
+        // keep going to show explicit error state
+      }
+    }
+
+    if (!mounted) return;
     setState(() {
-      steps = data['steps'] as List<dynamic>;
-      missionTitle = (data['title'] ?? _defaultMissionTitle).toString();
+      _loadError = '문제 데이터를 불러오지 못했어요. 앱을 다시 시작해 주세요.';
+      steps = const [];
     });
-
-    await _syncBgmForCurrentStep();
   }
 
   void nextStep() {
@@ -91,6 +147,48 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loadError != null) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFF163988),
+          surfaceTintColor: Colors.white,
+          elevation: 0,
+          title: const Text(
+            _defaultMissionTitle,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+          ),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Color(0xFFE05C57), size: 64),
+                const SizedBox(height: 14),
+                Text(
+                  _loadError!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1E1E1E)),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: loadMissionData,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF123E97),
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('다시 시도'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     if (steps.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -112,7 +210,7 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
         ),
         centerTitle: true,
         title: Text(
-          missionTitle,
+          _defaultMissionTitle,
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         actions: [
@@ -377,6 +475,10 @@ class _QuizScreenState extends State<QuizScreen> {
     final step = widget.step;
     final quizType = (step['quiz_type'] ?? '').toString();
     final choices = (step['choices'] as List<dynamic>?) ?? const [];
+    final showHanoiVisual = _asTrue(step['show_hanoi_visual']);
+    final renderChoicesAsShapes = _asTrue(step['choices_as_shapes']);
+    final choicesLayout = (step['choices_layout'] ?? '').toString().trim().toLowerCase();
+    final useSingleColumnChoices = choicesLayout == '4x1';
 
     final isCompact = MediaQuery.of(context).size.width < 1100;
     final bannerFontSize = isCompact ? 18.0 : 22.0;
@@ -442,23 +544,28 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
           ),
+          if (showHanoiVisual) ...[
+            const SizedBox(height: 14),
+            const _HanoiVisualPanel(),
+          ],
           const SizedBox(height: 14),
           if (quizType == 'mcq')
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: 4,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: useSingleColumnChoices ? 1 : 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 4.5,
+                childAspectRatio: useSingleColumnChoices ? (isCompact ? 6.8 : 8.4) : 4.5,
               ),
               itemBuilder: (context, index) {
                 final selected = selectedChoiceIndex == index;
                 final color = _optionColors[index % _optionColors.length];
                 final isEnabled = index < choices.length;
                 final choiceText = isEnabled ? choices[index].toString() : '준비 중';
+                final shapeType = _parseShapeChoiceType(choiceText);
                 final textColor = color.computeLuminance() > 0.55 ? const Color(0xFF163988) : Colors.white;
 
                 return AnimatedScale(
@@ -470,16 +577,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       border: selected ? Border.all(color: const Color(0xFF0B1F61), width: 5) : null,
-                      boxShadow: selected
-                          ? const [
-                              BoxShadow(
-                                color: Color(0x55133E97),
-                                blurRadius: 16,
-                                spreadRadius: 1,
-                                offset: Offset(0, 4),
-                              ),
-                            ]
-                          : null,
+                      boxShadow: selected ? const [BoxShadow(color: Color(0x33133E97), blurRadius: 8, offset: Offset(0, 2))] : null,
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -498,16 +596,23 @@ class _QuizScreenState extends State<QuizScreen> {
                           child: Stack(
                             children: [
                               Center(
-                                child: Text(
-                                  choiceText,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: textColor,
-                                    fontSize: optionFontSize,
-                                    fontWeight: FontWeight.w900,
-                                    shadows: selected ? const [Shadow(color: Color(0xAA000000), blurRadius: 6)] : null,
-                                  ),
-                                ),
+                                child: renderChoicesAsShapes
+                                    ? _ShapeOptionSymbol(
+                                        type: shapeType,
+                                        color: textColor,
+                                        size: useSingleColumnChoices ? (isCompact ? 34 : 40) : (isCompact ? 40 : 50),
+                                        selected: selected,
+                                      )
+                                    : Text(
+                                        choiceText,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: useSingleColumnChoices ? (isCompact ? 34 : 40) : (isCompact ? 42 : 54),
+                                          fontWeight: FontWeight.w900,
+                                          shadows: selected ? const [Shadow(color: Color(0x55000000), blurRadius: 4)] : null,
+                                        ),
+                                      ),
                               ),
                               if (selected)
                                 Positioned(
@@ -579,4 +684,148 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
     );
   }
+}
+
+class _ShapeOptionSymbol extends StatelessWidget {
+  const _ShapeOptionSymbol({
+    required this.type,
+    required this.color,
+    required this.size,
+    required this.selected,
+  });
+
+  final _ShapeChoiceType type;
+  final Color color;
+  final double size;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (type) {
+      case _ShapeChoiceType.square:
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        );
+      case _ShapeChoiceType.circle:
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        );
+      case _ShapeChoiceType.star:
+        return Icon(Icons.star_rounded, size: size + 6, color: color);
+      case _ShapeChoiceType.heart:
+        return Icon(Icons.favorite_rounded, size: size + 6, color: color);
+      case _ShapeChoiceType.unknown:
+        return Text(
+          '?',
+          style: TextStyle(
+            color: color,
+            fontSize: size,
+            fontWeight: FontWeight.w900,
+            shadows: selected ? const [Shadow(color: Color(0xAA000000), blurRadius: 6)] : null,
+          ),
+        );
+    }
+  }
+}
+
+class _HanoiVisualPanel extends StatelessWidget {
+  const _HanoiVisualPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 1100;
+
+    return Container(
+      width: double.infinity,
+      height: isCompact ? 220 : 280,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFF),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '하노이의 탑 (원반 3개)',
+            style: TextStyle(
+              fontSize: isCompact ? 18 : 22,
+              fontWeight: FontWeight.w900,
+              color: const Color(0xFF163988),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: CustomPaint(
+              painter: _HanoiTowerPainter(),
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HanoiTowerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final groundPaint = Paint()..color = const Color(0xFF2E4E9D);
+    final rodPaint = Paint()..color = const Color(0xFF8B6B3D);
+
+    final baseTop = size.height * 0.86;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width * 0.06, baseTop, size.width * 0.88, size.height * 0.08),
+        const Radius.circular(8),
+      ),
+      groundPaint,
+    );
+
+    final rodX = [size.width * 0.22, size.width * 0.50, size.width * 0.78];
+    for (final x in rodX) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(x - 5, size.height * 0.24, 10, baseTop - size.height * 0.24),
+          const Radius.circular(6),
+        ),
+        rodPaint,
+      );
+    }
+
+    final diskColors = const [Color(0xFF4A9BFF), Color(0xFF78B7FF), Color(0xFFA7D0FF)];
+    final diskWidths = [size.width * 0.22, size.width * 0.16, size.width * 0.10];
+    final diskHeight = size.height * 0.09;
+    final centerX = rodX[0];
+
+    for (var i = 0; i < 3; i++) {
+      final y = baseTop - diskHeight * (i + 1);
+      final rect = Rect.fromCenter(
+        center: Offset(centerX, y + diskHeight / 2),
+        width: diskWidths[i],
+        height: diskHeight * 0.78,
+      );
+      final fill = Paint()..color = diskColors[i];
+      final stroke = Paint()
+        ..color = const Color(0xFF2467B6)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
+      final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(10));
+      canvas.drawRRect(rrect, fill);
+      canvas.drawRRect(rrect, stroke);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

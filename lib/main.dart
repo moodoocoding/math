@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'mission_low.dart';
 import 'story_dummy_screen.dart';
 import 'chapter1_story2_tbd_screen.dart';
+import 'chapter2_story_screen.dart';
 
 void main() {
   runApp(const MissionTourApp());
@@ -74,6 +75,7 @@ class MissionTourApp extends StatelessWidget {
         '/home': (context) => const MissionHomeScreen(),
         '/story_low_dummy': (context) => const StoryDummyScreen(),
         '/chapter1_story2_tbd': (context) => const Chapter1Story2TbdScreen(),
+        '/chapter2_story': (context) => const Chapter2StoryScreen(),
         '/mission_low': (context) {
           LobbyBgmController.stop();
           return const MissionLowScreen(completedRouteName: '/chapter1_story2_tbd');
@@ -82,7 +84,7 @@ class MissionTourApp extends StatelessWidget {
           LobbyBgmController.stop();
           return const MissionLowScreen(
             missionDataPath: 'assets/data/mission_chapter1_q2.json',
-            completedRouteName: '/home',
+            completedRouteName: '/chapter2_story',
           );
         },
       },
@@ -202,30 +204,8 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
         top: false,
         child: Container(
           color: const Color(0xFFEDEDED),
-          padding: const EdgeInsets.fromLTRB(horizontalPadding, 14, horizontalPadding, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('과학체험관·수학체험센터를 한 곳에서!', style: TextStyle(fontSize: infoTitleSize, fontWeight: FontWeight.w500, color: const Color(0xFF2D2D2D))),
-              const SizedBox(height: 6),
-              Text('충북자연과학교육원에서 과학과 수학을 함께 체험해요.', style: TextStyle(fontSize: infoBodySize, fontWeight: FontWeight.w800, color: const Color(0xFF222222), height: 1.15)),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: _openReservePage,
-                child: Text(
-                  '통합예약 바로가기  →',
-                  style: TextStyle(
-                    fontSize: infoLinkSize,
-                    color: const Color(0xFF3E5FB8),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _StartButton(onPressed: _goMissionLow),
-            ],
-          ),
+          padding: const EdgeInsets.fromLTRB(horizontalPadding, 10, horizontalPadding, 12),
+          child: _StartButton(onPressed: _goMissionLow),
         ),
       ),
       body: Stack(
@@ -322,6 +302,32 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                     _MissionCard(width: cardWidth, icon: Icons.auto_awesome_rounded, title: '미션! 수사모의\n보물을 찾아서', subtitle: '초등 고학년 추천', backgroundColor: const Color(0xFFF0DEEA), subtitleColor: const Color(0xFFDE5C85)),
                     _MissionCard(width: cardWidth, icon: Icons.edit_note_rounded, title: '수학자의 비밀\n노트를 찾아라!', subtitle: '중학생 추천', backgroundColor: const Color(0xFFDDE2F5), subtitleColor: const Color(0xFF4A67BF)),
                     _MissionCard(width: cardWidth, icon: Icons.menu_book_rounded, title: '역설, 혹은\n모호함', subtitle: '고등학생 추천', backgroundColor: const Color(0xFFDDE2F5), subtitleColor: const Color(0xFF4A67BF)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFEDEDED),
+                padding: const EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('과학체험관·수학체험센터를 한 곳에서!', style: TextStyle(fontSize: infoTitleSize, fontWeight: FontWeight.w500, color: const Color(0xFF2D2D2D))),
+                    const SizedBox(height: 6),
+                    Text('충북자연과학교육원에서 과학과 수학을 함께 체험해요.', style: TextStyle(fontSize: infoBodySize, fontWeight: FontWeight.w800, color: const Color(0xFF222222), height: 1.15)),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: _openReservePage,
+                      child: Text(
+                        '통합예약 바로가기  →',
+                        style: TextStyle(
+                          fontSize: infoLinkSize,
+                          color: const Color(0xFF3E5FB8),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
