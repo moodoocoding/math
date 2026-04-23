@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'bgm_controller.dart';
 
 final Random _random = Random();
 
@@ -62,34 +62,21 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
   List<dynamic> steps = [];
   String? _loadError;
 
-  final AudioPlayer _bgmPlayer = AudioPlayer();
-  String? _currentBgmAsset;
-
   @override
   void initState() {
     super.initState();
     loadMissionData();
-    _playBgm('audio/bgm_main.mp3');
-  }
-
-  Future<void> _playBgm(String assetPath) async {
-    if (_currentBgmAsset == assetPath) return;
-    _currentBgmAsset = assetPath;
-    await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
-    await _bgmPlayer.play(AssetSource(assetPath), volume: 0.35);
   }
 
   Future<void> _syncBgmForCurrentStep() async {
     if (steps.isEmpty) return;
     final step = steps[currentStep] as Map<String, dynamic>;
     final isQuizStep = step['type'] == 'quiz';
-    await _playBgm(isQuizStep ? 'audio/bgm_problem.mp3' : 'audio/bgm_main.mp3');
-  }
-
-  @override
-  void dispose() {
-    _bgmPlayer.dispose();
-    super.dispose();
+    if (isQuizStep) {
+      await AppBgmController.playProblem();
+    } else {
+      await AppBgmController.playStory();
+    }
   }
 
   Future<void> loadMissionData() async {

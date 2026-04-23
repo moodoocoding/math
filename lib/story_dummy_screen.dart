@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'bgm_controller.dart';
 
 class StoryDummyScreen extends StatefulWidget {
   const StoryDummyScreen({super.key});
@@ -36,6 +37,12 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
       characterAsset: 'assets/images/chr_play_surprised.png',
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    AppBgmController.playStory();
+  }
 
   @override
   void didChangeDependencies() {
