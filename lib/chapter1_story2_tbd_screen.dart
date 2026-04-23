@@ -33,6 +33,15 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
     ),
   ];
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(const AssetImage('assets/images/chapter1_bg_1.png'), context);
+    for (var scene in _scenes) {
+      precacheImage(AssetImage(scene.characterAsset), context);
+    }
+  }
+
   void _goNext() {
     if (_sceneIndex < _scenes.length - 1) {
       setState(() => _sceneIndex++);
@@ -76,6 +85,8 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
             child: Image.asset(
               'assets/images/chapter1_bg_1.png',
               fit: BoxFit.cover,
+              cacheWidth: 800,
+              errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
           Positioned.fill(
@@ -87,44 +98,55 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                 const Spacer(),
                 SizedBox(
                   height: charHeight,
-                  child: Image.asset(
-                    scene.characterAsset,
-                    fit: BoxFit.contain,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Image.asset(
+                      scene.characterAsset,
+                      key: ValueKey(scene.characterAsset),
+                      fit: BoxFit.fitHeight,
+                      cacheHeight: 600,
+                      gaplessPlayback: false,
+                      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: const Color(0xFF133E97), width: 3),
-                      boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF133E97),
-                              borderRadius: BorderRadius.circular(999),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Container(
+                      key: ValueKey(scene.line),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: const Color(0xFF133E97), width: 3),
+                        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF133E97),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                scene.speaker,
+                                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                              ),
                             ),
-                            child: Text(
-                              scene.speaker,
-                              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                            const SizedBox(height: 12),
+                            Text(
+                              scene.line,
+                              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            scene.line,
-                            style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

@@ -37,6 +37,20 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
     ),
   ];
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(const AssetImage('assets/images/chapter1_bg_1.png'), context);
+    for (var scene in _scenes) {
+      if (scene.characterAsset != null) {
+        precacheImage(AssetImage(scene.characterAsset!), context);
+      }
+      if (scene.welcomeImageAsset != null) {
+        precacheImage(AssetImage(scene.welcomeImageAsset!), context);
+      }
+    }
+  }
+
   void _goNext() {
     if (_sceneIndex < _scenes.length - 1) {
       setState(() => _sceneIndex++);
@@ -85,7 +99,15 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                     children: [
                       SizedBox(
                         width: width < 900 ? width * 0.78 : 700,
-                        child: Image.asset(scene.welcomeImageAsset!, fit: BoxFit.contain),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: Image.asset(
+                            scene.welcomeImageAsset!,
+                            key: ValueKey(scene.welcomeImageAsset!),
+                            fit: BoxFit.contain,
+                            cacheHeight: 400,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 22),
                       Text(
@@ -118,6 +140,8 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                   child: Image.asset(
                     'assets/images/chapter1_bg_1.png',
                     fit: BoxFit.cover,
+                    cacheWidth: 800,
+                    errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFF4F5F7)),
                   ),
                 ),
                 Positioned.fill(
@@ -129,44 +153,53 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                       const Spacer(),
                       SizedBox(
                         height: charHeight,
-                        child: Image.asset(
-                          scene.characterAsset!,
-                          fit: BoxFit.contain,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: Image.asset(
+                            scene.characterAsset!,
+                            key: ValueKey(scene.characterAsset!),
+                            fit: BoxFit.contain,
+                            cacheHeight: 600,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(22),
-                            border: Border.all(color: const Color(0xFF133E97), width: 3),
-                            boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF133E97),
-                                    borderRadius: BorderRadius.circular(999),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: Container(
+                            key: ValueKey(scene.line),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(color: const Color(0xFF133E97), width: 3),
+                              boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF133E97),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      scene.speaker!,
+                                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                                    ),
                                   ),
-                                  child: Text(
-                                    scene.speaker!,
-                                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    scene.line,
+                                    style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
                                   ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  scene.line,
-                                  style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

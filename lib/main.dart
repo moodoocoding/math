@@ -87,6 +87,13 @@ class MissionTourApp extends StatelessWidget {
             completedRouteName: '/chapter2_story',
           );
         },
+        '/mission_chapter2_q1': (context) {
+          LobbyBgmController.stop();
+          return const MissionLowScreen(
+            missionDataPath: 'assets/data/mission_chapter2_q1.json',
+            completedRouteName: '/home',
+          );
+        },
       },
     );
   }
@@ -109,6 +116,7 @@ class _IntroScreenState extends State<IntroScreen> {
           Image.asset(
             'assets/images/bg_intro.png',
             fit: BoxFit.cover,
+            cacheWidth: 800,
             errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFF4F5F7)),
           ),
           Container(color: const Color(0x66000000)),
@@ -133,8 +141,8 @@ class _IntroScreenState extends State<IntroScreen> {
                     width: double.infinity,
                     height: 62,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        await LobbyBgmController.playBackground(forceRestart: true);
+                      onPressed: () {
+                        LobbyBgmController.playBackground(forceRestart: true);
                         if (!mounted) return;
                         Navigator.pushReplacementNamed(context, '/home');
                       },
@@ -214,6 +222,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
             child: Image.asset(
               'assets/images/bg_intro.png',
               fit: BoxFit.cover,
+              cacheWidth: 800,
               alignment: isUltraWide ? const Alignment(0, -0.35) : Alignment.center,
               errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFF4F5F7)),
             ),
@@ -251,6 +260,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                             'assets/images/logo_cb_math.png',
                             width: 62,
                             height: 62,
+                            cacheWidth: 150,
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 10),

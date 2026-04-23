@@ -43,12 +43,20 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
     ),
   ];
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    for (var scene in _scenes) {
+      precacheImage(AssetImage(scene.characterAsset), context);
+    }
+  }
+
   void _goNext() {
     if (_sceneIndex < _scenes.length - 1) {
       setState(() => _sceneIndex++);
       return;
     }
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    Navigator.pushReplacementNamed(context, '/mission_chapter2_q1');
   }
 
   @override
@@ -88,6 +96,7 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
             child: Image.asset(
               backgroundAsset,
               fit: BoxFit.cover,
+              cacheWidth: 800,
               errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
@@ -100,15 +109,19 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                 const Spacer(),
                 SizedBox(
                   height: sceneCharHeight,
-                  child: Image.asset(
-                    scene.characterAsset,
-                    key: ValueKey(scene.characterAsset),
-                    fit: BoxFit.fitHeight,
-                    gaplessPlayback: false,
-                    errorBuilder: (context, error, stackTrace) => const Center(
-                      child: Text(
-                        '캐릭터 이미지를 불러오지 못했어요',
-                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Image.asset(
+                      scene.characterAsset,
+                      key: ValueKey(scene.characterAsset),
+                      fit: BoxFit.fitHeight,
+                      cacheHeight: 600,
+                      gaplessPlayback: false,
+                      errorBuilder: (context, error, stackTrace) => const Center(
+                        child: Text(
+                          '캐릭터 이미지를 불러오지 못했어요',
+                          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                        ),
                       ),
                     ),
                   ),
@@ -116,36 +129,40 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                 const SizedBox(height: 12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: const Color(0xFF133E97), width: 3),
-                      boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF133E97),
-                              borderRadius: BorderRadius.circular(999),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Container(
+                      key: ValueKey(scene.line),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: const Color(0xFF133E97), width: 3),
+                        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF133E97),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                scene.speaker,
+                                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                              ),
                             ),
-                            child: Text(
-                              scene.speaker,
-                              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                            const SizedBox(height: 12),
+                            Text(
+                              scene.line,
+                              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            scene.line,
-                            style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

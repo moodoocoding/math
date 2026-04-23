@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -102,7 +102,7 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
         _loadError = null;
       });
 
-      await _syncBgmForCurrentStep();
+      _syncBgmForCurrentStep();
       return;
     } catch (_) {
       // Fallback for stale asset cache / old builds.
@@ -116,7 +116,7 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
           steps = data['steps'] as List<dynamic>;
           _loadError = null;
         });
-        await _syncBgmForCurrentStep();
+        _syncBgmForCurrentStep();
         return;
       } catch (_) {
         // keep going to show explicit error state
@@ -251,6 +251,7 @@ class StoryScreen extends StatelessWidget {
           child: Image.asset(
             'assets/images/chr_background.png',
             fit: BoxFit.contain,
+            cacheHeight: 600,
           ),
         ),
         const SizedBox(height: 16),
@@ -297,6 +298,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   int? selectedChoiceIndex;
   String inputAnswer = '';
+  int _simulationIndex = 0;
   final TextEditingController _inputController = TextEditingController();
 
   @override
@@ -305,6 +307,7 @@ class _QuizScreenState extends State<QuizScreen> {
     if (oldWidget.step != widget.step) {
       selectedChoiceIndex = null;
       inputAnswer = '';
+      _simulationIndex = 0;
       _inputController.clear();
     }
   }
@@ -342,7 +345,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   child: Text('힌트', style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.w900)),
                 ),
                 const SizedBox(height: 18),
-                Image.asset(randomCharacterAsset('surprised'), height: screenWidth < 1100 ? 130 : 160, fit: BoxFit.contain),
+                Image.asset(randomCharacterAsset('surprised'), height: screenWidth < 1100 ? 130 : 160, fit: BoxFit.contain, cacheHeight: 400),
                 const SizedBox(height: 18),
                 Text(
                   (hint == null || hint.trim().isEmpty) ? '준비된 힌트가 없어요.' : hint,
@@ -416,6 +419,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       randomCharacterAsset(correct ? 'happy' : 'fail'),
                       height: imageHeight,
                       fit: BoxFit.contain,
+                      cacheHeight: 500,
                     ),
                   ),
                 ),
@@ -470,6 +474,61 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
+  Widget _buildSimulationArea(List<String> images) {
+    return Column(
+      children: [
+        const SizedBox(height: 14),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          child: Image.asset(
+            images[_simulationIndex],
+            key: ValueKey<int>(_simulationIndex),
+            height: 220,
+            fit: BoxFit.contain,
+            cacheHeight: 600,
+            errorBuilder: (context, error, stackTrace) => Container(
+              height: 220,
+              color: Colors.grey[200],
+              alignment: Alignment.center,
+              child: const Text('이미지 준비중...', style: TextStyle(color: Colors.grey)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton.icon(
+          onPressed: () async {
+            if (_simulationIndex != 0) return; // 이미 실행 중이거나 완료된 경우 무시
+            if (images.length < 2) return;
+            
+            setState(() {
+              _simulationIndex = 1;
+            });
+            
+            if (images.length > 2) {
+              await Future.delayed(const Duration(milliseconds: 1200));
+              if (!mounted) return;
+              setState(() {
+                _simulationIndex = 2;
+              });
+            }
+          },
+          icon: const Icon(Icons.balance),
+          label: const Text('직접 저울에 올려보기 ⚖️', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange[400],
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final step = widget.step;
@@ -519,6 +578,8 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
           ),
+          if (step['simulation_images'] != null && (step['simulation_images'] as List<dynamic>).isNotEmpty)
+            _buildSimulationArea((step['simulation_images'] as List<dynamic>).cast<String>()),
           if (showHanoiVisual) ...[
             const SizedBox(height: 14),
             _HanoiVisualPanel(height: hanoiHeight),
@@ -533,7 +594,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 crossAxisCount: useSingleColumnChoices ? 1 : 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: useSingleColumnChoices ? (isCompact ? 6.8 : 8.4) : 4.5,
+                childAspectRatio: useSingleColumnChoices ? (isCompact ? 6.8 : 8.4) : (isCompact ? 5.5 : 7.5),
               ),
               itemBuilder: (context, index) {
                 final selected = selectedChoiceIndex == index;
