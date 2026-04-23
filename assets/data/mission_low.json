@@ -11,8 +11,7 @@
       "choices": ["네모", "동그라미", "별", "하트"],
       "answer": 0,
       "hint": "타일처럼 서로 빈틈 없이 딱 맞게 반복되는 모양을 찾아보세요.",
-      "choices_as_shapes": true,
-      "choices_layout": "4x1"
+      "choices_as_shapes": true
     }
   ]
 }

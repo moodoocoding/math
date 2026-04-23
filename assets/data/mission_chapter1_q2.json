@@ -11,8 +11,7 @@
       "choices": ["5번", "6번", "7번", "8번"],
       "answer": 2,
       "hint": "작은 원반부터 규칙을 지켜 옮기면 최소 횟수를 찾을 수 있어요.",
-      "show_hanoi_visual": true,
-      "choices_layout": "4x1"
+      "show_hanoi_visual": true
     }
   ]
 }

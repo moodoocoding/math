@@ -479,43 +479,18 @@ class _QuizScreenState extends State<QuizScreen> {
     final renderChoicesAsShapes = _asTrue(step['choices_as_shapes']);
     final choicesLayout = (step['choices_layout'] ?? '').toString().trim().toLowerCase();
     final useSingleColumnChoices = choicesLayout == '4x1';
-
     final isCompact = MediaQuery.of(context).size.width < 1100;
-    final bannerFontSize = isCompact ? 18.0 : 22.0;
+    final questionText = step['question'].toString();
     final questionFontSize = isCompact ? 28.0 : 40.0;
-    final optionFontSize = isCompact ? 42.0 : 54.0;
+    final optionTextSize = isCompact ? 42.0 : 54.0;
+    final optionShapeSize = isCompact ? 40.0 : 50.0;
     final actionFontSize = isCompact ? 28.0 : 38.0;
+    final hanoiHeight = isCompact ? 220.0 : 280.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(18, 10, 18, 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFF4C430), width: 2),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '하우와 플레이와 함께하는 신나는 수학 보물탐험 떠나자!',
-                    style: TextStyle(
-                      color: const Color(0xFF163988),
-                      fontSize: bannerFontSize,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Image.asset('assets/images/chr_howplay.png', height: isCompact ? 78 : 92, fit: BoxFit.contain),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: LinearProgressIndicator(
@@ -525,7 +500,7 @@ class _QuizScreenState extends State<QuizScreen> {
               color: const Color(0xFFF0B126),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
@@ -534,7 +509,7 @@ class _QuizScreenState extends State<QuizScreen> {
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              step['question'].toString(),
+              questionText,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: questionFontSize,
@@ -546,7 +521,7 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
           if (showHanoiVisual) ...[
             const SizedBox(height: 14),
-            const _HanoiVisualPanel(),
+            _HanoiVisualPanel(height: hanoiHeight),
           ],
           const SizedBox(height: 14),
           if (quizType == 'mcq')
@@ -600,7 +575,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                     ? _ShapeOptionSymbol(
                                         type: shapeType,
                                         color: textColor,
-                                        size: useSingleColumnChoices ? (isCompact ? 34 : 40) : (isCompact ? 40 : 50),
+                                        size: useSingleColumnChoices ? (isCompact ? 34 : 40) : optionShapeSize,
                                         selected: selected,
                                       )
                                     : Text(
@@ -608,7 +583,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: textColor,
-                                          fontSize: useSingleColumnChoices ? (isCompact ? 34 : 40) : (isCompact ? 42 : 54),
+                                          fontSize: useSingleColumnChoices ? (isCompact ? 34 : 40) : optionTextSize,
                                           fontWeight: FontWeight.w900,
                                           shadows: selected ? const [Shadow(color: Color(0x55000000), blurRadius: 4)] : null,
                                         ),
@@ -739,16 +714,18 @@ class _ShapeOptionSymbol extends StatelessWidget {
 }
 
 class _HanoiVisualPanel extends StatelessWidget {
-  const _HanoiVisualPanel();
+  const _HanoiVisualPanel({required this.height});
+
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    final isCompact = MediaQuery.of(context).size.width < 1100;
+    final isCompact = MediaQuery.of(context).size.width < 1100 || height < 180;
 
     return Container(
       width: double.infinity,
-      height: isCompact ? 220 : 280,
-      padding: const EdgeInsets.all(14),
+      height: height,
+      padding: EdgeInsets.all(isCompact ? 10 : 14),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FBFF),
         borderRadius: BorderRadius.circular(14),
@@ -759,12 +736,12 @@ class _HanoiVisualPanel extends StatelessWidget {
           Text(
             '하노이의 탑 (원반 3개)',
             style: TextStyle(
-              fontSize: isCompact ? 18 : 22,
+              fontSize: isCompact ? 16 : 22,
               fontWeight: FontWeight.w900,
               color: const Color(0xFF163988),
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: isCompact ? 6 : 10),
           Expanded(
             child: CustomPaint(
               painter: _HanoiTowerPainter(),

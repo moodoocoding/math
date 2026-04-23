@@ -14,7 +14,7 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
     _Chapter2Scene(
       speaker: '하우',
       line: '첫 번째 조각을 찾았어!',
-      characterAsset: 'assets/images/chr_together_1.png',
+      characterAsset: 'assets/images/chr_together.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
