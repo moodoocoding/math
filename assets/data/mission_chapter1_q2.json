@@ -1,0 +1,16 @@
+{
+  "mission_id": "cb_math_ch1_q2",
+  "title": "챕터1 문제 2",
+  "grade": "초등저학년",
+  "steps": [
+    {
+      "type": "quiz",
+      "quiz_type": "mcq",
+      "question_no": 2,
+      "question": "다음에 올 모양은 무엇일까요?\n○ △ ○ △ ○ ?",
+      "choices": ["○", "△", "□", "☆"],
+      "answer": 1,
+      "hint": "앞에서 어떤 모양이 반복되는지 차례대로 살펴보세요."
+    }
+  ]
+}

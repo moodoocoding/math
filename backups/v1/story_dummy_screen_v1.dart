@@ -1,0 +1,215 @@
+import 'package:flutter/material.dart';
+
+class StoryDummyScreen extends StatefulWidget {
+  const StoryDummyScreen({super.key});
+
+  @override
+  State<StoryDummyScreen> createState() => _StoryDummyScreenState();
+}
+
+class _StoryDummyScreenState extends State<StoryDummyScreen> {
+  int _sceneIndex = 0;
+
+  static const List<_ChapterScene> _scenes = [
+    _ChapterScene(
+      line: '수학체험센터에 온 것을 환영해! 함께 모험을 시작하자.',
+      welcomeImageAsset: 'assets/images/chr_background.png',
+    ),
+    _ChapterScene(
+      speaker: '하우',
+      line: '큰일이야! 수학체험센터의 반짝별이 사라졌어!',
+      characterAsset: 'assets/images/chr_how_thinking.png',
+    ),
+    _ChapterScene(
+      speaker: '플레이',
+      line: '반짝별이 없어지면 체험실의 신나는 빛도 점점 약해진대!',
+      characterAsset: 'assets/images/chr_play_worry.png',
+    ),
+    _ChapterScene(
+      speaker: '하우',
+      line: '첫 번째 반짝 조각은 수학체험실에 있대',
+      characterAsset: 'assets/images/chr_how_lefttalk.png',
+    ),
+    _ChapterScene(
+      speaker: '플레이',
+      line: '여기가 수학체험실인데, 앗 저기 문제가 있어!',
+      characterAsset: 'assets/images/chr_play_surprised.png',
+    ),
+  ];
+
+  void _goNext() {
+    if (_sceneIndex < _scenes.length - 1) {
+      setState(() => _sceneIndex++);
+      return;
+    }
+    Navigator.pushNamed(context, '/mission_low');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scene = _scenes[_sceneIndex];
+    final isLast = _sceneIndex == _scenes.length - 1;
+    final width = MediaQuery.of(context).size.width;
+    final charHeight = width < 1100 ? width * 0.36 : 360.0;
+    final isWelcome = scene.welcomeImageAsset != null;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF163988),
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 32),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home_rounded, size: 38),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+          ),
+        ],
+      ),
+      body: isWelcome
+          ? SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: width < 900 ? width * 0.78 : 700,
+                        child: Image.asset(scene.welcomeImageAsset!, fit: BoxFit.contain),
+                      ),
+                      const SizedBox(height: 22),
+                      Text(
+                        scene.line,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w800, color: Color(0xFF163988)),
+                      ),
+                      const SizedBox(height: 22),
+                      SizedBox(
+                        width: width < 900 ? 220 : 260,
+                        child: ElevatedButton(
+                          onPressed: _goNext,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF133E97),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          child: const Text('다음', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          : Stack(
+              children: [
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/chapter1_bg_1.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned.fill(
+                  child: Container(color: const Color(0x4A000000)),
+                ),
+                SafeArea(
+                  child: Column(
+                    children: [
+                      const Spacer(),
+                      SizedBox(
+                        height: charHeight,
+                        child: Image.asset(
+                          scene.characterAsset!,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(color: const Color(0xFF133E97), width: 3),
+                            boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF133E97),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    scene.speaker!,
+                                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  scene.line,
+                                  style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _goNext,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF133E97),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Text(
+                              isLast ? '문제 풀이 시작' : '다음',
+                              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class _ChapterScene {
+  const _ChapterScene({
+    this.speaker,
+    required this.line,
+    this.characterAsset,
+    this.welcomeImageAsset,
+  });
+
+  final String? speaker;
+  final String line;
+  final String? characterAsset;
+  final String? welcomeImageAsset;
+}

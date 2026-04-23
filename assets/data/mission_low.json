@@ -1,0 +1,16 @@
+{
+  "mission_id": "cb_math_low_01",
+  "title": "챕터1 문제 1",
+  "grade": "초등저학년",
+  "steps": [
+    {
+      "type": "quiz",
+      "quiz_type": "mcq",
+      "question_no": 1,
+      "question": "풍선은 모두 몇 개일까?",
+      "choices": ["5개", "6개", "7개", "8개"],
+      "answer": 1,
+      "hint": "왼쪽부터 하나씩 세어봐!"
+    }
+  ]
+}
