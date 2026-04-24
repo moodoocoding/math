@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'bgm_controller.dart';
 
 class Chapter1Story2TbdScreen extends StatefulWidget {
   const Chapter1Story2TbdScreen({super.key});
@@ -23,15 +24,21 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '앗! 이번에는 여러 모양이 차례대로 놓여 있어!',
+      line: '어? 이번에는 원판이 기둥에 쌓여 있어!',
       characterAsset: 'assets/images/chr_how_surprised.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '모양이 어떤 순서로 반복되는지 잘 보면 두 번째 문제를 풀 수 있대!',
+      line: '규칙을 지키며 옮기면 다음 조각을 찾을 수 있대!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    AppBgmController.playStory();
+  }
 
   @override
   void didChangeDependencies() {

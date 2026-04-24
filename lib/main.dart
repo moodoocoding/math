@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'bgm_controller.dart';
 import 'mission_low.dart';
 import 'story_dummy_screen.dart';
 import 'chapter1_story2_tbd_screen.dart';
@@ -8,54 +11,6 @@ import 'chapter2_story_screen.dart';
 
 void main() {
   runApp(const MissionTourApp());
-}
-
-class LobbyBgmController {
-  LobbyBgmController._();
-
-  static final AudioPlayer _player = AudioPlayer();
-  static bool _configured = false;
-  static String? _currentAsset;
-  static const List<String> _fallbackAssets = [
-    'audio/bgm_bg.mp3',
-    'audio/bgm_main.mp3',
-    'audio/bgm.ogg',
-  ];
-
-  static Future<void> playBackground({bool forceRestart = false}) async {
-    if (!_configured) {
-      await _player.setReleaseMode(ReleaseMode.loop);
-      _configured = true;
-    }
-    if (_currentAsset == 'audio/bgm_bg.mp3' && !forceRestart) {
-      return;
-    }
-
-    if (forceRestart) {
-      await _player.stop();
-    }
-
-    var played = false;
-    for (final asset in _fallbackAssets) {
-      try {
-        await _player.play(AssetSource(asset), volume: 0.5);
-        _currentAsset = asset;
-        played = true;
-        break;
-      } catch (_) {
-        // Try next asset candidate.
-      }
-    }
-
-    if (!played) {
-      _currentAsset = null;
-    }
-  }
-
-  static Future<void> stop() async {
-    _currentAsset = null;
-    await _player.stop();
-  }
 }
 
 class MissionTourApp extends StatelessWidget {
@@ -76,24 +31,17 @@ class MissionTourApp extends StatelessWidget {
         '/story_low_dummy': (context) => const StoryDummyScreen(),
         '/chapter1_story2_tbd': (context) => const Chapter1Story2TbdScreen(),
         '/chapter2_story': (context) => const Chapter2StoryScreen(),
-        '/mission_low': (context) {
-          LobbyBgmController.stop();
-          return const MissionLowScreen(completedRouteName: '/chapter1_story2_tbd');
-        },
-        '/mission_ch1_q2': (context) {
-          LobbyBgmController.stop();
-          return const MissionLowScreen(
-            missionDataPath: 'assets/data/mission_chapter1_q2.json',
-            completedRouteName: '/chapter2_story',
-          );
-        },
-        '/mission_chapter2_q1': (context) {
-          LobbyBgmController.stop();
-          return const MissionLowScreen(
-            missionDataPath: 'assets/data/mission_chapter2_q1.json',
-            completedRouteName: '/home',
-          );
-        },
+        '/mission_low': (context) => const MissionLowScreen(completedRouteName: '/chapter1_story2_tbd'),
+        '/mission_ch1_q2': (context) => const MissionLowScreen(
+              missionDataPath: 'assets/data/mission_chapter1_q2.json',
+              completedRouteName: '/chapter2_story',
+            ),
+        '/mission_chapter2_q1': (context) => const MissionLowScreen(
+              missionDataPath: 'assets/data/mission_chapter2_q1.json',
+              completedRouteName: '/mission_chapter2_q2',
+            ),
+        '/mission_chapter2_q2': (context) => const Chapter2PuzzleQ2Screen(),
+        '/mission_chapter2_q3_qr': (context) => const Chapter2QrVerificationScreen(),
       },
     );
   }
@@ -142,7 +90,6 @@ class _IntroScreenState extends State<IntroScreen> {
                     height: 62,
                     child: ElevatedButton(
                       onPressed: () {
-                        LobbyBgmController.playBackground(forceRestart: true);
                         if (!mounted) return;
                         Navigator.pushReplacementNamed(context, '/home');
                       },
@@ -177,7 +124,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
   @override
   void initState() {
     super.initState();
-    LobbyBgmController.playBackground();
+    AppBgmController.playMain();
   }
 
   Future<void> _goMissionLow() async {
@@ -416,6 +363,910 @@ class _MissionCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PuzzlePiece {
+  _PuzzlePiece({
+    required this.id,
+    required this.imagePath,
+    this.currentCell,
+  });
+
+  final String id;
+  final String imagePath;
+  int? currentCell;
+}
+
+class _PlacedPiece {
+  _PlacedPiece({
+    required this.id,
+    required this.imagePath,
+    this.rotationQuarterTurns = 0,
+  });
+
+  final String id;
+  final String imagePath;
+  int rotationQuarterTurns;
+}
+
+class _DragPayload {
+  _DragPayload({
+    required this.pieceId,
+    required this.imagePath,
+    required this.fromTray,
+    this.fromCell,
+  });
+
+  final String pieceId;
+  final String imagePath;
+  final bool fromTray;
+  final int? fromCell;
+}
+
+class Chapter2PuzzleQ2Screen extends StatefulWidget {
+  const Chapter2PuzzleQ2Screen({super.key});
+
+  @override
+  State<Chapter2PuzzleQ2Screen> createState() => _Chapter2PuzzleQ2ScreenState();
+}
+
+class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
+  static const int _boardSize = 4;
+  static const int _totalCells = _boardSize * _boardSize;
+
+  // 목표 모양(원형 중앙)을 기준으로 칸별 판정 규칙.
+  // 테두리 12칸은 사각 조각, 중앙 4칸은 원호 조각 + 회전값을 검사한다.
+  static const List<int> _centerCells = [5, 6, 9, 10];
+  static const Map<int, int> _centerCellExpectedRotation = {
+    5: 0,  // 좌상
+    6: 1,  // 우상
+    9: 3,  // 좌하
+    10: 2, // 우하
+  };
+  static const Map<int, int> _centerCellTargetRotation = {
+    5: 2,
+    6: 3,
+    9: 1,
+    10: 0,
+  };
+
+  late final List<_PuzzlePiece> _pieceTemplates;
+  final List<_PlacedPiece?> _boardCells = List<_PlacedPiece?>.filled(_totalCells, null);
+  int? _selectedCell;
+
+  @override
+  void initState() {
+    super.initState();
+    AppBgmController.playProblem();
+    _pieceTemplates = List<_PuzzlePiece>.generate(
+      6,
+      (index) => _PuzzlePiece(
+        id: 'piece${index + 1}',
+        imagePath: 'assets/pieces/piece${index + 1}.png',
+      ),
+    );
+  }
+
+  // 조각을 보드 칸에 배치. 한 칸에는 1개만 허용.
+  void _placePayloadOnCell(_DragPayload payload, int targetCell) {
+    if (payload.fromTray) {
+      setState(() {
+        _boardCells[targetCell] = _PlacedPiece(
+          id: payload.pieceId,
+          imagePath: payload.imagePath,
+        );
+        _selectedCell = targetCell;
+      });
+      return;
+    }
+
+    final fromCell = payload.fromCell;
+    if (fromCell == null) return;
+    if (fromCell == targetCell) {
+      setState(() {
+        _selectedCell = targetCell;
+      });
+      return;
+    }
+
+    setState(() {
+      final moving = _boardCells[fromCell];
+      final displaced = _boardCells[targetCell];
+      _boardCells[targetCell] = moving;
+      _boardCells[fromCell] = displaced;
+      _selectedCell = targetCell;
+    });
+  }
+
+  // 보드 밖으로 드래그해서 놓았을 때 트레이로 복귀.
+  void _returnPieceToTray(int fromCell) {
+    setState(() {
+      _boardCells[fromCell] = null;
+      if (_selectedCell == fromCell) _selectedCell = null;
+    });
+  }
+
+  void _resetPuzzle() {
+    setState(() {
+      for (var i = 0; i < _totalCells; i++) {
+        _boardCells[i] = null;
+      }
+      _selectedCell = null;
+    });
+  }
+
+  void _selectCell(int cellIndex) {
+    setState(() {
+      _selectedCell = cellIndex;
+    });
+  }
+
+  void _rotateSelectedCellPiece() {
+    if (_selectedCell == null || _boardCells[_selectedCell!] == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('보드에 놓인 조각을 먼저 선택해 주세요.')),
+      );
+      return;
+    }
+
+    setState(() {
+      final piece = _boardCells[_selectedCell!]!;
+      piece.rotationQuarterTurns = (piece.rotationQuarterTurns + 1) % 4;
+    });
+  }
+
+  bool _isSquarePiece(_PlacedPiece piece) => piece.id == 'piece1';
+
+  bool _isCenterPiece(_PlacedPiece piece) => piece.id == 'piece4';
+
+  int _targetRotationForCell(int cellIndex) => _centerCellTargetRotation[cellIndex]!;
+
+  bool _hasCorrectCenterPieces() {
+    int? sharedOffset;
+
+    for (final cellIndex in _centerCells) {
+      final piece = _boardCells[cellIndex];
+      if (piece == null || !_isCenterPiece(piece)) return false;
+
+      final offset = (piece.rotationQuarterTurns - _targetRotationForCell(cellIndex)) % 4;
+      sharedOffset ??= offset;
+      if (sharedOffset != offset) return false;
+    }
+
+    return true;
+  }
+
+  bool _isCorrect() {
+    for (var i = 0; i < _totalCells; i++) {
+      final current = _boardCells[i];
+      if (current == null) return false;
+
+      // 중앙 4칸: 원호 조각 + 회전값이 목표와 일치해야 함.
+      if (_centerCells.contains(i)) continue;
+
+      // 나머지 12칸: 사각 조각이어야 함.
+      if (!_isSquarePiece(current)) return false;
+    }
+    return _hasCorrectCenterPieces();
+  }
+
+  void _handlePuzzleSolved() {
+    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, '/mission_chapter2_q3_qr');
+  }
+
+  void _checkPuzzle() {
+    final correct = _isCorrect();
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text(correct ? '성공!' : '다시 도전!'),
+        content: Text(
+          correct
+              ? '목표 모양을 정확히 만들었어요!'
+              : '아직 목표 모양과 달라요. 조각을 다시 옮겨 보세요.',
+          style: const TextStyle(height: 1.35),
+        ),
+        actions: [
+          TextButton(
+            onPressed: correct ? _handlePuzzleSolved : () => Navigator.pop(context),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPieceVisual({
+    required String pieceId,
+    required String imagePath,
+    required int rotationQuarterTurns,
+    required bool selected,
+    double size = 72,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        decoration: BoxDecoration(
+          border: selected ? Border.all(color: const Color(0xFF2F6BDD), width: 3) : null,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Transform.rotate(
+          angle: rotationQuarterTurns * (math.pi / 2),
+          child: Image.asset(
+            imagePath,
+            width: size,
+            height: size,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              width: size,
+              height: size,
+              color: const Color(0xFFFFE7EC),
+              alignment: Alignment.center,
+              child: Text(
+                pieceId.replaceFirst('piece', '조각'),
+                style: const TextStyle(
+                  color: Color(0xFFB33961),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrayPiece(_PuzzlePiece piece, {required double size}) {
+    final payload = _DragPayload(
+      pieceId: piece.id,
+      imagePath: piece.imagePath,
+      fromTray: true,
+    );
+
+    return Draggable<_DragPayload>(
+      data: payload,
+      feedback: Material(
+        color: Colors.transparent,
+        child: _buildPieceVisual(
+          pieceId: piece.id,
+          imagePath: piece.imagePath,
+          rotationQuarterTurns: 0,
+          selected: false,
+          size: size,
+        ),
+      ),
+      childWhenDragging: Opacity(
+        opacity: 0.35,
+        child: _buildPieceVisual(
+          pieceId: piece.id,
+          imagePath: piece.imagePath,
+          rotationQuarterTurns: 0,
+          selected: false,
+          size: size,
+        ),
+      ),
+      child: _buildPieceVisual(
+        pieceId: piece.id,
+        imagePath: piece.imagePath,
+        rotationQuarterTurns: 0,
+        selected: false,
+        size: size,
+      ),
+    );
+  }
+
+  Widget _buildBoardPiece({
+    required int cellIndex,
+    required _PlacedPiece piece,
+    required double size,
+  }) {
+    return Draggable<_DragPayload>(
+      data: _DragPayload(
+        pieceId: piece.id,
+        imagePath: piece.imagePath,
+        fromTray: false,
+        fromCell: cellIndex,
+      ),
+      feedback: Material(
+        color: Colors.transparent,
+        child: _buildPieceVisual(
+          pieceId: piece.id,
+          imagePath: piece.imagePath,
+          rotationQuarterTurns: piece.rotationQuarterTurns,
+          selected: false,
+          size: size,
+        ),
+      ),
+      onDragStarted: () => _selectCell(cellIndex),
+      onDraggableCanceled: (_, __) => _returnPieceToTray(cellIndex),
+      childWhenDragging: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: const Color(0x33FFFFFF),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: GestureDetector(
+        onTap: () => _selectCell(cellIndex),
+        child: _buildPieceVisual(
+          pieceId: piece.id,
+          imagePath: piece.imagePath,
+          rotationQuarterTurns: piece.rotationQuarterTurns,
+          selected: _selectedCell == cellIndex,
+          size: size,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBoard({required double boardWidth}) {
+    final cellSize = (boardWidth - 12) / _boardSize;
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF1FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF97B0E9), width: 2),
+      ),
+      child: SizedBox(
+        width: boardWidth - 12,
+        height: boardWidth - 12,
+        child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _totalCells,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: _boardSize,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+          ),
+          itemBuilder: (context, index) {
+            final piece = _boardCells[index];
+            return DragTarget<_DragPayload>(
+              onWillAcceptWithDetails: (details) => true,
+              onAcceptWithDetails: (details) => _placePayloadOnCell(details.data, index),
+              builder: (context, candidateData, rejectedData) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: candidateData.isNotEmpty ? const Color(0xFFE2F7E7) : Colors.white,
+                    border: Border.all(color: const Color(0xFF9DB4E8), width: 1.6),
+                  ),
+                  child: piece == null
+                      ? null
+                      : Center(
+                          child: _buildBoardPiece(
+                            cellIndex: index,
+                            piece: piece,
+                            size: cellSize - 6,
+                          ),
+                        ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTargetPreview({required double side}) {
+    final cellSize = (side - 12) / _boardSize;
+
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF1FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF97B0E9), width: 2),
+      ),
+      child: SizedBox(
+        width: side - 12,
+        height: side - 12,
+        child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _totalCells,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: _boardSize,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+          ),
+          itemBuilder: (context, index) {
+            final isCenter = _centerCells.contains(index);
+            final pieceId = isCenter ? 'piece4' : 'piece1';
+            final rotationQuarterTurns = isCenter ? _targetRotationForCell(index) : 0;
+
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: const Color(0xFF9DB4E8), width: 1.6),
+              ),
+              child: Center(
+                child: _buildPieceVisual(
+                  pieceId: pieceId,
+                  imagePath: 'assets/pieces/$pieceId.png',
+                  rotationQuarterTurns: rotationQuarterTurns,
+                  selected: false,
+                  size: cellSize - 6,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTargetCard({required double width}) {
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7D6),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFECC94B), width: 2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '목표 모양',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF7A5A00)),
+          ),
+          const SizedBox(height: 8),
+          _buildTargetPreview(side: width - 20),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF163988),
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: const Color(0xFFF6FAFF),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final wide = constraints.maxWidth >= 1000;
+            final trayPieceSize = wide ? 80.0 : 70.0;
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE9F2FF),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
+                    ),
+                    child: const Text(
+                      '조각 6개를 움직여서 오른쪽과 같은 모양을 만들어 보세요.',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF163988),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: wide
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(
+                                width: constraints.maxWidth * 0.24,
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        '조각 보관함',
+                                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF355AA8)),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Expanded(
+                                        child: GridView.count(
+                                          crossAxisCount: 2,
+                                          crossAxisSpacing: 10,
+                                          mainAxisSpacing: 10,
+                                          childAspectRatio: 1,
+                                          children: _pieceTemplates
+                                        .map((piece) => _buildTrayPiece(piece, size: trayPieceSize))
+                                        .toList(growable: false),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: LayoutBuilder(
+                                  builder: (context, rightConstraints) {
+                                    final targetWidth = (rightConstraints.maxWidth * 0.26).clamp(170.0, 220.0).toDouble();
+                                    final boardSide = math.min(
+                                      rightConstraints.maxHeight - 6,
+                                      rightConstraints.maxWidth - targetWidth - 14,
+                                    ).clamp(240.0, 520.0).toDouble();
+
+                                    return Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Center(
+                                            child: _buildBoard(boardWidth: boardSide),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        _buildTargetCard(width: targetWidth),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          )
+                        : SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                _buildTargetCard(width: (constraints.maxWidth * 0.50).clamp(170.0, 240.0)),
+                                const SizedBox(height: 10),
+                                _buildBoard(boardWidth: (constraints.maxWidth - 28).clamp(240.0, 520.0).toDouble()),
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        '조각 보관함',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF355AA8)),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      GridView.count(
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        crossAxisCount: 3,
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 10,
+                                        childAspectRatio: 1,
+                                        children: _pieceTemplates
+                                        .map((piece) => _buildTrayPiece(piece, size: trayPieceSize))
+                                        .toList(growable: false),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _resetPuzzle,
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(58),
+                            side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text(
+                            '다시하기',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _rotateSelectedCellPiece,
+                          icon: const Icon(Icons.rotate_right_rounded),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(58),
+                            side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          label: const Text(
+                            '돌리기',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _checkPuzzle,
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(58),
+                            backgroundColor: const Color(0xFF2F6BDD),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text(
+                            '완성 확인',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class Chapter2QrVerificationScreen extends StatefulWidget {
+  const Chapter2QrVerificationScreen({super.key});
+
+  @override
+  State<Chapter2QrVerificationScreen> createState() => _Chapter2QrVerificationScreenState();
+}
+
+class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScreen> {
+  static const String _allowedScheme = 'https';
+  static const String _allowedHost = 'www.cbnse.go.kr';
+
+  final MobileScannerController _scannerController = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    facing: CameraFacing.back,
+  );
+
+  bool _handlingDetection = false;
+  String? _lastScannedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    AppBgmController.stop();
+  }
+
+  bool _isAcceptedQrValue(String rawValue) {
+    final value = rawValue.trim();
+    if (value.isEmpty) return false;
+
+    final uri = Uri.tryParse(value);
+    if (uri == null) return false;
+
+    return uri.scheme == _allowedScheme && uri.host == _allowedHost;
+  }
+
+  Future<void> _showResultDialog({
+    required bool success,
+    required String title,
+    required String message,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text(title),
+        content: Text(message, style: const TextStyle(height: 1.35)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    } else {
+      setState(() {
+        _handlingDetection = false;
+      });
+      await _scannerController.start();
+    }
+  }
+
+  Future<void> _handleDetection(String rawValue) async {
+    if (_handlingDetection) return;
+
+    setState(() {
+      _handlingDetection = true;
+      _lastScannedValue = rawValue;
+    });
+
+    await _scannerController.stop();
+
+    if (!mounted) return;
+
+    if (_isAcceptedQrValue(rawValue)) {
+      await _showResultDialog(
+        success: true,
+        title: '미션 인증 완료!',
+        message: '수학역사실 QR 코드가 확인되었어요. 현장 방문이 인증되었습니다.',
+      );
+      return;
+    }
+
+    await _showResultDialog(
+      success: false,
+      title: '다시 스캔해 주세요',
+      message: '수학역사실 QR 코드가 아니에요. 충북수학체험센터 주소로 연결되는 QR 코드를 다시 읽어 주세요.',
+    );
+  }
+
+  @override
+  void dispose() {
+    _scannerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF163988),
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: const Color(0xFFF6FAFF),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE9F2FF),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
+                ),
+                child: const Column(
+                  children: [
+                    Text(
+                      '수학역사실 QR 인증',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF163988),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '수학역사실에 비치된 QR 코드를 스캔해 미션을 인증해 보세요.',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF163988),
+                        height: 1.25,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final scannerSide = math.min(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      ).clamp(260.0, 560.0);
+
+                      return Center(
+                        child: SizedBox(
+                          width: scannerSide,
+                          height: scannerSide,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                MobileScanner(
+                                  controller: _scannerController,
+                                  onDetect: (capture) {
+                                    final rawValue = capture.barcodes
+                                        .map((barcode) => barcode.rawValue?.trim() ?? '')
+                                        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                    if (rawValue.isEmpty) return;
+                                    _handleDetection(rawValue);
+                                  },
+                                ),
+                                IgnorePointer(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: const Color(0x99FFFFFF), width: 3),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                ),
+                child: Text(
+                  _lastScannedValue == null
+                      ? '충북수학체험센터 QR 코드를 비추면 자동으로 인증 여부를 확인합니다.'
+                      : '최근 스캔 결과: $_lastScannedValue',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF29427A),
+                    height: 1.3,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

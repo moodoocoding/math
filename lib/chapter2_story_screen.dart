@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'bgm_controller.dart';
 
 class Chapter2StoryScreen extends StatefulWidget {
   const Chapter2StoryScreen({super.key});
@@ -13,35 +14,41 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
       speaker: '하우',
-      line: '첫 번째 조각을 찾았어!',
+      line: '첫 번째 반짝 조각을 찾았어!',
       characterAsset: 'assets/images/chr_together.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '다음은 수학체험센터야!',
+      line: '조각에 다음 장소가 적혀 있어. 수학놀이실이야!',
       characterAsset: 'assets/images/chr_howplay.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '와! 여기가 수학체험센터구나!',
+      line: '와! 여기가 수학놀이실이구나!',
       characterAsset: 'assets/images/chr_how_surprised.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '저기 반짝이는 체험판이 보여!',
+      line: '두 번째 반짝 조각은 여기 숨겨져 있대!',
       characterAsset: 'assets/images/chr_play_lefthand.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '이번 문제는 뭘까?',
+      line: '어? 저기 저울 놀이가 보여!',
       characterAsset: 'assets/images/chr_how_lefttalk.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '같이 도전해 보자!',
+      line: '첫 번째 놀이 미션을 풀면 조각에 가까워질 수 있어!',
       characterAsset: 'assets/images/chr_play_left.png',
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    AppBgmController.playStory();
+  }
 
   @override
   void didChangeDependencies() {
@@ -63,9 +70,14 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
   Widget build(BuildContext context) {
     final scene = _scenes[_sceneIndex];
     final isLast = _sceneIndex == _scenes.length - 1;
-    final width = MediaQuery.of(context).size.width;
-    final charHeight = width < 1100 ? width * 0.46 : 460.0;
-    final sceneCharHeight = _sceneIndex == 0 ? charHeight * 1.22 : charHeight;
+    final media = MediaQuery.of(context);
+    final width = media.size.width;
+    final availableHeight = media.size.height - media.padding.top - kToolbarHeight;
+    final desiredCharacterHeight = _sceneIndex == 0 ? width * 0.40 : width * 0.34;
+    final maxCharacterHeight = availableHeight * 0.46;
+    final sceneCharHeight = desiredCharacterHeight.clamp(220.0, maxCharacterHeight).toDouble();
+    final dialogFontSize = width < 1100 ? 30.0 : 34.0;
+    final buttonBottomPadding = (media.padding.bottom > 0 ? media.padding.bottom : 12.0) + 10.0;
     final backgroundAsset = _sceneIndex <= 1 ? 'assets/images/chapter1_bg_1.png' : 'assets/images/chapter2_bg_1.png';
 
     return Scaffold(
@@ -159,7 +171,7 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
-                              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                              style: TextStyle(fontSize: dialogFontSize, fontWeight: FontWeight.w800, color: const Color(0xFF1E1E1E), height: 1.25),
                             ),
                           ],
                         ),
@@ -169,7 +181,7 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                 ),
                 const SizedBox(height: 12),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                  padding: EdgeInsets.fromLTRB(18, 0, 18, buttonBottomPadding),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
