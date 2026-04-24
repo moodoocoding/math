@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
 class StoryDummyScreen extends StatefulWidget {
@@ -90,6 +91,7 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         actions: [
+          const BgmToggleButton(iconSize: 34),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 38),
             onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 import 'mission_low.dart';
 import 'story_dummy_screen.dart';
@@ -227,7 +228,10 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFFBAC5E8), width: 2)),
-                      child: const Icon(Icons.volume_up_outlined, color: Color(0xFF6377BE), size: 24),
+                      child: const BgmToggleButton(
+                        iconSize: 24,
+                        color: Color(0xFF6377BE),
+                      ),
                     ),
                   ],
                 ),
@@ -836,6 +840,13 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         centerTitle: true,
+        actions: [
+          const BgmToggleButton(iconSize: 36),
+          IconButton(
+            icon: const Icon(Icons.home_rounded, size: 38),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+          ),
+        ],
       ),
       backgroundColor: const Color(0xFFF6FAFF),
       body: SafeArea(

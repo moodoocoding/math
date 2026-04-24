@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
 final Random _random = Random();
@@ -150,6 +151,9 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
           ),
           centerTitle: true,
+          actions: const [
+            BgmToggleButton(iconSize: 40),
+          ],
         ),
         body: Center(
           child: Padding(
@@ -205,6 +209,7 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         actions: [
+          const BgmToggleButton(iconSize: 40),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 44),
             onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
