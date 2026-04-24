@@ -80,10 +80,13 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
   }
 
   Future<void> loadMissionData() async {
+    if (!mounted) return;
+    final assetBundle = DefaultAssetBundle.of(context);
     try {
-      final jsonString = await DefaultAssetBundle.of(context).loadString(widget.missionDataPath);
+      final jsonString = await assetBundle.loadString(widget.missionDataPath);
       final data = json.decode(jsonString) as Map<String, dynamic>;
 
+      if (!mounted) return;
       setState(() {
         steps = data['steps'] as List<dynamic>;
         _loadError = null;
@@ -97,8 +100,9 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
 
     if (widget.missionDataPath == 'assets/data/mission_chapter1_q2_hanoi.json') {
       try {
-        final fallbackJson = await DefaultAssetBundle.of(context).loadString('assets/data/mission_chapter1_q2.json');
+        final fallbackJson = await assetBundle.loadString('assets/data/mission_chapter1_q2.json');
         final data = json.decode(fallbackJson) as Map<String, dynamic>;
+        if (!mounted) return;
         setState(() {
           steps = data['steps'] as List<dynamic>;
           _loadError = null;
@@ -286,6 +290,13 @@ class _QuizScreenState extends State<QuizScreen> {
   int? selectedChoiceIndex;
   String inputAnswer = '';
   int _simulationIndex = 0;
+  int? _selectedHanoiPeg;
+  int _hanoiMoveCount = 0;
+  List<List<int>> _hanoiPegs = [
+    [3, 2, 1],
+    [],
+    [],
+  ];
   final TextEditingController _inputController = TextEditingController();
 
   @override
@@ -295,6 +306,7 @@ class _QuizScreenState extends State<QuizScreen> {
       selectedChoiceIndex = null;
       inputAnswer = '';
       _simulationIndex = 0;
+      _resetHanoi();
       _inputController.clear();
     }
   }
@@ -308,6 +320,54 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _isAnswerReady(String quizType) {
     if (quizType == 'mcq') return selectedChoiceIndex != null;
     return inputAnswer.trim().isNotEmpty;
+  }
+
+  void _resetHanoi() {
+    _selectedHanoiPeg = null;
+    _hanoiMoveCount = 0;
+    _hanoiPegs = [
+      [3, 2, 1],
+      [],
+      [],
+    ];
+  }
+
+  void _handleHanoiPegTap(int pegIndex) {
+    final selectedPeg = _selectedHanoiPeg;
+
+    if (selectedPeg == null) {
+      if (_hanoiPegs[pegIndex].isEmpty) return;
+      setState(() {
+        _selectedHanoiPeg = pegIndex;
+      });
+      return;
+    }
+
+    if (selectedPeg == pegIndex) {
+      setState(() {
+        _selectedHanoiPeg = null;
+      });
+      return;
+    }
+
+    final movingDisk = _hanoiPegs[selectedPeg].last;
+    final targetTopDisk = _hanoiPegs[pegIndex].isEmpty ? null : _hanoiPegs[pegIndex].last;
+    if (targetTopDisk != null && targetTopDisk < movingDisk) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('큰 원반은 작은 원반 위에 올릴 수 없어요.')),
+      );
+      setState(() {
+        _selectedHanoiPeg = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _hanoiPegs[selectedPeg].removeLast();
+      _hanoiPegs[pegIndex].add(movingDisk);
+      _selectedHanoiPeg = null;
+      _hanoiMoveCount++;
+    });
   }
 
   void _showHint(String? hint) {
@@ -532,6 +592,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final optionShapeSize = isCompact ? 40.0 : 50.0;
     final actionFontSize = isCompact ? 28.0 : 38.0;
     final hanoiHeight = isCompact ? 220.0 : 280.0;
+    final floorPreviewHeight = isCompact ? 86.0 : 118.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
@@ -569,7 +630,20 @@ class _QuizScreenState extends State<QuizScreen> {
             _buildSimulationArea((step['simulation_images'] as List<dynamic>).cast<String>()),
           if (showHanoiVisual) ...[
             const SizedBox(height: 14),
-            _HanoiVisualPanel(height: hanoiHeight),
+            _InteractiveHanoiVisualPanel(
+              height: hanoiHeight,
+              pegs: _hanoiPegs,
+              selectedPeg: _selectedHanoiPeg,
+              moveCount: _hanoiMoveCount,
+              onPegTap: _handleHanoiPegTap,
+              onReset: () {
+                setState(_resetHanoi);
+              },
+            ),
+          ],
+          if (renderChoicesAsShapes) ...[
+            const SizedBox(height: 12),
+            _TessellationFloorPreview(height: floorPreviewHeight),
           ],
           const SizedBox(height: 14),
           if (quizType == 'mcq')
@@ -761,6 +835,286 @@ class _ShapeOptionSymbol extends StatelessWidget {
   }
 }
 
+class _TessellationFloorPreview extends StatelessWidget {
+  const _TessellationFloorPreview({required this.height});
+
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(
+        painter: _TessellationFloorPainter(),
+      ),
+    );
+  }
+}
+
+class _TessellationFloorPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final wallPaint = Paint()..color = const Color(0xFFEAF1FF);
+    final floorPaint = Paint()..color = const Color(0xFFFFF7D8);
+    final tilePaintA = Paint()..color = const Color(0xFFFFD65A);
+    final tilePaintB = Paint()..color = const Color(0xFFFFE78F);
+    final gridPaint = Paint()
+      ..color = const Color(0xFF9D7A20)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+    final borderPaint = Paint()
+      ..color = const Color(0xFF163988)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(10)),
+      wallPaint,
+    );
+
+    final horizon = size.height * 0.18;
+    final floor = Path()
+      ..moveTo(size.width * 0.06, horizon)
+      ..lineTo(size.width * 0.94, horizon)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(floor, floorPaint);
+
+    final rows = 4;
+    final columns = 14;
+    for (var row = 0; row < rows; row++) {
+      final topT = row / rows;
+      final bottomT = (row + 1) / rows;
+      final topY = _floorY(horizon, size.height, topT);
+      final bottomY = _floorY(horizon, size.height, bottomT);
+      final topLeft = _floorLeft(size.width, topT);
+      final topRight = _floorRight(size.width, topT);
+      final bottomLeft = _floorLeft(size.width, bottomT);
+      final bottomRight = _floorRight(size.width, bottomT);
+
+      for (var col = 0; col < columns; col++) {
+        final leftT = col / columns;
+        final rightT = (col + 1) / columns;
+        final tile = Path()
+          ..moveTo(_lerp(topLeft, topRight, leftT), topY)
+          ..lineTo(_lerp(topLeft, topRight, rightT), topY)
+          ..lineTo(_lerp(bottomLeft, bottomRight, rightT), bottomY)
+          ..lineTo(_lerp(bottomLeft, bottomRight, leftT), bottomY)
+          ..close();
+        canvas.drawPath(tile, (row + col).isEven ? tilePaintA : tilePaintB);
+        canvas.drawPath(tile, gridPaint);
+      }
+    }
+
+    canvas.drawPath(floor, borderPaint);
+  }
+
+  double _floorY(double horizon, double bottom, double t) {
+    return horizon + (bottom - horizon) * t;
+  }
+
+  double _floorLeft(double width, double t) {
+    return _lerp(width * 0.06, 0, t);
+  }
+
+  double _floorRight(double width, double t) {
+    return _lerp(width * 0.94, width, t);
+  }
+
+  double _lerp(double a, double b, double t) {
+    return a + (b - a) * t;
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _InteractiveHanoiVisualPanel extends StatelessWidget {
+  const _InteractiveHanoiVisualPanel({
+    required this.height,
+    required this.pegs,
+    required this.selectedPeg,
+    required this.moveCount,
+    required this.onPegTap,
+    required this.onReset,
+  });
+
+  final double height;
+  final List<List<int>> pegs;
+  final int? selectedPeg;
+  final int moveCount;
+  final ValueChanged<int> onPegTap;
+  final VoidCallback onReset;
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 1100 || height < 180;
+
+    return Container(
+      width: double.infinity,
+      height: height,
+      padding: EdgeInsets.all(isCompact ? 10 : 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFF),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '하노이의 탑 (원반 3개)  이동 $moveCount회',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: isCompact ? 16 : 22,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF163988),
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: '초기화',
+                onPressed: onReset,
+                icon: const Icon(Icons.refresh_rounded, color: Color(0xFF163988)),
+              ),
+            ],
+          ),
+          SizedBox(height: isCompact ? 4 : 8),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Stack(
+                  children: [
+                    CustomPaint(
+                      painter: _HanoiBasePainter(selectedPeg: selectedPeg),
+                      child: const SizedBox.expand(),
+                    ),
+                    ..._buildDisks(constraints.biggest),
+                    Row(
+                      children: List.generate(3, (index) {
+                        return Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => onPegTap(index),
+                            child: const SizedBox.expand(),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildDisks(Size size) {
+    final baseTop = size.height * 0.86;
+    final diskHeight = (size.height * 0.12).clamp(16.0, 30.0).toDouble();
+    final pegWidth = size.width / 3;
+    final diskColors = const {
+      1: Color(0xFFA7D0FF),
+      2: Color(0xFF78B7FF),
+      3: Color(0xFF4A9BFF),
+    };
+
+    final widgets = <Widget>[];
+    for (var pegIndex = 0; pegIndex < pegs.length; pegIndex++) {
+      final peg = pegs[pegIndex];
+      final pegCenter = pegWidth * pegIndex + pegWidth / 2;
+      for (var level = 0; level < peg.length; level++) {
+        final disk = peg[level];
+        final isSelectedTop = selectedPeg == pegIndex && level == peg.length - 1;
+        final diskWidth = pegWidth * (0.28 + disk * 0.16);
+        final top = baseTop - diskHeight * (level + 1) - (isSelectedTop ? diskHeight * 0.75 : 0);
+        widgets.add(
+          AnimatedPositioned(
+            key: ValueKey('hanoi-$disk'),
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            left: pegCenter - diskWidth / 2,
+            top: top,
+            width: diskWidth,
+            height: diskHeight * 0.8,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: diskColors[disk],
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: isSelectedTop ? const Color(0xFFF0B126) : const Color(0xFF2467B6),
+                  width: isSelectedTop ? 3 : 2,
+                ),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x22000000), blurRadius: 4, offset: Offset(0, 2)),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+    }
+    return widgets;
+  }
+}
+
+class _HanoiBasePainter extends CustomPainter {
+  const _HanoiBasePainter({required this.selectedPeg});
+
+  final int? selectedPeg;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final groundPaint = Paint()..color = const Color(0xFF2E4E9D);
+    final rodPaint = Paint()..color = const Color(0xFF8B6B3D);
+    final highlightPaint = Paint()..color = const Color(0x2AF0B126);
+
+    final baseTop = size.height * 0.86;
+    final pegWidth = size.width / 3;
+
+    if (selectedPeg != null) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(pegWidth * selectedPeg!, 0, pegWidth, size.height),
+          const Radius.circular(12),
+        ),
+        highlightPaint,
+      );
+    }
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width * 0.02, baseTop, size.width * 0.96, size.height * 0.08),
+        const Radius.circular(8),
+      ),
+      groundPaint,
+    );
+
+    final rodX = [pegWidth * 0.5, pegWidth * 1.5, pegWidth * 2.5];
+    for (final x in rodX) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(x - 5, size.height * 0.18, 10, baseTop - size.height * 0.18),
+          const Radius.circular(6),
+        ),
+        rodPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _HanoiBasePainter oldDelegate) {
+    return oldDelegate.selectedPeg != selectedPeg;
+  }
+}
+
+// ignore: unused_element
 class _HanoiVisualPanel extends StatelessWidget {
   const _HanoiVisualPanel({required this.height});
 
@@ -802,6 +1156,7 @@ class _HanoiVisualPanel extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _HanoiTowerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

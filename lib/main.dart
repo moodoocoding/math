@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'bgm_controller.dart';
 import 'mission_low.dart';
@@ -40,6 +41,7 @@ class MissionTourApp extends StatelessWidget {
               completedRouteName: '/mission_chapter2_q2',
             ),
         '/mission_chapter2_q2': (context) => const Chapter2PuzzleQ2Screen(),
+        '/mission_chapter2_q3_qr': (context) => const Chapter2QrVerificationScreen(),
       },
     );
   }
@@ -195,7 +197,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 8, offset: Offset(0, 2))],
                       ),
@@ -352,7 +354,7 @@ class _MissionCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: isUltraWide ? 18 : (isWide ? 12 : 10), vertical: isUltraWide ? 8 : (isWide ? 5 : 4)),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.72),
+                color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
@@ -371,24 +373,21 @@ class _PuzzlePiece {
   _PuzzlePiece({
     required this.id,
     required this.imagePath,
-    this.currentCell,
   });
 
   final String id;
   final String imagePath;
-  int? currentCell;
 }
 
 class _PlacedPiece {
   _PlacedPiece({
     required this.id,
     required this.imagePath,
-    this.rotationQuarterTurns = 0,
   });
 
   final String id;
   final String imagePath;
-  int rotationQuarterTurns;
+  int rotationQuarterTurns = 0;
 }
 
 class _DragPayload {
@@ -419,13 +418,19 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   // 목표 모양(원형 중앙)을 기준으로 칸별 판정 규칙.
   // 테두리 12칸은 사각 조각, 중앙 4칸은 원호 조각 + 회전값을 검사한다.
   static const List<int> _centerCells = [5, 6, 9, 10];
+  // ignore: unused_field
   static const Map<int, int> _centerCellExpectedRotation = {
     5: 0,  // 좌상
     6: 1,  // 우상
     9: 3,  // 좌하
     10: 2, // 우하
   };
-  static const Set<String> _curvePieceIds = {'piece4', 'piece5', 'piece6'};
+  static const Map<int, int> _centerCellTargetRotation = {
+    5: 2,
+    6: 3,
+    9: 1,
+    10: 0,
+  };
 
   late final List<_PuzzlePiece> _pieceTemplates;
   final List<_PlacedPiece?> _boardCells = List<_PlacedPiece?>.filled(_totalCells, null);
@@ -514,7 +519,24 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
 
   bool _isSquarePiece(_PlacedPiece piece) => piece.id == 'piece1';
 
-  bool _isCurvePiece(_PlacedPiece piece) => _curvePieceIds.contains(piece.id);
+  bool _isCenterPiece(_PlacedPiece piece) => piece.id == 'piece4';
+
+  int _targetRotationForCell(int cellIndex) => _centerCellTargetRotation[cellIndex]!;
+
+  bool _hasCorrectCenterPieces() {
+    int? sharedOffset;
+
+    for (final cellIndex in _centerCells) {
+      final piece = _boardCells[cellIndex];
+      if (piece == null || !_isCenterPiece(piece)) return false;
+
+      final offset = (piece.rotationQuarterTurns - _targetRotationForCell(cellIndex)) % 4;
+      sharedOffset ??= offset;
+      if (sharedOffset != offset) return false;
+    }
+
+    return true;
+  }
 
   bool _isCorrect() {
     for (var i = 0; i < _totalCells; i++) {
@@ -522,16 +544,17 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
       if (current == null) return false;
 
       // 중앙 4칸: 원호 조각 + 회전값이 목표와 일치해야 함.
-      if (_centerCells.contains(i)) {
-        if (!_isCurvePiece(current)) return false;
-        if (current.rotationQuarterTurns != _centerCellExpectedRotation[i]) return false;
-        continue;
-      }
+      if (_centerCells.contains(i)) continue;
 
       // 나머지 12칸: 사각 조각이어야 함.
       if (!_isSquarePiece(current)) return false;
     }
-    return true;
+    return _hasCorrectCenterPieces();
+  }
+
+  void _handlePuzzleSolved() {
+    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, '/mission_chapter2_q3_qr');
   }
 
   void _checkPuzzle() {
@@ -549,7 +572,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: correct ? _handlePuzzleSolved : () => Navigator.pop(context),
             child: const Text('확인'),
           ),
         ],
@@ -659,7 +682,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         ),
       ),
       onDragStarted: () => _selectCell(cellIndex),
-      onDraggableCanceled: (_, __) => _returnPieceToTray(cellIndex),
+      onDraggableCanceled: (velocity, offset) => _returnPieceToTray(cellIndex),
       childWhenDragging: Container(
         width: size,
         height: size,
@@ -730,6 +753,53 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
     );
   }
 
+  Widget _buildTargetPreview({required double side}) {
+    final cellSize = (side - 12) / _boardSize;
+
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF1FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF97B0E9), width: 2),
+      ),
+      child: SizedBox(
+        width: side - 12,
+        height: side - 12,
+        child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _totalCells,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: _boardSize,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+          ),
+          itemBuilder: (context, index) {
+            final isCenter = _centerCells.contains(index);
+            final pieceId = isCenter ? 'piece4' : 'piece1';
+            final rotationQuarterTurns = isCenter ? _targetRotationForCell(index) : 0;
+
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: const Color(0xFF9DB4E8), width: 1.6),
+              ),
+              child: Center(
+                child: _buildPieceVisual(
+                  pieceId: pieceId,
+                  imagePath: 'assets/pieces/$pieceId.png',
+                  rotationQuarterTurns: rotationQuarterTurns,
+                  selected: false,
+                  size: cellSize - 6,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildTargetCard({required double width}) {
     return Container(
       width: width,
@@ -747,25 +817,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF7A5A00)),
           ),
           const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              'assets/pieces/target.png',
-              width: width - 20,
-              height: width - 20,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                width: width - 20,
-                height: width - 20,
-                color: const Color(0xFFF7E7A2),
-                alignment: Alignment.center,
-                child: const Text(
-                  'target.png',
-                  style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF7A5A00)),
-                ),
-              ),
-            ),
-          ),
+          _buildTargetPreview(side: width - 20),
         ],
       ),
     );
@@ -780,8 +832,8 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         surfaceTintColor: Colors.white,
         elevation: 0,
         title: const Text(
-          '수학놀이실 문제 2',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         centerTitle: true,
       ),
@@ -975,6 +1027,344 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class Chapter2QrVerificationScreen extends StatefulWidget {
+  const Chapter2QrVerificationScreen({super.key});
+
+  @override
+  State<Chapter2QrVerificationScreen> createState() => _Chapter2QrVerificationScreenState();
+}
+
+class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScreen>
+    with WidgetsBindingObserver {
+  static const String _allowedScheme = 'https';
+  static const String _allowedHost = 'www.cbnse.go.kr';
+
+  final MobileScannerController _scannerController = MobileScannerController(
+    autoStart: false,
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    facing: CameraFacing.back,
+  );
+
+  bool _handlingDetection = false;
+  bool _isStartingScanner = false;
+  String? _lastScannedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    AppBgmController.stop();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startScanner();
+    });
+  }
+
+  Future<void> _startScanner() async {
+    if (!mounted || _isStartingScanner) return;
+    if (_scannerController.value.isRunning) return;
+
+    _isStartingScanner = true;
+    try {
+      await _scannerController.start();
+    } on MobileScannerException {
+      if (!mounted) return;
+      setState(() {});
+    } finally {
+      _isStartingScanner = false;
+    }
+  }
+
+  Future<void> _stopScanner() async {
+    if (!mounted) return;
+    if (!_scannerController.value.isRunning) return;
+    try {
+      await _scannerController.stop();
+    } on MobileScannerException {
+      // Ignore stop failures during lifecycle transitions.
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted || _handlingDetection) return;
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _startScanner();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        _stopScanner();
+        break;
+    }
+  }
+
+  bool _isAcceptedQrValue(String rawValue) {
+    final value = rawValue.trim();
+    if (value.isEmpty) return false;
+
+    final uri = Uri.tryParse(value);
+    if (uri == null) return false;
+
+    return uri.scheme == _allowedScheme && uri.host == _allowedHost;
+  }
+
+  Future<void> _showResultDialog({
+    required bool success,
+    required String title,
+    required String message,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text(title),
+        content: Text(message, style: const TextStyle(height: 1.35)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    } else {
+      setState(() {
+        _handlingDetection = false;
+      });
+      await _startScanner();
+    }
+  }
+
+  Future<void> _handleDetection(String rawValue) async {
+    if (_handlingDetection) return;
+
+    setState(() {
+      _handlingDetection = true;
+      _lastScannedValue = rawValue;
+    });
+
+    await _scannerController.stop();
+
+    if (!mounted) return;
+
+    if (_isAcceptedQrValue(rawValue)) {
+      await _showResultDialog(
+        success: true,
+        title: '미션 인증 완료!',
+        message: '수학역사실 QR 코드가 확인되었어요. 현장 방문이 인증되었습니다.',
+      );
+      return;
+    }
+
+    await _showResultDialog(
+      success: false,
+      title: '다시 스캔해 주세요',
+      message: '수학역사실 QR 코드가 아니에요. 충북수학체험센터 주소로 연결되는 QR 코드를 다시 읽어 주세요.',
+    );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _scannerController.dispose();
+    super.dispose();
+  }
+
+  String _errorTextFor(MobileScannerException error) {
+    switch (error.errorCode) {
+      case MobileScannerErrorCode.permissionDenied:
+        return '카메라 권한이 꺼져 있어요. 설정에서 카메라 권한을 허용한 뒤 다시 시도해 주세요.';
+      case MobileScannerErrorCode.unsupported:
+        return '현재 실행 환경에서는 카메라 스캔이 지원되지 않아요. Android/iOS 기기에서 실행해 주세요.';
+      default:
+        return '카메라를 시작하지 못했어요. 권한 확인 후 다시 시도해 주세요.';
+    }
+  }
+
+  Widget _buildScannerError(MobileScannerException error) {
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white, size: 36),
+              const SizedBox(height: 12),
+              Text(
+                _errorTextFor(error),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  height: 1.35,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 14),
+              ElevatedButton(
+                onPressed: _startScanner,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2F6BDD),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('다시 시도'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF163988),
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: const Color(0xFFF6FAFF),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE9F2FF),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
+                ),
+                child: const Column(
+                  children: [
+                    Text(
+                      '수학역사실 QR 인증',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF163988),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '수학역사실에 비치된 QR 코드를 스캔해 미션을 인증해 보세요.',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF163988),
+                        height: 1.25,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final scannerSide = math.min(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      ).clamp(260.0, 560.0);
+
+                      return Center(
+                        child: SizedBox(
+                          width: scannerSide,
+                          height: scannerSide,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                MobileScanner(
+                                  controller: _scannerController,
+                                  errorBuilder: (context, error, child) {
+                                    return _buildScannerError(error);
+                                  },
+                                  onDetect: (capture) {
+                                    final rawValue = capture.barcodes
+                                        .map((barcode) => barcode.rawValue?.trim() ?? '')
+                                        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                    if (rawValue.isEmpty) return;
+                                    _handleDetection(rawValue);
+                                  },
+                                ),
+                                IgnorePointer(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: const Color(0x99FFFFFF), width: 3),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                ),
+                child: Text(
+                  _lastScannedValue == null
+                      ? '충북수학체험센터 QR 코드를 비추면 자동으로 인증 여부를 확인합니다.'
+                      : '최근 스캔 결과: $_lastScannedValue',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF29427A),
+                    height: 1.3,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
