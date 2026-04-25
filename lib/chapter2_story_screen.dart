@@ -15,33 +15,28 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
       speaker: '하우',
-      line: '첫 번째 반짝 조각을 찾았어!',
+      line: '첫 번째 별 조각을 찾았어! 다음 조각을 찾으러 서둘러 가자!',
       characterAsset: 'assets/images/chr_together.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '조각에 다음 장소가 적혀 있어. 수학놀이실이야!',
-      characterAsset: 'assets/images/chr_howplay.png',
+      line: '어? 체험센터 불빛이 또 하나 꺼졌어! 더 늦기 전에 두 번째 별 조각을 찾아야 해!',
+      characterAsset: 'assets/images/chr_play_worry.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '와! 여기가 수학놀이실이구나!',
-      characterAsset: 'assets/images/chr_how_surprised.png',
-    ),
-    _Chapter2Scene(
-      speaker: '플레이',
-      line: '두 번째 반짝 조각은 여기 숨겨져 있대!',
-      characterAsset: 'assets/images/chr_play_lefthand.png',
-    ),
-    _Chapter2Scene(
-      speaker: '하우',
-      line: '어? 저기 저울 놀이가 보여!',
+      line: '첫 번째 조각 뒤에 다음 단서가 있어! 두 번째 별 조각은 수학놀이실에 있대!',
       characterAsset: 'assets/images/chr_how_lefttalk.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '첫 번째 놀이 미션을 풀면 조각에 가까워질 수 있어!',
-      characterAsset: 'assets/images/chr_play_left.png',
+      line: '와! 여기가 수학놀이실이구나! 그런데 저기 반짝이는 저울이 보여!',
+      characterAsset: 'assets/images/chr_play_surprised.png',
+    ),
+    _Chapter2Scene(
+      speaker: '하우',
+      line: '찾았다! 그런데 저울 아래 서랍이 꼭 닫혀 있어! 더 무거운 쪽을 맞혀야 열 수 있대!',
+      characterAsset: 'assets/images/chr_how_thinking.png',
     ),
   ];
 
@@ -77,9 +72,9 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
     final desiredCharacterHeight = _sceneIndex == 0 ? width * 0.40 : width * 0.34;
     final maxCharacterHeight = availableHeight * 0.46;
     final sceneCharHeight = desiredCharacterHeight.clamp(220.0, maxCharacterHeight).toDouble();
-    final dialogFontSize = width < 1100 ? 30.0 : 34.0;
+    final dialogFontSize = width < 1100 ? 26.0 : 28.0;
     final buttonBottomPadding = (media.padding.bottom > 0 ? media.padding.bottom : 12.0) + 10.0;
-    final backgroundAsset = _sceneIndex <= 1 ? 'assets/images/chapter1_bg_1.png' : 'assets/images/chapter2_bg_1.png';
+    final backgroundAsset = _sceneIndex <= 2 ? 'assets/images/chapter1_bg_1.png' : 'assets/images/chapter2_bg_1.png';
 
     return Scaffold(
       appBar: AppBar(
@@ -93,7 +88,7 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
         ),
         centerTitle: true,
         title: const Text(
-          '미션! 수학체험센터를 찾아라!',
+          '미션! 수학체험센터의 반짝별을 찾아서',
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         actions: [
@@ -191,12 +186,12 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF133E97),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '홈으로' : '다음',
-                        style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
+                        isLast ? '문제 풀이 시작' : '다음',
+                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
                       ),
                     ),
                   ),

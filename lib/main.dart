@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,6 +10,11 @@ import 'mission_low.dart';
 import 'story_dummy_screen.dart';
 import 'chapter1_story2_tbd_screen.dart';
 import 'chapter2_story_screen.dart';
+import 'chapter2_story2_screen.dart';
+import 'chapter2_story3_screen.dart';
+import 'chapter3_story_screen.dart';
+import 'chapter3_story2_screen.dart';
+import 'chapter3_story3_screen.dart';
 
 void main() {
   runApp(const MissionTourApp());
@@ -32,6 +38,11 @@ class MissionTourApp extends StatelessWidget {
         '/story_low_dummy': (context) => const StoryDummyScreen(),
         '/chapter1_story2_tbd': (context) => const Chapter1Story2TbdScreen(),
         '/chapter2_story': (context) => const Chapter2StoryScreen(),
+        '/chapter2_story2': (context) => const Chapter2Story2Screen(),
+        '/chapter2_story3': (context) => const Chapter2Story3Screen(),
+        '/chapter3_story': (context) => const Chapter3StoryScreen(),
+        '/chapter3_story2': (context) => const Chapter3Story2Screen(),
+        '/chapter3_story3': (context) => const Chapter3Story3Screen(),
         '/mission_low': (context) => const MissionLowScreen(completedRouteName: '/chapter1_story2_tbd'),
         '/mission_ch1_q2': (context) => const MissionLowScreen(
               missionDataPath: 'assets/data/mission_chapter1_q2.json',
@@ -39,10 +50,18 @@ class MissionTourApp extends StatelessWidget {
             ),
         '/mission_chapter2_q1': (context) => const MissionLowScreen(
               missionDataPath: 'assets/data/mission_chapter2_q1.json',
-              completedRouteName: '/mission_chapter2_q2',
+              completedRouteName: '/chapter2_story2',
             ),
         '/mission_chapter2_q2': (context) => const Chapter2PuzzleQ2Screen(),
         '/mission_chapter2_q3_qr': (context) => const Chapter2QrVerificationScreen(),
+        '/mission_chapter3_q1': (context) => const MissionLowScreen(
+              missionDataPath: 'assets/data/mission_chapter3_q1.json',
+              completedRouteName: '/chapter3_story2',
+            ),
+        '/mission_chapter3_q2': (context) => const MissionLowScreen(
+              missionDataPath: 'assets/data/mission_chapter3_q2.json',
+              completedRouteName: '/chapter3_story3',
+            ),
       },
     );
   }
@@ -558,7 +577,11 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
 
   void _handlePuzzleSolved() {
     Navigator.pop(context);
-    Navigator.pushReplacementNamed(context, '/mission_chapter2_q3_qr');
+    Navigator.pushReplacementNamed(context, '/chapter2_story3');
+  }
+
+  void _skipPuzzleForTest() {
+    Navigator.pushReplacementNamed(context, '/chapter2_story3');
   }
 
   void _checkPuzzle() {
@@ -853,7 +876,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= 1000;
-            final trayPieceSize = wide ? 80.0 : 70.0;
+            final trayPieceSize = wide ? 68.0 : 62.0;
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
@@ -868,7 +891,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                       border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
                     ),
                     child: const Text(
-                      '조각 6개를 움직여서 오른쪽과 같은 모양을 만들어 보세요.',
+                      '문제2: 조각 6개를 움직여 목표 무늬를 완성하세요.',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -878,76 +901,85 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _buildPuzzleStepChip(stepNo: '1', label: '조각 놓기'),
+                      _buildPuzzleStepChip(stepNo: '2', label: '필요하면 돌리기'),
+                      _buildPuzzleStepChip(stepNo: '3', label: '완성 확인'),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
                   Expanded(
                     child: wide
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              SizedBox(
-                                width: constraints.maxWidth * 0.24,
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        '조각 보관함',
-                                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF355AA8)),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Expanded(
-                                        child: GridView.count(
-                                          crossAxisCount: 2,
-                                          crossAxisSpacing: 10,
-                                          mainAxisSpacing: 10,
-                                          childAspectRatio: 1,
-                                          children: _pieceTemplates
-                                        .map((piece) => _buildTrayPiece(piece, size: trayPieceSize))
-                                        .toList(growable: false),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: LayoutBuilder(
-                                  builder: (context, rightConstraints) {
-                                    final targetWidth = (rightConstraints.maxWidth * 0.26).clamp(170.0, 220.0).toDouble();
-                                    final boardSide = math.min(
-                                      rightConstraints.maxHeight - 6,
-                                      rightConstraints.maxWidth - targetWidth - 14,
-                                    ).clamp(240.0, 520.0).toDouble();
+                        ? LayoutBuilder(
+                            builder: (context, rightConstraints) {
+                              final sidePanelWidth = (rightConstraints.maxWidth * 0.28).clamp(220.0, 300.0).toDouble();
+                              final boardSide = math.min(
+                                rightConstraints.maxHeight - 6,
+                                rightConstraints.maxWidth - sidePanelWidth - 14,
+                              ).clamp(260.0, 560.0).toDouble();
 
-                                    return Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Center(
+                                      child: _buildBoard(boardWidth: boardSide),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  SizedBox(
+                                    width: sidePanelWidth,
+                                    child: Column(
                                       children: [
+                                        _buildTargetCard(width: sidePanelWidth),
+                                        const SizedBox(height: 10),
                                         Expanded(
-                                          child: Center(
-                                            child: _buildBoard(boardWidth: boardSide),
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(14),
+                                              border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  '조각 보관함',
+                                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF355AA8)),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Expanded(
+                                                  child: GridView.count(
+                                                    crossAxisCount: 2,
+                                                    crossAxisSpacing: 8,
+                                                    mainAxisSpacing: 8,
+                                                    childAspectRatio: 1,
+                                                    children: _pieceTemplates.map((piece) => _buildTrayPiece(piece, size: trayPieceSize)).toList(growable: false),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
-                                        _buildTargetCard(width: targetWidth),
                                       ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           )
                         : SingleChildScrollView(
                             child: Column(
                               children: [
-                                _buildTargetCard(width: (constraints.maxWidth * 0.50).clamp(170.0, 240.0)),
+                                _buildBoard(boardWidth: (constraints.maxWidth - 20).clamp(260.0, 560.0).toDouble()),
                                 const SizedBox(height: 10),
-                                _buildBoard(boardWidth: (constraints.maxWidth - 28).clamp(240.0, 520.0).toDouble()),
+                                _buildTargetCard(width: (constraints.maxWidth * 0.62).clamp(200.0, 300.0)),
                                 const SizedBox(height: 12),
                                 Container(
                                   width: double.infinity,
@@ -969,12 +1001,10 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                         shrinkWrap: true,
                                         physics: const NeverScrollableScrollPhysics(),
                                         crossAxisCount: 3,
-                                        crossAxisSpacing: 10,
-                                        mainAxisSpacing: 10,
+                                        crossAxisSpacing: 8,
+                                        mainAxisSpacing: 8,
                                         childAspectRatio: 1,
-                                        children: _pieceTemplates
-                                        .map((piece) => _buildTrayPiece(piece, size: trayPieceSize))
-                                        .toList(growable: false),
+                                        children: _pieceTemplates.map((piece) => _buildTrayPiece(piece, size: trayPieceSize)).toList(growable: false),
                                       ),
                                     ],
                                   ),
@@ -990,13 +1020,13 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                         child: OutlinedButton(
                           onPressed: _resetPuzzle,
                           style: OutlinedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(58),
+                            minimumSize: const Size.fromHeight(56),
                             side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text(
                             '다시하기',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
                           ),
                         ),
                       ),
@@ -1006,13 +1036,13 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                           onPressed: _rotateSelectedCellPiece,
                           icon: const Icon(Icons.rotate_right_rounded),
                           style: OutlinedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(58),
+                            minimumSize: const Size.fromHeight(56),
                             side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           label: const Text(
                             '돌리기',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
                           ),
                         ),
                       ),
@@ -1021,19 +1051,38 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                         child: ElevatedButton(
                           onPressed: _checkPuzzle,
                           style: ElevatedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(58),
+                            minimumSize: const Size.fromHeight(56),
                             backgroundColor: const Color(0xFF2F6BDD),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text(
                             '완성 확인',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
                           ),
                         ),
                       ),
                     ],
                   ),
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _skipPuzzleForTest,
+                        icon: const Icon(Icons.skip_next_rounded),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(42),
+                          side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        label: const Text(
+                          '테스트용: 문제 건너뛰고 다음으로',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             );
@@ -1053,18 +1102,20 @@ class Chapter2QrVerificationScreen extends StatefulWidget {
 
 class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScreen>
     with WidgetsBindingObserver {
-  static const String _allowedScheme = 'https';
-  static const String _allowedHost = 'www.cbnse.go.kr';
+  static const Set<String> _allowedSchemes = {'https', 'http'};
+  static const Set<String> _allowedHosts = {'www.cbnse.go.kr', 'cbnse.go.kr', 'm.cbnse.go.kr'};
 
   final MobileScannerController _scannerController = MobileScannerController(
     autoStart: false,
     detectionSpeed: DetectionSpeed.noDuplicates,
     facing: CameraFacing.back,
+    formats: const [BarcodeFormat.qrCode],
   );
 
   bool _handlingDetection = false;
   bool _isStartingScanner = false;
   String? _lastScannedValue;
+  final TextEditingController _manualQrController = TextEditingController();
 
   @override
   void initState() {
@@ -1117,14 +1168,85 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
     }
   }
 
+  bool _isAllowedHost(String host) {
+    final normalized = host.trim().toLowerCase();
+    if (normalized.isEmpty) return false;
+    return _allowedHosts.contains(normalized) || normalized.endsWith('.cbnse.go.kr');
+  }
+
+  Widget _buildPuzzleStepChip({
+    required String stepNo,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFB8CAEE), width: 1.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              color: Color(0xFF2F6BDD),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              stepNo,
+              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF29427A), fontSize: 14, fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _matchesAcceptedUri(Uri uri) {
+    final scheme = uri.scheme.toLowerCase();
+    if (scheme.isNotEmpty && !_allowedSchemes.contains(scheme)) return false;
+    if (_isAllowedHost(uri.host)) return true;
+
+    for (final values in uri.queryParametersAll.values) {
+      for (final value in values) {
+        final decoded = Uri.decodeFull(value.trim());
+        if (decoded.isEmpty) continue;
+        final nestedCandidate = decoded.contains('://') ? decoded : 'https://$decoded';
+        final nested = Uri.tryParse(nestedCandidate);
+        if (nested != null && _isAllowedHost(nested.host)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   bool _isAcceptedQrValue(String rawValue) {
     final value = rawValue.trim();
     if (value.isEmpty) return false;
 
-    final uri = Uri.tryParse(value);
+    // Some QR payloads include a redirected URL string; allow known domain tokens.
+    final decodedLower = Uri.decodeFull(value).toLowerCase();
+    if (decodedLower.contains('cbnse.go.kr')) return true;
+
+    Uri? uri = Uri.tryParse(value);
+    if ((uri == null || uri.host.isEmpty) && !value.contains('://')) {
+      // Some QR codes contain host/path only (without http/https).
+      uri = Uri.tryParse('https://$value');
+    }
     if (uri == null) return false;
 
-    return uri.scheme == _allowedScheme && uri.host == _allowedHost;
+    return _matchesAcceptedUri(uri);
   }
 
   Future<void> _showResultDialog({
@@ -1151,7 +1273,7 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
     if (!mounted) return;
 
     if (success) {
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      Navigator.pushReplacementNamed(context, '/chapter3_story');
     } else {
       setState(() {
         _handlingDetection = false;
@@ -1176,7 +1298,7 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
       await _showResultDialog(
         success: true,
         title: '미션 인증 완료!',
-        message: '수학역사실 QR 코드가 확인되었어요. 현장 방문이 인증되었습니다.',
+        message: 'QR 인증이 완료됐어요! 다음 단계로 이동할 준비가 되었어요.',
       );
       return;
     }
@@ -1184,13 +1306,43 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
     await _showResultDialog(
       success: false,
       title: '다시 스캔해 주세요',
-      message: '수학역사실 QR 코드가 아니에요. 충북수학체험센터 주소로 연결되는 QR 코드를 다시 읽어 주세요.',
+      message: '인증용 QR 코드가 아니에요. 충북수학체험센터 QR 코드를 다시 읽어 주세요.',
+    );
+  }
+
+  Future<void> _submitManualQr() async {
+    final rawValue = _manualQrController.text.trim();
+    if (rawValue.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('URL 또는 QR 값을 입력해 주세요.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _lastScannedValue = rawValue;
+    });
+
+    if (_isAcceptedQrValue(rawValue)) {
+      await _showResultDialog(
+        success: true,
+        title: '미션 인증 완료!',
+        message: 'QR 인증이 완료됐어요! 다음 단계로 이동할 준비가 되었어요.',
+      );
+      return;
+    }
+
+    await _showResultDialog(
+      success: false,
+      title: '인증 실패',
+      message: '입력한 값이 인증용 QR 코드가 아니에요.',
     );
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _manualQrController.dispose();
     _scannerController.dispose();
     super.dispose();
   }
@@ -1256,6 +1408,13 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: '카메라 전환',
+            onPressed: () => _scannerController.switchCamera(),
+            icon: const Icon(Icons.cameraswitch_rounded, size: 32),
+          ),
+        ],
       ),
       backgroundColor: const Color(0xFFF6FAFF),
       body: SafeArea(
@@ -1274,7 +1433,7 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                 child: const Column(
                   children: [
                     Text(
-                      '수학역사실 QR 인증',
+                      '다음 단계 QR 인증',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
@@ -1284,7 +1443,7 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '수학역사실에 비치된 QR 코드를 스캔해 미션을 인증해 보세요.',
+                      '다음 단계로 이동하려면 현장 QR 코드를 스캔해 인증해 보세요.',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -1352,6 +1511,59 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                   ),
                 ),
               ),
+              if (kDebugMode) ...[
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _manualQrController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                          hintText: '테스트용: URL/QR 값을 직접 입력',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: _submitManualQr,
+                          icon: const Icon(Icons.verified_outlined),
+                          label: const Text(
+                            '직접 입력으로 인증',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/chapter3_story'),
+                    icon: const Icon(Icons.skip_next_rounded),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(42),
+                      side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    label: const Text(
+                      '테스트용: 인증 건너뛰고 다음으로',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,

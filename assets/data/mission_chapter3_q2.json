@@ -1,0 +1,20 @@
+{
+  "mission_id": "cb_math_ch3_q2",
+  "title": "챕터3 문제 2",
+  "grade": "초등 저학년",
+  "steps": [
+    {
+      "type": "quiz",
+      "quiz_type": "mcq",
+      "question_no": 2,
+      "question": "문제2: 가로와 세로의 합이 같아지도록 빈칸에 들어갈 수를 고르세요.",
+      "choices": [],
+      "hint": "각 줄의 합이 15가 되도록 아래쪽 가운데 수를 찾아보세요.",
+      "visual_type": "magic_square",
+      "magic_square_answers": {
+        "7": 1,
+        "8": 6
+      }
+    }
+  ]
+}

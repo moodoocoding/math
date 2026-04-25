@@ -1,0 +1,29 @@
+{
+  "mission_id": "cb_math_ch3_q1_q2",
+  "title": "챕터3 문제",
+  "grade": "초등 저학년",
+  "steps": [
+    {
+      "type": "quiz",
+      "quiz_type": "mcq",
+      "question_no": 1,
+      "question": "문제1: 그림의 산가지는 어떤 수를 나타낼까요?",
+      "choices": ["12", "23", "32", "21"],
+      "answer": 1,
+      "hint": "십의 자리 묶음과 일의 자리 낱개를 따로 세어 보세요.",
+      "visual_type": "rod_numeral",
+      "rod_tens": 2,
+      "rod_ones": 3
+    },
+    {
+      "type": "quiz",
+      "quiz_type": "mcq",
+      "question_no": 2,
+      "question": "문제2: 가로와 세로의 합이 같아지도록 빈칸에 들어갈 수를 고르세요.",
+      "choices": ["1", "2", "3", "4"],
+      "answer": 0,
+      "hint": "각 줄의 합이 15가 되도록 아래쪽 가운데 수를 찾아보세요.",
+      "visual_type": "magic_square"
+    }
+  ]
+}

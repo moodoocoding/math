@@ -14,27 +14,27 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
 
   static const List<_ChapterScene> _scenes = [
     _ChapterScene(
-      line: '수학체험센터에 온 것을 환영해! 함께 모험을 시작하자.',
+      line: '수학체험센터에 온 것을 환영해! 하우와 플레이와 함께 모험을 시작하자!',
       welcomeImageAsset: 'assets/images/chr_background.png',
     ),
     _ChapterScene(
       speaker: '하우',
-      line: '큰일이야! 수학체험센터의 반짝별이 사라졌어!',
+      line: '큰일이야! 체험센터 불빛이 또 하나 꺼졌어!',
       characterAsset: 'assets/images/chr_how_thinking.png',
     ),
     _ChapterScene(
       speaker: '플레이',
-      line: '반짝별이 없어지면 체험실의 신나는 빛도 점점 약해진대!',
+      line: '마지막 불빛까지 꺼지기 전에 첫 번째 별 조각을 찾아야 해!',
       characterAsset: 'assets/images/chr_play_worry.png',
     ),
     _ChapterScene(
       speaker: '하우',
-      line: '첫 번째 반짝 조각은 수학체험실에 있대',
+      line: '저기! 벽에 빛나는 문장이 보여! 첫 번째 별 조각은 수학체험실에 있대!',
       characterAsset: 'assets/images/chr_how_lefttalk.png',
     ),
     _ChapterScene(
       speaker: '플레이',
-      line: '여기가 수학체험실인데, 앗 저기 문제가 있어!',
+      line: '찾았다! 그런데 문이 잠겨 있어! 문제를 풀어야 열 수 있나 봐!',
       characterAsset: 'assets/images/chr_play_surprised.png',
     ),
   ];
@@ -135,7 +135,7 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          child: const Text('다음', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800)),
+                          child: const Text('다음', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
                         ),
                       ),
                     ],
@@ -205,7 +205,7 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                                   const SizedBox(height: 12),
                                   Text(
                                     scene.line,
-                                    style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
                                   ),
                                 ],
                               ),
@@ -223,12 +223,12 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF133E97),
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             child: Text(
                               isLast ? '문제 풀이 시작' : '다음',
-                              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
+                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
                             ),
                           ),
                         ),

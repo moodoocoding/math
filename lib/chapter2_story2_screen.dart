@@ -2,36 +2,31 @@ import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
-class Chapter1Story2TbdScreen extends StatefulWidget {
-  const Chapter1Story2TbdScreen({super.key});
+class Chapter2Story2Screen extends StatefulWidget {
+  const Chapter2Story2Screen({super.key});
 
   @override
-  State<Chapter1Story2TbdScreen> createState() => _Chapter1Story2TbdScreenState();
+  State<Chapter2Story2Screen> createState() => _Chapter2Story2ScreenState();
 }
 
-class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
+class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
   int _sceneIndex = 0;
 
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
-      speaker: '하우',
-      line: '문이 열렸어! 바닥에 반짝이는 길이 나타났어!',
-      characterAsset: 'assets/images/chr_how_happy.png',
-    ),
-    _Chapter2Scene(
       speaker: '플레이',
-      line: '저 길 끝에 다음 장치가 있어! 얼른 가 보자!',
-      characterAsset: 'assets/images/chr_play_lefthand2.png',
+      line: '열렸어! 저울 아래에서 반짝이는 무늬판이 나타났어!',
+      characterAsset: 'assets/images/chr_play_happy.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '어? 이번에는 원판이 기둥에 쌓여 있어!',
+      line: '앗, 무늬판이 길을 막고 있어! 조각을 맞춰 같은 무늬를 만들어야 지나갈 수 있대!',
       characterAsset: 'assets/images/chr_how_surprised.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '원판을 규칙대로 옮기면 첫 번째 별 조각을 꺼낼 수 있대!',
-      characterAsset: 'assets/images/chr_play_thinking.png',
+      line: '봐! 여기 조각 6개가 있어! 이 조각으로 목표 무늬를 완성하면 될 것 같아!',
+      characterAsset: 'assets/images/chr_play_lefthand2.png',
     ),
   ];
 
@@ -44,7 +39,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    precacheImage(const AssetImage('assets/images/chapter1_bg_1.png'), context);
+    precacheImage(const AssetImage('assets/images/chapter2_bg_1.png'), context);
     for (var scene in _scenes) {
       precacheImage(AssetImage(scene.characterAsset), context);
     }
@@ -55,7 +50,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
       setState(() => _sceneIndex++);
       return;
     }
-    Navigator.pushReplacementNamed(context, '/mission_ch1_q2');
+    Navigator.pushReplacementNamed(context, '/mission_chapter2_q2');
   }
 
   @override
@@ -63,7 +58,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
     final scene = _scenes[_sceneIndex];
     final isLast = _sceneIndex == _scenes.length - 1;
     final width = MediaQuery.of(context).size.width;
-    final charHeight = width < 1100 ? width * 0.46 : 460.0;
+    final charHeight = width < 1100 ? width * 0.44 : 430.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -92,7 +87,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/chapter1_bg_1.png',
+              'assets/images/chapter2_bg_1.png',
               fit: BoxFit.cover,
               cacheWidth: 800,
               errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
@@ -114,8 +109,6 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                       key: ValueKey(scene.characterAsset),
                       fit: BoxFit.fitHeight,
                       cacheHeight: 600,
-                      gaplessPlayback: false,
-                      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
                     ),
                   ),
                 ),

@@ -3,7 +3,7 @@
     {
       "type": "quiz",
       "quiz_type": "mcq",
-      "question": "더 무거운 것은 무엇일까요?",
+      "question": "문제1: 더 무거운 것은 무엇일까요?",
       "choices": [
         "사과",
         "배",

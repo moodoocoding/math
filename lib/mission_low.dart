@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
@@ -303,6 +304,9 @@ class _QuizScreenState extends State<QuizScreen> {
     [],
   ];
   final TextEditingController _inputController = TextEditingController();
+  static const Set<int> _magicSquareBlankIndexes = {7, 8};
+  final Map<int, int?> _magicSquareInputs = {7: null, 8: null};
+  int? _activeMagicSquareCell;
 
   @override
   void didUpdateWidget(covariant QuizScreen oldWidget) {
@@ -313,6 +317,9 @@ class _QuizScreenState extends State<QuizScreen> {
       _simulationIndex = 0;
       _resetHanoi();
       _inputController.clear();
+      _magicSquareInputs
+        ..updateAll((key, value) => null);
+      _activeMagicSquareCell = null;
     }
   }
 
@@ -322,9 +329,89 @@ class _QuizScreenState extends State<QuizScreen> {
     super.dispose();
   }
 
-  bool _isAnswerReady(String quizType) {
+  bool _isAnswerReady(String quizType, Map<String, dynamic> step) {
+    final visualType = (step['visual_type'] ?? '').toString().trim().toLowerCase();
+    if (visualType == 'magic_square') {
+      return _magicSquareBlankIndexes.every((index) => _magicSquareInputs[index] != null);
+    }
     if (quizType == 'mcq') return selectedChoiceIndex != null;
     return inputAnswer.trim().isNotEmpty;
+  }
+
+  void _showMagicSquareKeypad(int cellIndex) {
+    setState(() {
+      _activeMagicSquareCell = cellIndex;
+    });
+    final isCompact = MediaQuery.of(context).size.width < 1100;
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '숫자를 선택하세요',
+                  style: TextStyle(fontSize: isCompact ? 24 : 30, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 12),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: 10,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 1.5,
+                  ),
+                  itemBuilder: (context, index) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _magicSquareInputs[cellIndex] = index;
+                          _activeMagicSquareCell = cellIndex;
+                        });
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF123E97),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        '$index',
+                        style: TextStyle(fontSize: isCompact ? 24 : 30, fontWeight: FontWeight.w900),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _magicSquareInputs[cellIndex] = null;
+                        _activeMagicSquareCell = cellIndex;
+                      });
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.backspace_outlined),
+                    label: const Text('입력 지우기'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _resetHanoi() {
@@ -421,7 +508,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _submitAnswer(Map<String, dynamic> step, String quizType) {
-    if (!_isAnswerReady(quizType)) {
+    if (!_isAnswerReady(quizType, step)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('답을 먼저 선택하거나 입력해 주세요.')),
       );
@@ -430,7 +517,20 @@ class _QuizScreenState extends State<QuizScreen> {
 
     bool correct = false;
 
-    if (quizType == 'mcq') {
+    final visualType = (step['visual_type'] ?? '').toString().trim().toLowerCase();
+    if (visualType == 'magic_square') {
+      final rawAnswers = (step['magic_square_answers'] as Map<String, dynamic>?) ?? const {'7': 1, '8': 6};
+      correct = true;
+      for (final entry in rawAnswers.entries) {
+        final cell = int.tryParse(entry.key);
+        final expected = int.tryParse(entry.value.toString());
+        if (cell == null || expected == null) continue;
+        if (_magicSquareInputs[cell] != expected) {
+          correct = false;
+          break;
+        }
+      }
+    } else if (quizType == 'mcq') {
       final answerIndex = step['answer'] as int;
       correct = selectedChoiceIndex == answerIndex;
     } else if (quizType == 'input' || quizType == 'qr') {
@@ -527,6 +627,10 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Widget _buildSimulationArea(List<String> images) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final simulationHeight = (screenHeight * (screenWidth < 1100 ? 0.30 : 0.34)).clamp(240.0, 420.0).toDouble();
+
     return Column(
       children: [
         const SizedBox(height: 14),
@@ -538,11 +642,11 @@ class _QuizScreenState extends State<QuizScreen> {
           child: Image.asset(
             images[_simulationIndex],
             key: ValueKey<int>(_simulationIndex),
-            height: 220,
+            height: simulationHeight,
             fit: BoxFit.contain,
             cacheHeight: 600,
             errorBuilder: (context, error, stackTrace) => Container(
-              height: 220,
+              height: simulationHeight,
               color: Colors.grey[200],
               alignment: Alignment.center,
               child: const Text('이미지 준비중...', style: TextStyle(color: Colors.grey)),
@@ -584,20 +688,27 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final step = widget.step;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final quizType = (step['quiz_type'] ?? '').toString();
+    final visualType = (step['visual_type'] ?? '').toString().trim().toLowerCase();
+    final isMagicSquare = visualType == 'magic_square';
     final choices = (step['choices'] as List<dynamic>?) ?? const [];
     final showHanoiVisual = _asTrue(step['show_hanoi_visual']);
     final renderChoicesAsShapes = _asTrue(step['choices_as_shapes']);
     final choicesLayout = (step['choices_layout'] ?? '').toString().trim().toLowerCase();
-    final useSingleColumnChoices = choicesLayout == '4x1';
-    final isCompact = MediaQuery.of(context).size.width < 1100;
+    final useSingleColumnChoices = (quizType == 'mcq' && choices.length == 4) || choicesLayout == '4x1';
+    final isCompact = screenWidth < 1100;
     final questionText = step['question'].toString();
-    final questionFontSize = isCompact ? 28.0 : 40.0;
-    final optionTextSize = isCompact ? 42.0 : 54.0;
-    final optionShapeSize = isCompact ? 40.0 : 50.0;
-    final actionFontSize = isCompact ? 28.0 : 38.0;
-    final hanoiHeight = isCompact ? 220.0 : 280.0;
-    final floorPreviewHeight = isCompact ? 86.0 : 118.0;
+    final questionFontSize = isCompact ? 24.0 : 30.0;
+    final optionTextSize = isCompact ? 30.0 : 34.0;
+    final optionShapeSize = isCompact ? 30.0 : 34.0;
+    final actionFontSize = isCompact ? 20.0 : 24.0;
+    final actionButtonHeight = isMagicSquare ? 52.0 : 56.0;
+    final hanoiHeight = (screenHeight * (isCompact ? 0.30 : 0.34)).clamp(260.0, 420.0).toDouble();
+    final floorPreviewHeight = (screenHeight * (isCompact ? 0.28 : 0.32)).clamp(180.0, 360.0).toDouble();
+    final rodVisualHeight = (screenHeight * (isCompact ? 0.34 : 0.38)).clamp(260.0, 460.0).toDouble();
+    final magicSquareVisualHeight = (screenHeight * 0.50).clamp(340.0, 640.0).toDouble();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
@@ -646,12 +757,30 @@ class _QuizScreenState extends State<QuizScreen> {
               },
             ),
           ],
+          if (visualType == 'rod_numeral') ...[
+            const SizedBox(height: 12),
+            _RodNumeralVisualPanel(
+              height: rodVisualHeight,
+              tens: (step['rod_tens'] as int?) ?? 2,
+              ones: (step['rod_ones'] as int?) ?? 3,
+            ),
+          ],
+          if (visualType == 'magic_square') ...[
+            const SizedBox(height: 12),
+            _MagicSquareVisualPanel(
+              height: magicSquareVisualHeight,
+              blankIndexes: _magicSquareBlankIndexes,
+              values: _magicSquareInputs,
+              onBlankTap: _showMagicSquareKeypad,
+              activeBlankIndex: _activeMagicSquareCell,
+            ),
+          ],
           if (renderChoicesAsShapes) ...[
             const SizedBox(height: 12),
             _TessellationFloorPreview(height: floorPreviewHeight),
           ],
           const SizedBox(height: 14),
-          if (quizType == 'mcq')
+          if (quizType == 'mcq' && !isMagicSquare)
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -660,7 +789,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 crossAxisCount: useSingleColumnChoices ? 1 : 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: useSingleColumnChoices ? (isCompact ? 6.8 : 8.4) : (isCompact ? 5.5 : 7.5),
+                childAspectRatio: useSingleColumnChoices ? (isCompact ? 8.0 : 10.5) : (isCompact ? 5.5 : 7.5),
               ),
               itemBuilder: (context, index) {
                 final selected = selectedChoiceIndex == index;
@@ -702,7 +831,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                     ? _ShapeOptionSymbol(
                                         type: shapeType,
                                         color: textColor,
-                                        size: useSingleColumnChoices ? (isCompact ? 34 : 40) : optionShapeSize,
+                                        size: useSingleColumnChoices ? (isCompact ? 28 : 32) : optionShapeSize,
                                         selected: selected,
                                       )
                                     : Text(
@@ -710,7 +839,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: textColor,
-                                          fontSize: useSingleColumnChoices ? (isCompact ? 34 : 40) : optionTextSize,
+                                          fontSize: useSingleColumnChoices ? (isCompact ? 28 : 32) : optionTextSize,
                                           fontWeight: FontWeight.w900,
                                           shadows: selected ? const [Shadow(color: Color(0x55000000), blurRadius: 4)] : null,
                                         ),
@@ -731,7 +860,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 );
               },
             )
-          else
+          else if (!isMagicSquare)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -763,25 +892,45 @@ class _QuizScreenState extends State<QuizScreen> {
                     foregroundColor: const Color(0xFF163988),
                     side: const BorderSide(color: Color(0xFF21396C), width: 2),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    minimumSize: const Size.fromHeight(72),
+                    minimumSize: Size.fromHeight(actionButtonHeight),
                   ),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () => _submitAnswer(step, quizType),
+                  onPressed: _isAnswerReady(quizType, step) ? () => _submitAnswer(step, quizType) : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF123E97),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    minimumSize: const Size.fromHeight(72),
+                    minimumSize: Size.fromHeight(actionButtonHeight),
                   ),
                   child: Text('정답 제출', style: TextStyle(fontSize: actionFontSize, fontWeight: FontWeight.w800)),
                 ),
               ),
             ],
           ),
+          if (kDebugMode) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: widget.onNext,
+                icon: const Icon(Icons.skip_next_rounded),
+                label: Text(
+                  '테스트용: 문제 건너뛰고 다음으로',
+                  style: TextStyle(fontSize: isCompact ? 14 : 16, fontWeight: FontWeight.w800),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF355AA8),
+                  side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  minimumSize: const Size.fromHeight(42),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -934,6 +1083,227 @@ class _TessellationFloorPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _RodNumeralVisualPanel extends StatelessWidget {
+  const _RodNumeralVisualPanel({
+    required this.height,
+    required this.tens,
+    required this.ones,
+  });
+
+  final double height;
+  final int tens;
+  final int ones;
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 1100;
+    return Container(
+      width: double.infinity,
+      height: height,
+      padding: EdgeInsets.all(isCompact ? 12 : 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7E2),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFD6B06A), width: 2),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '산가지 수 모형',
+            style: TextStyle(
+              fontSize: isCompact ? 20 : 24,
+              fontWeight: FontWeight.w900,
+              color: const Color(0xFF7C4D15),
+            ),
+          ),
+          SizedBox(height: isCompact ? 8 : 12),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _RodGroupCard(
+                    label: '십의 자리',
+                    count: tens,
+                    horizontal: false,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _RodGroupCard(
+                    label: '일의 자리',
+                    count: ones,
+                    horizontal: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RodGroupCard extends StatelessWidget {
+  const _RodGroupCard({
+    required this.label,
+    required this.count,
+    required this.horizontal,
+  });
+
+  final String label;
+  final int count;
+  final bool horizontal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD6B06A), width: 2),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF7C4D15),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Center(
+              child: Wrap(
+                direction: horizontal ? Axis.vertical : Axis.horizontal,
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: List.generate(count, (index) {
+                  return Container(
+                    width: horizontal ? 56 : 12,
+                    height: horizontal ? 12 : 56,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9C6B2F),
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 3, offset: Offset(0, 2))],
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MagicSquareVisualPanel extends StatelessWidget {
+  const _MagicSquareVisualPanel({
+    required this.height,
+    required this.blankIndexes,
+    required this.values,
+    required this.onBlankTap,
+    required this.activeBlankIndex,
+  });
+
+  final double height;
+  final Set<int> blankIndexes;
+  final Map<int, int?> values;
+  final ValueChanged<int> onBlankTap;
+  final int? activeBlankIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 1100;
+    final numberStyle = TextStyle(
+      fontSize: isCompact ? 34 : 42,
+      fontWeight: FontWeight.w900,
+      color: const Color(0xFF5B3611),
+    );
+
+    final cells = const [
+      '4', '9', '2',
+      '3', '5', '7',
+      '8', '?', '?',
+    ];
+
+    return Container(
+      width: double.infinity,
+      height: height,
+      padding: EdgeInsets.all(isCompact ? 12 : 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7E2),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFD6B06A), width: 2),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '마방진 판',
+            style: TextStyle(
+              fontSize: isCompact ? 20 : 24,
+              fontWeight: FontWeight.w900,
+              color: const Color(0xFF7C4D15),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 9,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
+                itemBuilder: (context, index) {
+                  final baseValue = cells[index];
+                  final isBlank = blankIndexes.contains(index);
+                  final typedValue = values[index];
+
+                  final isActive = isBlank && activeBlankIndex == index;
+                  final tile = Container(
+                    decoration: BoxDecoration(
+                      color: isBlank ? const Color(0xFFFFE7A8) : Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isBlank
+                            ? (isActive ? const Color(0xFF163988) : const Color(0xFFD5962A))
+                            : const Color(0xFFD6B06A),
+                        width: isBlank ? (isActive ? 4 : 3) : 2,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        isBlank ? (typedValue?.toString() ?? '?') : baseValue,
+                        style: numberStyle,
+                      ),
+                    ),
+                  );
+
+                  if (!isBlank) return tile;
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () => onBlankTap(index),
+                    child: tile,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _InteractiveHanoiVisualPanel extends StatelessWidget {
