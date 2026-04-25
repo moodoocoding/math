@@ -29,6 +29,7 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
 
   @override
   Widget build(BuildContext context) {
+
     final width = MediaQuery.of(context).size.width;
     final charHeight = width < 1100 ? width * 0.42 : 420.0;
 
@@ -86,8 +87,17 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: const Color(0xFF133E97), width: 3),
-                      boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                      border: Border.all(
+                        color: const Color(0xFFFF6B80), // Always How in this screen
+                        width: 3,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFF6B80).withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
                     ),
                     child: const Padding(
                       padding: EdgeInsets.fromLTRB(22, 18, 22, 20),
@@ -141,10 +151,11 @@ class _SpeakerBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = name == '하우' ? const Color(0xFFFF6B80) : const Color(0xFF3B82F6);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF133E97),
+        color: color,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

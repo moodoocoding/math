@@ -16,7 +16,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
     _Chapter3Scene(
       speaker: '플레이',
       line: '열렸어! 안쪽에 숫자판이 또 숨어 있었어!',
-      characterAsset: 'assets/images/chr_play_happy.png',
+      characterAsset: 'assets/images/chr_play_jumping.png',
     ),
     _Chapter3Scene(
       speaker: '하우',
@@ -26,7 +26,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
     _Chapter3Scene(
       speaker: '플레이',
       line: '가로와 세로의 합을 잘 보면 답을 찾을 수 있어!',
-      characterAsset: 'assets/images/chr_play_explaining.png',
+      characterAsset: 'assets/images/chr_play_laughing.png',
     ),
   ];
 
@@ -57,6 +57,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
   Widget build(BuildContext context) {
     final scene = _scenes[_sceneIndex];
     final isLast = _sceneIndex == _scenes.length - 1;
+
     final width = MediaQuery.of(context).size.width;
     final charHeight = width < 1100 ? width * 0.44 : 430.0;
 
@@ -121,8 +122,22 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0xFF133E97), width: 3),
-                        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                        border: Border.all(
+                          color: scene.speaker == '하우'
+                              ? const Color(0xFFFF6B80)
+                              : const Color(0xFF3B82F6),
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (scene.speaker == '하우'
+                                    ? const Color(0xFFFF6B80)
+                                    : const Color(0xFF3B82F6))
+                                .withValues(alpha: 0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
@@ -177,10 +192,11 @@ class _SpeakerBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = name == '하우' ? const Color(0xFFFF6B80) : const Color(0xFF3B82F6);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF133E97),
+        color: color,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

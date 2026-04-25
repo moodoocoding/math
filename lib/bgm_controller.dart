@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 
-enum AppBgmTrack { main, problem, story }
+enum AppBgmTrack { main, problem, story, ending }
 
 class AppBgmController {
   AppBgmController._();
@@ -16,9 +16,10 @@ class AppBgmController {
   static final Map<String, Duration> _savedPositions = <String, Duration>{};
   static final ValueNotifier<bool> isMuted = ValueNotifier<bool>(false);
 
-  static const String _mainAsset = 'audio/bgm_main.mp3';
-  static const String _problemAsset = 'audio/bgm_problem.mp3';
-  static const String _storyAsset = 'audio/bgm_bg.mp3';
+  static const String _mainAsset = 'audio/bgm_main.m4a';
+  static const String _problemAsset = 'audio/bgm_problem.m4a';
+  static const String _storyAsset = 'audio/bgm_bg.m4a';
+  static const String _endingAsset = 'audio/bgm_ending.mp3';
   static const double _defaultVolume = 0.35;
   static const double _problemVolume = _defaultVolume * 0.7;
 
@@ -42,12 +43,15 @@ class AppBgmController {
         return _problemAsset;
       case AppBgmTrack.story:
         return _storyAsset;
+      case AppBgmTrack.ending:
+        return _endingAsset;
     }
   }
 
   static Future<void> playMain() => playTrack(AppBgmTrack.main);
   static Future<void> playProblem() => playTrack(AppBgmTrack.problem);
   static Future<void> playStory() => playTrack(AppBgmTrack.story);
+  static Future<void> playEnding() => playTrack(AppBgmTrack.ending);
 
   static Future<void> playTrack(AppBgmTrack track) async {
     await _ensureConfigured();
@@ -123,5 +127,53 @@ class AppBgmController {
     _currentTrack = null;
     isMuted.value = false;
     _savedPositions.clear();
+  }
+}
+
+class AppSfxController {
+  AppSfxController._();
+
+  static final AudioPlayer _sfxPlayer = AudioPlayer()..setReleaseMode(ReleaseMode.stop);
+
+  static Future<void> playClick() async {
+    if (AppBgmController.isMuted.value) return;
+    try {
+      await _sfxPlayer.play(AssetSource('audio/click.wav'), volume: 0.8);
+    } catch (_) {}
+  }
+
+  static Future<void> playCorrect() async {
+    if (AppBgmController.isMuted.value) return;
+    try {
+      await _sfxPlayer.play(AssetSource('audio/correct.wav'), volume: 1.0);
+    } catch (_) {}
+  }
+
+  static Future<void> playWrong() async {
+    if (AppBgmController.isMuted.value) return;
+    try {
+      await _sfxPlayer.play(AssetSource('audio/wrong.wav'), volume: 1.0);
+    } catch (_) {}
+  }
+
+  static Future<void> playIntro() async {
+    if (AppBgmController.isMuted.value) return;
+    try {
+      await _sfxPlayer.play(AssetSource('audio/sfx_intro.mp3'), volume: 1.0);
+    } catch (_) {}
+  }
+
+  static Future<void> playMissionStart() async {
+    if (AppBgmController.isMuted.value) return;
+    try {
+      await _sfxPlayer.play(AssetSource('audio/sfx_mission_start.mp3'), volume: 1.0);
+    } catch (_) {}
+  }
+
+  static Future<void> playStarCollect() async {
+    if (AppBgmController.isMuted.value) return;
+    try {
+      await _sfxPlayer.play(AssetSource('audio/sfx_star_collect.mp3'), volume: 1.0);
+    } catch (_) {}
   }
 }

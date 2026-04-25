@@ -338,7 +338,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF18BEB6),
+                  backgroundColor: const Color(0xFF133E97),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 40,
                     vertical: 16,

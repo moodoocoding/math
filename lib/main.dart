@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'chapter2_story3_screen.dart';
 import 'chapter3_story_screen.dart';
 import 'chapter3_story2_screen.dart';
 import 'chapter4_story_screen.dart';
+import 'ending_story_screen.dart';
 
 void main() {
   runApp(const MissionTourApp());
@@ -76,6 +78,7 @@ class MissionTourApp extends StatelessWidget {
           missionDataPath: 'assets/data/mission_chapter3_q2.json',
           completedRouteName: '/chapter4_story',
         ),
+        '/ending_story': (context) => const EndingStoryScreen(),
       },
     );
   }
@@ -90,6 +93,12 @@ class IntroScreen extends StatefulWidget {
 
 class _IntroScreenState extends State<IntroScreen> {
   @override
+  void initState() {
+    super.initState();
+    AppSfxController.playIntro();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -98,14 +107,27 @@ class _IntroScreenState extends State<IntroScreen> {
           Image.asset(
             'assets/images/bg_intro.png',
             fit: BoxFit.cover,
-            cacheWidth: 800,
+            cacheWidth: 1800,
+            filterQuality: FilterQuality.high,
             errorBuilder: (context, error, stackTrace) =>
                 Container(color: const Color(0xFFF4F5F7)),
           ),
-          Container(color: const Color(0x66000000)),
+          // Smoother gradient overlay for better text readability
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x22000000), // Lighter at top
+                  Color(0x99000000), // Darker at bottom
+                ],
+              ),
+            ),
+          ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -114,40 +136,65 @@ class _IntroScreenState extends State<IntroScreen> {
                     '충북 수학체험센터에 온 걸 환영해!',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 34,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 38,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                      shadows: [
+                        Shadow(color: Colors.black26, blurRadius: 12, offset: Offset(0, 4)),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   const Text(
                     '준비되면 아래 버튼을 눌러 시작해 보자.',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+                      color: Colors.white70,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w600,
+                      shadows: [
+                        Shadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  SizedBox(
+                  const SizedBox(height: 32),
+                  // Premium Gradient Button
+                  Container(
                     width: double.infinity,
-                    height: 62,
+                    height: 68,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x44000000),
+                          blurRadius: 15,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF5A75D7), Color(0xFF354896)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
                     child: ElevatedButton(
                       onPressed: () {
                         if (!mounted) return;
                         Navigator.pushReplacementNamed(context, '/home');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4358AD),
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                       child: const Text(
                         '입장하기',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 26,
                           fontWeight: FontWeight.w800,
+                          letterSpacing: 1.5,
                         ),
                       ),
                     ),
@@ -209,26 +256,14 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
     final infoLinkSize = isUltraWide ? 24.0 : 16.0;
 
     return Scaffold(
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Container(
-          color: const Color(0xFFEDEDED),
-          padding: const EdgeInsets.fromLTRB(
-            horizontalPadding,
-            10,
-            horizontalPadding,
-            12,
-          ),
-          child: _StartButton(onPressed: _goMissionLow),
-        ),
-      ),
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
               'assets/images/bg_intro.png',
               fit: BoxFit.cover,
-              cacheWidth: 800,
+              cacheWidth: 1800, // Higher cache width for better resolution
+              filterQuality: FilterQuality.high, // Improve anti-aliasing
               alignment: isUltraWide
                   ? const Alignment(0, -0.35)
                   : Alignment.center,
@@ -262,25 +297,34 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: const [
                               BoxShadow(
-                                color: Color(0x22000000),
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
+                                color: Color(0x1A000000),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: Row(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: BackdropFilter(
+                              filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                              child: Container(
+                                padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.55),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                                ),
+                                child: Row(
                             children: [
                               Image.asset(
                                 'assets/images/logo_cb_math.png',
                                 width: 62,
                                 height: 62,
-                                cacheWidth: 150,
+                                cacheWidth: 300,
                                 fit: BoxFit.contain,
                               ),
                               const SizedBox(width: 10),
@@ -308,6 +352,9 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                                 ],
                               ),
                             ],
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         const Spacer(),
@@ -340,9 +387,19 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                       '충북수학체험센터에 온 걸 환영해!',
                       style: TextStyle(
                         fontSize: welcomeSize,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1E222A),
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF162547),
                         height: 1.15,
+                        shadows: [
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            blurRadius: 16,
+                          ),
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -358,8 +415,18 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                       style: TextStyle(
                         fontSize: adventureSize,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF1E222A),
+                        color: const Color(0xFF162547),
                         height: 1.1,
+                        shadows: [
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            blurRadius: 16,
+                          ),
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -411,7 +478,13 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 28),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: horizontalPadding),
+                    child: _StartButton(onPressed: _goMissionLow),
+                  ),
+                  const SizedBox(height: 40),
                   Container(
                     width: double.infinity,
                     color: const Color(0xFFEDEDED),
@@ -505,28 +578,36 @@ class _MissionCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: width,
-        constraints: BoxConstraints(minHeight: minHeight),
-        padding: EdgeInsets.fromLTRB(
-          isUltraWide ? 24 : (isWide ? 18 : 14),
-          isUltraWide ? 22 : (isWide ? 16 : 14),
-          isUltraWide ? 24 : (isWide ? 18 : 14),
-          isUltraWide ? 20 : (isWide ? 14 : 12),
-        ),
         decoration: BoxDecoration(
-          color: backgroundColor,
           borderRadius: BorderRadius.circular(16),
-          border: selected
-              ? Border.all(color: const Color(0xFF4A66B6), width: 5)
-              : null,
           boxShadow: const [
             BoxShadow(
-              color: Color(0x18000000),
-              blurRadius: 8,
-              offset: Offset(0, 3),
+              color: Color(0x15000000),
+              blurRadius: 12,
+              offset: Offset(0, 4),
             ),
           ],
         ),
-        child: Column(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
+              constraints: BoxConstraints(minHeight: minHeight),
+              padding: EdgeInsets.fromLTRB(
+                isUltraWide ? 24 : (isWide ? 18 : 14),
+                isUltraWide ? 22 : (isWide ? 16 : 14),
+                isUltraWide ? 24 : (isWide ? 18 : 14),
+                isUltraWide ? 20 : (isWide ? 14 : 12),
+              ),
+              decoration: BoxDecoration(
+                color: backgroundColor.withValues(alpha: 0.68),
+                borderRadius: BorderRadius.circular(16),
+                border: selected
+                    ? Border.all(color: const Color(0xFF4A66B6), width: 4)
+                    : Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+              ),
+              child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
@@ -569,6 +650,9 @@ class _MissionCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+            ),
+          ),
         ),
       ),
     );
@@ -1959,7 +2043,10 @@ class _StartButton extends StatelessWidget {
       width: double.infinity,
       height: 66,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: () {
+        AppSfxController.playMissionStart();
+        onPressed();
+      },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF4358AD),
           foregroundColor: Colors.white,

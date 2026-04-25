@@ -21,7 +21,7 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
     _Chapter3Scene(
       speaker: '플레이',
       line: '봐! 조각을 찾으니까 체험센터가 더 환해졌어!',
-      characterAsset: 'assets/images/chr_play_happy.png',
+      characterAsset: 'assets/images/chr_play_clapping.png',
     ),
     _Chapter3Scene(
       speaker: '하우',
@@ -142,8 +142,22 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0xFF133E97), width: 3),
-                        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                        border: Border.all(
+                          color: scene.speaker == '하우'
+                              ? const Color(0xFFFF6B80)
+                              : const Color(0xFF3B82F6),
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (scene.speaker == '하우'
+                                    ? const Color(0xFFFF6B80)
+                                    : const Color(0xFF3B82F6))
+                                .withValues(alpha: 0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
@@ -198,10 +212,11 @@ class _SpeakerBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = name == '하우' ? const Color(0xFFFF6B80) : const Color(0xFF3B82F6);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF133E97),
+        color: color,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

@@ -21,7 +21,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
     super.didChangeDependencies();
     precacheImage(const AssetImage('assets/images/chapter2_bg_1.png'), context);
     precacheImage(
-      const AssetImage('assets/images/chr_how_cheering.png'),
+      const AssetImage('assets/images/chr_how_waving.png'),
       context,
     );
   }
@@ -85,7 +85,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                 SizedBox(
                   height: charHeight,
                   child: Image.asset(
-                    'assets/images/chr_how_cheering.png',
+                    'assets/images/chr_how_waving.png',
                     fit: BoxFit.fitHeight,
                     cacheHeight: 600,
                   ),
@@ -99,15 +99,15 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: const Color(0xFF133E97),
+                        color: const Color(0xFFFF6B80), // Always How in this screen
                         width: 3,
                       ),
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
-                          color: Color(0x33000000),
+                          color: const Color(0xFFFF6B80).withValues(alpha: 0.2),
                           blurRadius: 10,
-                          offset: Offset(0, 4),
-                        ),
+                          offset: const Offset(0, 4),
+                        )
                       ],
                     ),
                     child: const Padding(
@@ -172,10 +172,11 @@ class _SpeakerBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = name == '하우' ? const Color(0xFFFF6B80) : const Color(0xFF3B82F6);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF133E97),
+        color: color,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

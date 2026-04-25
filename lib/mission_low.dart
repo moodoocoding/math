@@ -410,6 +410,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   itemBuilder: (context, index) {
                     return ElevatedButton(
                       onPressed: () {
+                        AppSfxController.playClick();
                         setState(() {
                           _magicSquareInputs[cellIndex] = index;
                           _activeMagicSquareCell = cellIndex;
@@ -575,6 +576,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _submitAnswer(Map<String, dynamic> step, String quizType) {
+    AppSfxController.playClick();
     if (!_isAnswerReady(quizType, step)) {
       ScaffoldMessenger.of(
         context,
@@ -613,46 +615,55 @@ class _QuizScreenState extends State<QuizScreen> {
     final resultTitle = correct ? '정답이야' : '정답이 아니야';
     final resultMessage = correct ? '잘했어, 정확하게 풀었네' : '다시 한번 풀어 볼래?';
 
+    if (correct) {
+      AppSfxController.playCorrect();
+    } else {
+      AppSfxController.playWrong();
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.75), // Darkened background
       builder: (context) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final dialogWidth = (screenWidth * 0.82).clamp(520.0, 1320.0);
-        final imageHeight = screenWidth < 1100 ? 190.0 : 240.0;
-        final titleSize = screenWidth < 1100 ? 60.0 : 74.0;
-        final messageSize = screenWidth < 1100 ? 42.0 : 52.0;
-        final confirmSize = screenWidth < 1100 ? 44.0 : 56.0;
+        // 팝업 너비 축소: 최대 500
+        final dialogWidth = (screenWidth * 0.45).clamp(360.0, 500.0);
+        // 캐릭터 높이 확대
+        final imageHeight = screenWidth < 1100 ? 180.0 : 220.0;
+        // 텍스트 크기 축소
+        final titleSize = screenWidth < 1100 ? 32.0 : 38.0;
+        final messageSize = screenWidth < 1100 ? 20.0 : 24.0;
+        final confirmSize = screenWidth < 1100 ? 22.0 : 26.0;
 
         return Dialog(
+          elevation: 20,
+          shadowColor: Colors.black54,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          child: SizedBox(
+          child: Container(
             width: dialogWidth,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEAF3F4),
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(24),
-                    ),
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      correct ? 'assets/images/chr_play_correct.png' : 'assets/images/chr_how_fail.png',
-                      height: imageHeight,
-                      fit: BoxFit.contain,
-                      cacheHeight: 500,
-                    ),
+                const SizedBox(height: 30),
+                // 상단 배경색 제거 및 캐릭터 사이즈 확대
+                Center(
+                  child: Image.asset(
+                    correct ? 'assets/images/chr_play_correct.png' : 'assets/images/chr_how_fail.png',
+                    height: imageHeight,
+                    fit: BoxFit.contain,
+                    cacheHeight: 500,
                   ),
                 ),
+                const SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
                       Text(
@@ -661,48 +672,52 @@ class _QuizScreenState extends State<QuizScreen> {
                           fontSize: titleSize,
                           fontWeight: FontWeight.w900,
                           color: correct
-                              ? const Color(0xFF18BEB6)
-                              : const Color(0xFFE05C57),
+                              ? const Color(0xFF13968F) // Desaturated cyan
+                              : const Color(0xFFD64A45), // Adjusted red
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Text(
                         resultMessage,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: messageSize,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF222222),
-                          height: 1.15,
+                          color: const Color(0xFF4B5563), // Dark gray
+                          height: 1.3,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Divider(height: 1, color: Color(0xFFD7D7D7)),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      if (correct) {
-                        widget.onNext();
-                      }
-                    },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          bottom: Radius.circular(24),
+                const SizedBox(height: 30),
+                // 버튼에 여백 주고 둥근 모서리(16) 적용
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (correct) {
+                          widget.onNext();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF133E97), // Main blue color
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
+                        elevation: 0,
                       ),
-                    ),
-                    child: Text(
-                      '확인',
-                      style: TextStyle(
-                        fontSize: confirmSize,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF4A67BF),
+                      child: Text(
+                        '확인',
+                        style: TextStyle(
+                          fontSize: confirmSize,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),

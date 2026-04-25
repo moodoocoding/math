@@ -27,7 +27,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
     _Chapter2Scene(
       speaker: '하우',
       line: '어? 이번에는 원판이 기둥에 쌓여 있어!',
-      characterAsset: 'assets/images/chr_how_surprised.png',
+      characterAsset: 'assets/images/chr_how_right.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
@@ -66,11 +66,19 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
     final width = MediaQuery.of(context).size.width;
     final charHeight = width < 1100 ? width * 0.46 : 460.0;
 
+    Color getSpeakerColor(String name) {
+      if (name == '하우') return const Color(0xFFFF6B80);
+      if (name == '플레이') return const Color(0xFF3B82F6);
+      return const Color(0xFF133E97);
+    }
+    final speakerColor = getSpeakerColor(scene.speaker);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        toolbarHeight: 50,
+        backgroundColor: const Color(0xFFF4F7FC),
         foregroundColor: const Color(0xFF163988),
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 32),
@@ -83,12 +91,12 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
         centerTitle: true,
         title: const Text(
           '미션! 수학체험센터의 반짝별을 찾아서',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22),
         ),
         actions: [
-          const BgmToggleButton(iconSize: 34),
+          const BgmToggleButton(iconSize: 32),
           IconButton(
-            icon: const Icon(Icons.home_rounded, size: 38),
+            icon: const Icon(Icons.home_rounded, size: 32),
             onPressed: () => Navigator.pushNamedAndRemoveUntil(
               context,
               '/home',
@@ -108,7 +116,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                   Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
-          Positioned.fill(child: Container(color: const Color(0x66000000))),
+          Positioned.fill(child: Container(color: const Color(0x33000000))),
           SafeArea(
             child: Column(
               children: [
@@ -120,7 +128,8 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                     child: Image.asset(
                       scene.characterAsset,
                       key: ValueKey(scene.characterAsset),
-                      fit: BoxFit.fitHeight,
+                      fit: BoxFit.contain,
+                      alignment: Alignment.bottomCenter,
                       cacheHeight: 600,
                       gaplessPlayback: false,
                       errorBuilder: (context, error, stackTrace) =>
@@ -128,7 +137,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 2),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: AnimatedSwitcher(
@@ -140,19 +149,19 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(
-                          color: const Color(0xFF133E97),
+                          color: speakerColor,
                           width: 3,
                         ),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x33000000),
+                            color: speakerColor.withValues(alpha: 0.2),
                             blurRadius: 10,
-                            offset: Offset(0, 4),
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+                        padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -162,8 +171,15 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF133E97),
+                                color: speakerColor,
                                 borderRadius: BorderRadius.circular(999),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x33000000),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: Text(
                                 scene.speaker,
@@ -174,7 +190,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             Text(
                               scene.line,
                               style: const TextStyle(

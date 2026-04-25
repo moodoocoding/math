@@ -17,13 +17,13 @@ class Chapter4StoryScreen extends StatelessWidget {
     _Chapter4Scene(
       speaker: '하우',
       line: '와! 체험센터가 거의 다 밝아졌어!',
-      characterAsset: 'assets/images/chr_how_cheering.png',
+      characterAsset: 'assets/images/chr_how_laughing.png',
       backgroundAsset: 'assets/images/chapter3_bg_1.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
       line: '다음 단서가 보여! 마지막 별 조각은 수학융합실에 있대!',
-      characterAsset: 'assets/images/chr_play_happy.png',
+      characterAsset: 'assets/images/chr_play_waving.png',
       backgroundAsset: 'assets/images/chapter3_bg_1.png',
     ),
     _Chapter4Scene(
@@ -34,12 +34,12 @@ class Chapter4StoryScreen extends StatelessWidget {
     _Chapter4Scene(
       speaker: '플레이',
       line: '와! 여기가 수학융합실이구나!',
-      characterAsset: 'assets/images/chr_play_surprised.png',
+      characterAsset: 'assets/images/chr_play_laughing.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
       line: '저기 빛나는 블록판이 보여! 첫 번째 장치인가 봐!',
-      characterAsset: 'assets/images/chr_how_surprised.png',
+      characterAsset: 'assets/images/chr_how_running.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
@@ -69,12 +69,12 @@ class Chapter4Story2Screen extends StatelessWidget {
     _Chapter4Scene(
       speaker: '플레이',
       line: '이번엔 글자 속에 숨은 수학 낱말을 찾아야 하나 봐!',
-      characterAsset: 'assets/images/chr_play_explaining.png',
+      characterAsset: 'assets/images/chr_play_right.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
       line: '잘 보면 마지막 단서가 나타날 거야!',
-      characterAsset: 'assets/images/chr_how_idea.png',
+      characterAsset: 'assets/images/chr_how_presenting.png',
     ),
   ];
 
@@ -93,8 +93,8 @@ class Chapter4Story3Screen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '플레이',
-      line: '드디어 마지막 별 조각이야! 이제 반짝별을 다시 빛나게 하자!',
-      characterAsset: 'assets/images/chr_play_cheering.png',
+      line: '드디어 마지막 별 조각을 찾았어, 반짝별을 다시 빛나게 하자!',
+      characterAsset: 'assets/images/chr_play_heart_hands.png',
     ),
   ];
 
@@ -102,9 +102,8 @@ class Chapter4Story3Screen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
-      nextRouteName: '/home',
-      finalButtonText: '홈으로',
-      replaceAllOnFinish: true,
+      nextRouteName: '/ending_story',
+      finalButtonText: '엔딩 보기',
     );
   }
 }
@@ -201,13 +200,11 @@ class _Chapter4StoryFlow extends StatefulWidget {
     required this.scenes,
     required this.nextRouteName,
     this.finalButtonText,
-    this.replaceAllOnFinish = false,
   });
 
   final List<_Chapter4Scene> scenes;
   final String nextRouteName;
   final String? finalButtonText;
-  final bool replaceAllOnFinish;
 
   @override
   State<_Chapter4StoryFlow> createState() => _Chapter4StoryFlowState();
@@ -238,10 +235,6 @@ class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
       return;
     }
 
-    if (widget.replaceAllOnFinish) {
-      Navigator.pushNamedAndRemoveUntil(context, widget.nextRouteName, (route) => false);
-      return;
-    }
     Navigator.pushReplacementNamed(context, widget.nextRouteName);
   }
 
@@ -292,8 +285,22 @@ class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0xFF133E97), width: 3),
-                        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                        border: Border.all(
+                          color: scene.speaker == '하우'
+                              ? const Color(0xFFFF6B80)
+                              : const Color(0xFF3B82F6),
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (scene.speaker == '하우'
+                                    ? const Color(0xFFFF6B80)
+                                    : const Color(0xFF3B82F6))
+                                .withValues(alpha: 0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
@@ -373,10 +380,11 @@ class _SpeakerBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = name == '하우' ? const Color(0xFFFF6B80) : const Color(0xFF3B82F6);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF133E97),
+        color: color,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

@@ -21,7 +21,7 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
     _Chapter2Scene(
       speaker: '플레이',
       line: '조각 6개를 움직여 같은 무늬를 만들면 지나갈 수 있대!',
-      characterAsset: 'assets/images/chr_play_angry.png',
+      characterAsset: 'assets/images/chr_play_right.png',
     ),
   ];
 
@@ -126,15 +126,20 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(
-                          color: const Color(0xFF133E97),
+                          color: scene.speaker == '하우'
+                              ? const Color(0xFFFF6B80)
+                              : const Color(0xFF3B82F6),
                           width: 3,
                         ),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x33000000),
+                            color: (scene.speaker == '하우'
+                                    ? const Color(0xFFFF6B80)
+                                    : const Color(0xFF3B82F6))
+                                .withValues(alpha: 0.2),
                             blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
+                            offset: const Offset(0, 4),
+                          )
                         ],
                       ),
                       child: Padding(
@@ -200,10 +205,11 @@ class _SpeakerBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = name == '하우' ? const Color(0xFFFF6B80) : const Color(0xFF3B82F6);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF133E97),
+        color: color,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

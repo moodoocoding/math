@@ -4,8 +4,7 @@
 
 - 화면별로 사용되는 배경, 캐릭터, 문제 이미지 에셋을 정리했습니다.
 - “주요 텍스트”는 `docs/story_development.md`의 화면별 대화 플로우를 기준으로 작성했습니다.
-- 문제 화면 중 Flutter 코드로 직접 그리는 도형, 격자, 글자판은 별도 이미지 에셋이 없는 것으로 표시했습니다.
-- 힌트/정답/오답 팝업처럼 여러 문제에서 공통으로 뜨는 이미지는 마지막에 따로 정리했습니다.
+- **[2026-04-26 업데이트]**: 모든 챕터 스토리 화면에 캐릭터가 정상 표시되며, 엔딩 스토리 화면에서만 캐릭터가 등장하지 않습니다.
 
 ## 공통 화면
 
@@ -63,6 +62,7 @@
 | 화면10 | 이번엔 빈칸에 알맞은 수를 넣어야 하나 봐! | `assets/images/chapter3_bg_1.png` | `assets/images/chr_how_confused.png` | 하우 |
 | 화면11 | 가로와 세로의 합을 잘 보면 답을 찾을 수 있어! | `assets/images/chapter3_bg_1.png` | `assets/images/chr_play_explaining.png` | 플레이 |
 | 화면12 | 문제2: 가로와 세로의 합이 같아지도록 빈칸에 들어갈 수를 고르세요. | - | 별도 이미지 없음 | 마방진 판과 숫자 입력은 Flutter UI |
+| 화면13 (Story3) | 좋아! 두 번째 별 조각을 찾으면 불빛이 더 밝아질 거야! | `assets/images/chapter3_bg_1.png` | `assets/images/chr_how_ok.png` | 하우 |
 
 ## 챕터4
 
@@ -80,7 +80,15 @@
 | 화면10 | 이번엔 글자 속에 숨은 수학 낱말을 찾아야 하나 봐! | `assets/images/chapter4_bg_1.png` | `assets/images/chr_play_explaining.png` | 플레이 |
 | 화면11 | 잘 보면 마지막 단서가 나타날 거야! | `assets/images/chapter4_bg_1.png` | `assets/images/chr_how_idea.png` | 하우 |
 | 화면12 | 문제2: 글자판에서 찾을 수 있는 수학 낱말은 무엇일까요? | - | 별도 이미지 없음 | 글자판은 Flutter UI |
-| 화면13 | 드디어 마지막 별 조각이야! 이제 반짝별을 다시 빛나게 하자! | `assets/images/chapter4_bg_1.png` | `assets/images/chr_play_cheering.png` | 플레이 |
+| 화면13 | 드디어 마지막 별 조각을 찾았어, 반짝별을 다시 빛나게 하자! | `assets/images/chapter4_bg_1.png` | `assets/images/chr_play_cheering.png` | 플레이 |
+
+## 엔딩
+
+| 화면 | 주요 텍스트 | 배경/영상 에셋 | 캐릭터/문제 에셋 | 비고 |
+|---|---|---|---|---|
+| 화면1 | 서둘러! 마지막 별 조각을 반짝별 앞으로 가져가자! | `assets/images/ending.png` | 캐릭터 등장 안 함 | 하우 (음성/텍스트만) |
+| 화면2 | 봐! 마지막 별 조각이 반짝별과 하나로 모이고 있어! | `assets/images/ending.png` | 캐릭터 등장 안 함 | 플레이 (음성/텍스트만) |
+| 영상 재생 | (엔딩 영상 재생) | `assets/video/ending_video.mp4` | - | 스토리 완료 후 자동 재생 |
 
 ## 공통 팝업/피드백 에셋
 
@@ -93,5 +101,5 @@
 
 ## 참고
 
-- `assets/images/chapter2_scene1_together.png`, `assets/images/chr_together.png` 등은 이미지 폴더에 있지만, 현재 주요 화면 흐름에서는 직접 표시되는 화면 에셋으로 확인되지 않았습니다.
-- 챕터4 문제 파일은 `lib/chapter4_problem1_brick_puzzle.dart`, `lib/chapter4_problem2_hidden_word.dart`로 연결되어 있으며, 현재는 이미지 파일 대신 코드 기반 도형/글자 UI를 사용합니다.
+- **엔딩 캐릭터**: 엔딩 스토리에서는 캐릭터 이미지를 쓰지 않고 배경 이미지(`ending.png`)와 대화창만 사용하여 시각적 집중도를 높였습니다.
+- **이미지 부재**: `chapter2_scene1_together.png`, `chr_together.png` 등은 현재 스토리 흐름에서 사용되지 않습니다.

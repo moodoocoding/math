@@ -78,6 +78,7 @@
 
 ## 참고 사항
 
-- `chr_how_cheering.png`와 `chr_how_cheering.png.png`는 이름상 중복 이미지일 가능성이 있습니다.
-- `bg_intro.jpg`와 `chr_main_happy.png`는 파일 용량이 26바이트로 매우 작아 손상 파일 또는 자리표시자일 가능성이 있습니다.
-- 캐릭터 파일은 대부분 `chr_how_*`, `chr_play_*` 규칙을 따르므로 스토리 화면에서 캐릭터 감정/행동에 맞춰 선택하기 좋습니다.
+- **자리표시자(Placeholder)**: `bg_intro.jpg`와 `chr_main_happy.png`는 파일 용량이 26바이트로 매우 작아 실제 이미지가 없는 자리표시자 파일입니다. 코드에서 사용하지 않도록 주의가 필요합니다.
+- **중복 및 오류 파일**: `chr_how_cheering.png (1).png`, `chr_how_cheering.png.png` 등은 파일명 생성 오류로 보이는 중복 파일들이며 현재 코드에서 사용되지 않습니다.
+- **캐릭터 사용 규칙**: 캐릭터 파일은 `chr_how_*`, `chr_play_*` 규칙을 따르며, 현재 스토리와 결과 팝업, 힌트 창에서 감정 상태에 맞춰 적절히 사용되고 있습니다. (상세 사용 내역은 `docs/character_asset_usage.md` 참고)
+- **엔딩 배경**: `ending.png`는 엔딩 스토리의 핵심 배경으로 사용됩니다.

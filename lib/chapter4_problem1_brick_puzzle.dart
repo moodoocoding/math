@@ -338,7 +338,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF18BEB6),
+                  backgroundColor: const Color(0xFF133E97),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 40,
                     vertical: 16,
@@ -704,40 +704,42 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
         border: Border.all(color: const Color(0xFFF4C430), width: 2),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: screenSize.width * 0.01),
-            child: Text(
-              '브릭 조각',
-              style: TextStyle(
-                fontSize: isCompact ? 16 : 20,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF163988),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: screenSize.width * 0.01),
+              child: Text(
+                '브릭 조각',
+                style: TextStyle(
+                  fontSize: isCompact ? 16 : 20,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF163988),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '조각은 사라지지 않아요.\n필요한 만큼 여러 번 끌어 쓰세요.',
-            style: TextStyle(
-              fontSize: isCompact ? 12 : 15,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF5B7BA6),
-              height: 1.25,
+            const SizedBox(height: 8),
+            Text(
+              '조각은 사라지지 않아요.\n필요한 만큼 여러 번 끌어 쓰세요.',
+              style: TextStyle(
+                fontSize: isCompact ? 12 : 15,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF5B7BA6),
+                height: 1.25,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: screenSize.width * 0.012,
-            runSpacing: screenSize.height * 0.012,
-            children: [
-              for (var brick in bricks)
-                _buildBrickWidget(brick, screenSize, isCompact),
-            ],
-          ),
-        ],
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: screenSize.width * 0.012,
+              runSpacing: screenSize.height * 0.012,
+              children: [
+                for (var brick in bricks)
+                  _buildBrickWidget(brick, screenSize, isCompact),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
