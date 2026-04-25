@@ -21,12 +21,12 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
     _Chapter3Scene(
       speaker: '하우',
       line: '이번엔 빈칸에 알맞은 수를 넣어야 하나 봐!',
-      characterAsset: 'assets/images/chr_how_thinking.png',
+      characterAsset: 'assets/images/chr_how_confused.png',
     ),
     _Chapter3Scene(
       speaker: '플레이',
       line: '가로와 세로의 합을 잘 보면 답을 찾을 수 있어!',
-      characterAsset: 'assets/images/chr_play_left.png',
+      characterAsset: 'assets/images/chr_play_explaining.png',
     ),
   ];
 
@@ -93,9 +93,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
               errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
-          Positioned.fill(
-            child: Container(color: const Color(0x66000000)),
-          ),
+          Positioned.fill(child: Container(color: const Color(0x66000000))),
           SafeArea(
             child: Column(
               children: [
@@ -131,17 +129,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF133E97),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                scene.speaker,
-                                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-                              ),
-                            ),
+                            _SpeakerBadge(name: scene.speaker),
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
@@ -167,7 +155,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '문제 풀이 시작' : '다음',
+                        isLast ? '문제 풀러 가기' : '다음',
                         style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
                       ),
                     ),
@@ -177,6 +165,27 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SpeakerBadge extends StatelessWidget {
+  const _SpeakerBadge({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFF133E97),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        name,
+        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
       ),
     );
   }

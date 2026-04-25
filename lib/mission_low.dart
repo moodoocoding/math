@@ -1,17 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
-
-final Random _random = Random();
-
-String randomCharacterAsset(String mood) {
-  final prefix = _random.nextBool() ? 'play' : 'how';
-  return 'assets/images/chr_${prefix}_$mood.png';
-}
 
 enum _ShapeChoiceType { square, circle, star, heart, unknown }
 
@@ -100,9 +91,12 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
       // Fallback for stale asset cache / old builds.
     }
 
-    if (widget.missionDataPath == 'assets/data/mission_chapter1_q2_hanoi.json') {
+    if (widget.missionDataPath ==
+        'assets/data/mission_chapter1_q2_hanoi.json') {
       try {
-        final fallbackJson = await assetBundle.loadString('assets/data/mission_chapter1_q2.json');
+        final fallbackJson = await assetBundle.loadString(
+          'assets/data/mission_chapter1_q2.json',
+        );
         final data = json.decode(fallbackJson) as Map<String, dynamic>;
         if (!mounted) return;
         setState(() {
@@ -152,9 +146,7 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
           ),
           centerTitle: true,
-          actions: const [
-            BgmToggleButton(iconSize: 40),
-          ],
+          actions: const [BgmToggleButton(iconSize: 40)],
         ),
         body: Center(
           child: Padding(
@@ -162,12 +154,20 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline_rounded, color: Color(0xFFE05C57), size: 64),
+                const Icon(
+                  Icons.error_outline_rounded,
+                  color: Color(0xFFE05C57),
+                  size: 64,
+                ),
                 const SizedBox(height: 14),
                 Text(
                   _loadError!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1E1E1E)),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1E1E1E),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -213,7 +213,11 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
           const BgmToggleButton(iconSize: 40),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 44),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
         ],
       ),
@@ -222,13 +226,23 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
               padding: const EdgeInsets.all(16),
               child: StoryScreen(step: step, onNext: nextStep, isLast: isLast),
             )
-          : QuizScreen(step: step, onNext: nextStep, isLast: isLast, progress: progress),
+          : QuizScreen(
+              step: step,
+              onNext: nextStep,
+              isLast: isLast,
+              progress: progress,
+            ),
     );
   }
 }
 
 class StoryScreen extends StatelessWidget {
-  const StoryScreen({super.key, required this.step, required this.onNext, required this.isLast});
+  const StoryScreen({
+    super.key,
+    required this.step,
+    required this.onNext,
+    required this.isLast,
+  });
 
   final Map<String, dynamic> step;
   final VoidCallback onNext;
@@ -255,7 +269,12 @@ class StoryScreen extends StatelessWidget {
         Text(
           step['text'].toString(),
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: Color(0xFF15347F), height: 1.3),
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF15347F),
+            height: 1.3,
+          ),
         ),
         const SizedBox(height: 24),
         ElevatedButton(
@@ -264,9 +283,14 @@ class StoryScreen extends StatelessWidget {
             backgroundColor: const Color(0xFF123E97),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
-          child: Text(isLast ? '완료' : '다음', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+          child: Text(
+            isLast ? '완료' : '다음',
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+          ),
         ),
       ],
     );
@@ -274,7 +298,13 @@ class StoryScreen extends StatelessWidget {
 }
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key, required this.step, required this.onNext, required this.isLast, required this.progress});
+  const QuizScreen({
+    super.key,
+    required this.step,
+    required this.onNext,
+    required this.isLast,
+    required this.progress,
+  });
 
   final Map<String, dynamic> step;
   final VoidCallback onNext;
@@ -317,8 +347,7 @@ class _QuizScreenState extends State<QuizScreen> {
       _simulationIndex = 0;
       _resetHanoi();
       _inputController.clear();
-      _magicSquareInputs
-        ..updateAll((key, value) => null);
+      _magicSquareInputs.updateAll((key, value) => null);
       _activeMagicSquareCell = null;
     }
   }
@@ -330,9 +359,14 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   bool _isAnswerReady(String quizType, Map<String, dynamic> step) {
-    final visualType = (step['visual_type'] ?? '').toString().trim().toLowerCase();
+    final visualType = (step['visual_type'] ?? '')
+        .toString()
+        .trim()
+        .toLowerCase();
     if (visualType == 'magic_square') {
-      return _magicSquareBlankIndexes.every((index) => _magicSquareInputs[index] != null);
+      return _magicSquareBlankIndexes.every(
+        (index) => _magicSquareInputs[index] != null,
+      );
     }
     if (quizType == 'mcq') return selectedChoiceIndex != null;
     return inputAnswer.trim().isNotEmpty;
@@ -357,7 +391,10 @@ class _QuizScreenState extends State<QuizScreen> {
               children: [
                 Text(
                   '숫자를 선택하세요',
-                  style: TextStyle(fontSize: isCompact ? 24 : 30, fontWeight: FontWeight.w900),
+                  style: TextStyle(
+                    fontSize: isCompact ? 24 : 30,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 GridView.builder(
@@ -382,11 +419,16 @@ class _QuizScreenState extends State<QuizScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF123E97),
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       child: Text(
                         '$index',
-                        style: TextStyle(fontSize: isCompact ? 24 : 30, fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                          fontSize: isCompact ? 24 : 30,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     );
                   },
@@ -443,11 +485,13 @@ class _QuizScreenState extends State<QuizScreen> {
     }
 
     final movingDisk = _hanoiPegs[selectedPeg].last;
-    final targetTopDisk = _hanoiPegs[pegIndex].isEmpty ? null : _hanoiPegs[pegIndex].last;
+    final targetTopDisk = _hanoiPegs[pegIndex].isEmpty
+        ? null
+        : _hanoiPegs[pegIndex].last;
     if (targetTopDisk != null && targetTopDisk < movingDisk) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('큰 원반은 작은 원반 위에 올릴 수 없어요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('큰 원반은 작은 원반 위에 올릴 수 없어요.')));
       setState(() {
         _selectedHanoiPeg = null;
       });
@@ -481,22 +525,45 @@ class _QuizScreenState extends State<QuizScreen> {
               children: [
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('힌트', style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.w900)),
+                  child: Text(
+                    '힌트',
+                    style: TextStyle(
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 18),
-                Image.asset(randomCharacterAsset('surprised'), height: screenWidth < 1100 ? 130 : 160, fit: BoxFit.contain, cacheHeight: 400),
+                Image.asset(
+                  'assets/images/chr_how_idea.png',
+                  height: screenWidth < 1100 ? 130 : 160,
+                  fit: BoxFit.contain,
+                  cacheHeight: 400,
+                ),
                 const SizedBox(height: 18),
                 Text(
                   (hint == null || hint.trim().isEmpty) ? '준비된 힌트가 없어요.' : hint,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: hintSize, fontWeight: FontWeight.w700, color: const Color(0xFF232323), height: 1.2),
+                  style: TextStyle(
+                    fontSize: hintSize,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF232323),
+                    height: 1.2,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('확인', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF6F63D1))),
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF6F63D1),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -509,17 +576,22 @@ class _QuizScreenState extends State<QuizScreen> {
 
   void _submitAnswer(Map<String, dynamic> step, String quizType) {
     if (!_isAnswerReady(quizType, step)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('답을 먼저 선택하거나 입력해 주세요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('답을 먼저 선택하거나 입력해 주세요.')));
       return;
     }
 
     bool correct = false;
 
-    final visualType = (step['visual_type'] ?? '').toString().trim().toLowerCase();
+    final visualType = (step['visual_type'] ?? '')
+        .toString()
+        .trim()
+        .toLowerCase();
     if (visualType == 'magic_square') {
-      final rawAnswers = (step['magic_square_answers'] as Map<String, dynamic>?) ?? const {'7': 1, '8': 6};
+      final rawAnswers =
+          (step['magic_square_answers'] as Map<String, dynamic>?) ??
+          const {'7': 1, '8': 6};
       correct = true;
       for (final entry in rawAnswers.entries) {
         final cell = int.tryParse(entry.key);
@@ -553,7 +625,9 @@ class _QuizScreenState extends State<QuizScreen> {
         final confirmSize = screenWidth < 1100 ? 44.0 : 56.0;
 
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           child: SizedBox(
             width: dialogWidth,
             child: Column(
@@ -564,11 +638,13 @@ class _QuizScreenState extends State<QuizScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
                   decoration: const BoxDecoration(
                     color: Color(0xFFEAF3F4),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
                   ),
                   child: Center(
                     child: Image.asset(
-                      randomCharacterAsset(correct ? 'happy' : 'fail'),
+                      correct ? 'assets/images/chr_play_correct.png' : 'assets/images/chr_how_fail.png',
                       height: imageHeight,
                       fit: BoxFit.contain,
                       cacheHeight: 500,
@@ -584,14 +660,21 @@ class _QuizScreenState extends State<QuizScreen> {
                         style: TextStyle(
                           fontSize: titleSize,
                           fontWeight: FontWeight.w900,
-                          color: correct ? const Color(0xFF18BEB6) : const Color(0xFFE05C57),
+                          color: correct
+                              ? const Color(0xFF18BEB6)
+                              : const Color(0xFFE05C57),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         resultMessage,
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: messageSize, fontWeight: FontWeight.w700, color: const Color(0xFF222222), height: 1.15),
+                        style: TextStyle(
+                          fontSize: messageSize,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF222222),
+                          height: 1.15,
+                        ),
                       ),
                     ],
                   ),
@@ -609,12 +692,18 @@ class _QuizScreenState extends State<QuizScreen> {
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+                        borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(24),
+                        ),
                       ),
                     ),
                     child: Text(
                       '확인',
-                      style: TextStyle(fontSize: confirmSize, fontWeight: FontWeight.w800, color: const Color(0xFF4A67BF)),
+                      style: TextStyle(
+                        fontSize: confirmSize,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF4A67BF),
+                      ),
                     ),
                   ),
                 ),
@@ -626,10 +715,13 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _buildSimulationArea(List<String> images) {
+  Widget _buildSimulationArea(List<String> images, {double? height}) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final simulationHeight = (screenHeight * (screenWidth < 1100 ? 0.30 : 0.34)).clamp(240.0, 420.0).toDouble();
+    final simulationHeight =
+        (height ?? (screenHeight * (screenWidth < 1100 ? 0.48 : 0.52)))
+            .clamp(340.0, 720.0)
+            .toDouble();
 
     return Column(
       children: [
@@ -649,7 +741,10 @@ class _QuizScreenState extends State<QuizScreen> {
               height: simulationHeight,
               color: Colors.grey[200],
               alignment: Alignment.center,
-              child: const Text('이미지 준비중...', style: TextStyle(color: Colors.grey)),
+              child: const Text(
+                '이미지 준비중...',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
           ),
         ),
@@ -658,11 +753,11 @@ class _QuizScreenState extends State<QuizScreen> {
           onPressed: () async {
             if (_simulationIndex != 0) return; // 이미 실행 중이거나 완료된 경우 무시
             if (images.length < 2) return;
-            
+
             setState(() {
               _simulationIndex = 1;
             });
-            
+
             if (images.length > 2) {
               await Future.delayed(const Duration(milliseconds: 1200));
               if (!mounted) return;
@@ -672,13 +767,18 @@ class _QuizScreenState extends State<QuizScreen> {
             }
           },
           icon: const Icon(Icons.balance),
-          label: const Text('직접 저울에 올려보기 ⚖️', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          label: const Text(
+            '직접 저울에 올려보기 ⚖️',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.orange[400],
             foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
           ),
         ),
       ],
@@ -691,13 +791,23 @@ class _QuizScreenState extends State<QuizScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final quizType = (step['quiz_type'] ?? '').toString();
-    final visualType = (step['visual_type'] ?? '').toString().trim().toLowerCase();
+    final visualType = (step['visual_type'] ?? '')
+        .toString()
+        .trim()
+        .toLowerCase();
     final isMagicSquare = visualType == 'magic_square';
     final choices = (step['choices'] as List<dynamic>?) ?? const [];
     final showHanoiVisual = _asTrue(step['show_hanoi_visual']);
     final renderChoicesAsShapes = _asTrue(step['choices_as_shapes']);
-    final choicesLayout = (step['choices_layout'] ?? '').toString().trim().toLowerCase();
-    final useSingleColumnChoices = (quizType == 'mcq' && choices.length == 4) || choicesLayout == '4x1';
+    final hasSimulationImages =
+        step['simulation_images'] != null &&
+        (step['simulation_images'] as List<dynamic>).isNotEmpty;
+    final choicesLayout = (step['choices_layout'] ?? '')
+        .toString()
+        .trim()
+        .toLowerCase();
+    final useFourAcrossChoices =
+        (quizType == 'mcq' && choices.length == 4) || choicesLayout == '4x1';
     final isCompact = screenWidth < 1100;
     final questionText = step['question'].toString();
     final questionFontSize = isCompact ? 24.0 : 30.0;
@@ -705,10 +815,27 @@ class _QuizScreenState extends State<QuizScreen> {
     final optionShapeSize = isCompact ? 30.0 : 34.0;
     final actionFontSize = isCompact ? 20.0 : 24.0;
     final actionButtonHeight = isMagicSquare ? 52.0 : 56.0;
-    final hanoiHeight = (screenHeight * (isCompact ? 0.30 : 0.34)).clamp(260.0, 420.0).toDouble();
-    final floorPreviewHeight = (screenHeight * (isCompact ? 0.28 : 0.32)).clamp(180.0, 360.0).toDouble();
-    final rodVisualHeight = (screenHeight * (isCompact ? 0.34 : 0.38)).clamp(260.0, 460.0).toDouble();
-    final magicSquareVisualHeight = (screenHeight * 0.50).clamp(340.0, 640.0).toDouble();
+    final hanoiHeight = (screenHeight * (isCompact ? 0.56 : 0.60))
+        .clamp(430.0, 720.0)
+        .toDouble();
+    final floorPreviewHeight = (screenHeight * (isCompact ? 0.50 : 0.54))
+        .clamp(360.0, 660.0)
+        .toDouble();
+    final rodVisualHeight = (screenHeight * (isCompact ? 0.52 : 0.56))
+        .clamp(390.0, 680.0)
+        .toDouble();
+    final magicSquareVisualHeight = (screenHeight * (isCompact ? 0.56 : 0.60))
+        .clamp(430.0, 720.0)
+        .toDouble();
+    final hasTopVisualSection =
+        hasSimulationImages ||
+        showHanoiVisual ||
+        renderChoicesAsShapes ||
+        visualType == 'rod_numeral' ||
+        visualType == 'magic_square';
+    final choicesTopGap = hasTopVisualSection
+        ? (isCompact ? 22.0 : 28.0)
+        : 14.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
@@ -742,8 +869,10 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
           ),
-          if (step['simulation_images'] != null && (step['simulation_images'] as List<dynamic>).isNotEmpty)
-            _buildSimulationArea((step['simulation_images'] as List<dynamic>).cast<String>()),
+          if (hasSimulationImages)
+            _buildSimulationArea(
+              (step['simulation_images'] as List<dynamic>).cast<String>(),
+            ),
           if (showHanoiVisual) ...[
             const SizedBox(height: 14),
             _InteractiveHanoiVisualPanel(
@@ -779,25 +908,31 @@ class _QuizScreenState extends State<QuizScreen> {
             const SizedBox(height: 12),
             _TessellationFloorPreview(height: floorPreviewHeight),
           ],
-          const SizedBox(height: 14),
+          SizedBox(height: choicesTopGap),
           if (quizType == 'mcq' && !isMagicSquare)
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: 4,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: useSingleColumnChoices ? 1 : 2,
+                crossAxisCount: useFourAcrossChoices ? 4 : 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: useSingleColumnChoices ? (isCompact ? 8.0 : 10.5) : (isCompact ? 5.5 : 7.5),
+                childAspectRatio: useFourAcrossChoices
+                    ? (isCompact ? 5.8 : 7.0)
+                    : (isCompact ? 5.5 : 7.5),
               ),
               itemBuilder: (context, index) {
                 final selected = selectedChoiceIndex == index;
                 final color = _optionColors[index % _optionColors.length];
                 final isEnabled = index < choices.length;
-                final choiceText = isEnabled ? choices[index].toString() : '준비 중';
+                final choiceText = isEnabled
+                    ? choices[index].toString()
+                    : '준비 중';
                 final shapeType = _parseShapeChoiceType(choiceText);
-                final textColor = color.computeLuminance() > 0.55 ? const Color(0xFF163988) : Colors.white;
+                final textColor = color.computeLuminance() > 0.55
+                    ? const Color(0xFF163988)
+                    : Colors.white;
 
                 return AnimatedScale(
                   scale: selected ? 1.0 : 0.98,
@@ -807,20 +942,36 @@ class _QuizScreenState extends State<QuizScreen> {
                     curve: Curves.easeOut,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      border: selected ? Border.all(color: const Color(0xFF0B1F61), width: 5) : null,
-                      boxShadow: selected ? const [BoxShadow(color: Color(0x33133E97), blurRadius: 8, offset: Offset(0, 2))] : null,
+                      border: selected
+                          ? Border.all(color: const Color(0xFF0B1F61), width: 5)
+                          : null,
+                      boxShadow: selected
+                          ? const [
+                              BoxShadow(
+                                color: Color(0x33133E97),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: isEnabled ? () => setState(() => selectedChoiceIndex = index) : null,
+                        onTap: isEnabled
+                            ? () => setState(() => selectedChoiceIndex = index)
+                            : null,
                         borderRadius: BorderRadius.circular(10),
                         child: Ink(
                           decoration: BoxDecoration(
                             color: isEnabled ? color : const Color(0xFFB8B8BE),
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: const [
-                              BoxShadow(color: Color(0x22000000), blurRadius: 6, offset: Offset(0, 2)),
+                              BoxShadow(
+                                color: Color(0x22000000),
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
                             ],
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -831,7 +982,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                     ? _ShapeOptionSymbol(
                                         type: shapeType,
                                         color: textColor,
-                                        size: useSingleColumnChoices ? (isCompact ? 28 : 32) : optionShapeSize,
+                                        size: useFourAcrossChoices
+                                            ? (isCompact ? 22 : 26)
+                                            : optionShapeSize,
                                         selected: selected,
                                       )
                                     : Text(
@@ -839,9 +992,18 @@ class _QuizScreenState extends State<QuizScreen> {
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: textColor,
-                                          fontSize: useSingleColumnChoices ? (isCompact ? 28 : 32) : optionTextSize,
+                                          fontSize: useFourAcrossChoices
+                                              ? (isCompact ? 22 : 26)
+                                              : optionTextSize,
                                           fontWeight: FontWeight.w900,
-                                          shadows: selected ? const [Shadow(color: Color(0x55000000), blurRadius: 4)] : null,
+                                          shadows: selected
+                                              ? const [
+                                                  Shadow(
+                                                    color: Color(0x55000000),
+                                                    blurRadius: 4,
+                                                  ),
+                                                ]
+                                              : null,
                                         ),
                                       ),
                               ),
@@ -849,7 +1011,11 @@ class _QuizScreenState extends State<QuizScreen> {
                                 Positioned(
                                   right: 10,
                                   top: 10,
-                                  child: Icon(Icons.check_circle_rounded, color: textColor, size: 30),
+                                  child: Icon(
+                                    Icons.check_circle_rounded,
+                                    color: textColor,
+                                    size: 30,
+                                  ),
                                 ),
                             ],
                           ),
@@ -872,11 +1038,19 @@ class _QuizScreenState extends State<QuizScreen> {
               child: TextField(
                 controller: _inputController,
                 onChanged: (value) => inputAnswer = value,
-                style: TextStyle(fontSize: isCompact ? 22 : 26, fontWeight: FontWeight.w700, color: const Color(0xFF091F59)),
+                style: TextStyle(
+                  fontSize: isCompact ? 22 : 26,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF091F59),
+                ),
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: quizType == 'qr' ? 'QR 결과를 입력하세요' : '답을 입력하세요',
-                  hintStyle: TextStyle(fontSize: isCompact ? 20 : 24, color: const Color(0xFF8A93AE), fontWeight: FontWeight.w600),
+                  hintStyle: TextStyle(
+                    fontSize: isCompact ? 20 : 24,
+                    color: const Color(0xFF8A93AE),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -887,11 +1061,19 @@ class _QuizScreenState extends State<QuizScreen> {
                 child: OutlinedButton.icon(
                   onPressed: () => _showHint(step['hint']?.toString()),
                   icon: const Icon(Icons.chat_bubble_outline_rounded, size: 28),
-                  label: Text('힌트', style: TextStyle(fontSize: actionFontSize, fontWeight: FontWeight.w800)),
+                  label: Text(
+                    '힌트',
+                    style: TextStyle(
+                      fontSize: actionFontSize,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF163988),
                     side: const BorderSide(color: Color(0xFF21396C), width: 2),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     minimumSize: Size.fromHeight(actionButtonHeight),
                   ),
                 ),
@@ -899,14 +1081,24 @@ class _QuizScreenState extends State<QuizScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _isAnswerReady(quizType, step) ? () => _submitAnswer(step, quizType) : null,
+                  onPressed: _isAnswerReady(quizType, step)
+                      ? () => _submitAnswer(step, quizType)
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF123E97),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     minimumSize: Size.fromHeight(actionButtonHeight),
                   ),
-                  child: Text('정답 제출', style: TextStyle(fontSize: actionFontSize, fontWeight: FontWeight.w800)),
+                  child: Text(
+                    '정답 제출',
+                    style: TextStyle(
+                      fontSize: actionFontSize,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -920,12 +1112,17 @@ class _QuizScreenState extends State<QuizScreen> {
                 icon: const Icon(Icons.skip_next_rounded),
                 label: Text(
                   '테스트용: 문제 건너뛰고 다음으로',
-                  style: TextStyle(fontSize: isCompact ? 14 : 16, fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                    fontSize: isCompact ? 14 : 16,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF355AA8),
                   side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   minimumSize: const Size.fromHeight(42),
                 ),
               ),
@@ -966,10 +1163,7 @@ class _ShapeOptionSymbol extends StatelessWidget {
         return Container(
           width: size,
           height: size,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         );
       case _ShapeChoiceType.star:
         return Icon(Icons.star_rounded, size: size + 6, color: color);
@@ -982,7 +1176,9 @@ class _ShapeOptionSymbol extends StatelessWidget {
             color: color,
             fontSize: size,
             fontWeight: FontWeight.w900,
-            shadows: selected ? const [Shadow(color: Color(0xAA000000), blurRadius: 6)] : null,
+            shadows: selected
+                ? const [Shadow(color: Color(0xAA000000), blurRadius: 6)]
+                : null,
           ),
         );
     }
@@ -999,9 +1195,7 @@ class _TessellationFloorPreview extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: CustomPaint(
-        painter: _TessellationFloorPainter(),
-      ),
+      child: CustomPaint(painter: _TessellationFloorPainter()),
     );
   }
 }
@@ -1191,7 +1385,13 @@ class _RodGroupCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0xFF9C6B2F),
                       borderRadius: BorderRadius.circular(8),
-                      boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 3, offset: Offset(0, 2))],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x22000000),
+                          blurRadius: 3,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                   );
                 }),
@@ -1228,11 +1428,7 @@ class _MagicSquareVisualPanel extends StatelessWidget {
       color: const Color(0xFF5B3611),
     );
 
-    final cells = const [
-      '4', '9', '2',
-      '3', '5', '7',
-      '8', '?', '?',
-    ];
+    final cells = const ['4', '9', '2', '3', '5', '7', '8', '?', '?'];
 
     return Container(
       width: double.infinity,
@@ -1277,7 +1473,9 @@ class _MagicSquareVisualPanel extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isBlank
-                            ? (isActive ? const Color(0xFF163988) : const Color(0xFFD5962A))
+                            ? (isActive
+                                  ? const Color(0xFF163988)
+                                  : const Color(0xFFD5962A))
                             : const Color(0xFFD6B06A),
                         width: isBlank ? (isActive ? 4 : 3) : 2,
                       ),
@@ -1354,11 +1552,24 @@ class _InteractiveHanoiVisualPanel extends StatelessWidget {
               IconButton(
                 tooltip: '초기화',
                 onPressed: onReset,
-                icon: const Icon(Icons.refresh_rounded, color: Color(0xFF163988)),
+                icon: const Icon(
+                  Icons.refresh_rounded,
+                  color: Color(0xFF163988),
+                ),
               ),
             ],
           ),
-          SizedBox(height: isCompact ? 4 : 8),
+          Text(
+            '기둥을 눌러 맨 위 원반을 고르고, 옮길 기둥을 다시 눌러요. 큰 원반은 작은 원반 위에 올릴 수 없어요.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: isCompact ? 13 : 16,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF4C6296),
+              height: 1.2,
+            ),
+          ),
+          SizedBox(height: isCompact ? 6 : 10),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -1406,9 +1617,13 @@ class _InteractiveHanoiVisualPanel extends StatelessWidget {
       final pegCenter = pegWidth * pegIndex + pegWidth / 2;
       for (var level = 0; level < peg.length; level++) {
         final disk = peg[level];
-        final isSelectedTop = selectedPeg == pegIndex && level == peg.length - 1;
+        final isSelectedTop =
+            selectedPeg == pegIndex && level == peg.length - 1;
         final diskWidth = pegWidth * (0.28 + disk * 0.16);
-        final top = baseTop - diskHeight * (level + 1) - (isSelectedTop ? diskHeight * 0.75 : 0);
+        final top =
+            baseTop -
+            diskHeight * (level + 1) -
+            (isSelectedTop ? diskHeight * 0.75 : 0);
         widgets.add(
           AnimatedPositioned(
             key: ValueKey('hanoi-$disk'),
@@ -1423,11 +1638,17 @@ class _InteractiveHanoiVisualPanel extends StatelessWidget {
                 color: diskColors[disk],
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                  color: isSelectedTop ? const Color(0xFFF0B126) : const Color(0xFF2467B6),
+                  color: isSelectedTop
+                      ? const Color(0xFFF0B126)
+                      : const Color(0xFF2467B6),
                   width: isSelectedTop ? 3 : 2,
                 ),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x22000000), blurRadius: 4, offset: Offset(0, 2)),
+                  BoxShadow(
+                    color: Color(0x22000000),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
                 ],
               ),
             ),
@@ -1465,7 +1686,12 @@ class _HanoiBasePainter extends CustomPainter {
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(size.width * 0.02, baseTop, size.width * 0.96, size.height * 0.08),
+        Rect.fromLTWH(
+          size.width * 0.02,
+          baseTop,
+          size.width * 0.96,
+          size.height * 0.08,
+        ),
         const Radius.circular(8),
       ),
       groundPaint,
@@ -1475,7 +1701,12 @@ class _HanoiBasePainter extends CustomPainter {
     for (final x in rodX) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(x - 5, size.height * 0.18, 10, baseTop - size.height * 0.18),
+          Rect.fromLTWH(
+            x - 5,
+            size.height * 0.18,
+            10,
+            baseTop - size.height * 0.18,
+          ),
           const Radius.circular(6),
         ),
         rodPaint,
@@ -1541,7 +1772,12 @@ class _HanoiTowerPainter extends CustomPainter {
     final baseTop = size.height * 0.86;
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(size.width * 0.06, baseTop, size.width * 0.88, size.height * 0.08),
+        Rect.fromLTWH(
+          size.width * 0.06,
+          baseTop,
+          size.width * 0.88,
+          size.height * 0.08,
+        ),
         const Radius.circular(8),
       ),
       groundPaint,
@@ -1551,15 +1787,28 @@ class _HanoiTowerPainter extends CustomPainter {
     for (final x in rodX) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(x - 5, size.height * 0.24, 10, baseTop - size.height * 0.24),
+          Rect.fromLTWH(
+            x - 5,
+            size.height * 0.24,
+            10,
+            baseTop - size.height * 0.24,
+          ),
           const Radius.circular(6),
         ),
         rodPaint,
       );
     }
 
-    final diskColors = const [Color(0xFF4A9BFF), Color(0xFF78B7FF), Color(0xFFA7D0FF)];
-    final diskWidths = [size.width * 0.22, size.width * 0.16, size.width * 0.10];
+    final diskColors = const [
+      Color(0xFF4A9BFF),
+      Color(0xFF78B7FF),
+      Color(0xFFA7D0FF),
+    ];
+    final diskWidths = [
+      size.width * 0.22,
+      size.width * 0.16,
+      size.width * 0.10,
+    ];
     final diskHeight = size.height * 0.09;
     final centerX = rodX[0];
 

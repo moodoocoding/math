@@ -16,27 +16,27 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
     _Chapter3Scene(
       speaker: '하우',
       line: '찾았다! 두 번째 별 조각이야!',
-      characterAsset: 'assets/images/chr_how_happy.png',
+      characterAsset: 'assets/images/chr_how_heart.png',
     ),
     _Chapter3Scene(
       speaker: '플레이',
-      line: '다음 단서가 보여. 세 번째 별 조각은 수학역사실에 있대!',
-      characterAsset: 'assets/images/chr_play_lefthand2.png',
+      line: '봐! 조각을 찾으니까 체험센터가 더 환해졌어!',
+      characterAsset: 'assets/images/chr_play_happy.png',
     ),
     _Chapter3Scene(
       speaker: '하우',
-      line: '어? 체험센터 불빛이 또 하나 꺼졌어!',
-      characterAsset: 'assets/images/chr_how_surprised.png',
+      line: '다음 단서가 보여! 세 번째 별 조각은 수학역사실에 있대!',
+      characterAsset: 'assets/images/chr_how_lefttalk.png',
     ),
     _Chapter3Scene(
       speaker: '플레이',
-      line: '서둘러! 다음 불빛이 꺼지기 전에 가야 해!',
-      characterAsset: 'assets/images/chr_play_worry.png',
+      line: '서둘러 가자! 다음 조각을 찾으면 빛이 더 돌아올 거야!',
+      characterAsset: 'assets/images/chr_play_running.png',
     ),
     _Chapter3Scene(
       speaker: '하우',
       line: '와! 여기가 수학역사실이구나!',
-      characterAsset: 'assets/images/chr_how_lefttalk.png',
+      characterAsset: 'assets/images/chr_how_jump.png',
     ),
     _Chapter3Scene(
       speaker: '플레이',
@@ -114,9 +114,7 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
               errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
-          Positioned.fill(
-            child: Container(color: const Color(0x66000000)),
-          ),
+          Positioned.fill(child: Container(color: const Color(0x66000000))),
           SafeArea(
             child: Column(
               children: [
@@ -152,17 +150,7 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF133E97),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                scene.speaker,
-                                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-                              ),
-                            ),
+                            _SpeakerBadge(name: scene.speaker),
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
@@ -188,7 +176,7 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '문제 풀이 시작' : '다음',
+                        isLast ? '문제 풀러 가기' : '다음',
                         style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
                       ),
                     ),
@@ -198,6 +186,27 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SpeakerBadge extends StatelessWidget {
+  const _SpeakerBadge({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFF133E97),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        name,
+        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
       ),
     );
   }

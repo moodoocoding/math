@@ -14,13 +14,13 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
 
   static const List<_ChapterScene> _scenes = [
     _ChapterScene(
-      line: '수학체험센터에 온 것을 환영해! 하우와 플레이와 함께 모험을 시작하자!',
+      line: '수학체험센터에 온 것을 환영해!\n하우와 플레이와 함께 모험을 시작하자!',
       welcomeImageAsset: 'assets/images/chr_background.png',
     ),
     _ChapterScene(
       speaker: '하우',
       line: '큰일이야! 체험센터 불빛이 또 하나 꺼졌어!',
-      characterAsset: 'assets/images/chr_how_thinking.png',
+      characterAsset: 'assets/images/chr_how_worry.png',
     ),
     _ChapterScene(
       speaker: '플레이',
@@ -30,7 +30,7 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
     _ChapterScene(
       speaker: '하우',
       line: '저기! 벽에 빛나는 문장이 보여! 첫 번째 별 조각은 수학체험실에 있대!',
-      characterAsset: 'assets/images/chr_how_lefttalk.png',
+      characterAsset: 'assets/images/chr_how_idea.png',
     ),
     _ChapterScene(
       speaker: '플레이',
@@ -94,7 +94,11 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
           const BgmToggleButton(iconSize: 34),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 38),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
         ],
       ),
@@ -122,7 +126,11 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                       Text(
                         scene.line,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w800, color: Color(0xFF163988)),
+                        style: const TextStyle(
+                          fontSize: 44,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF163988),
+                        ),
                       ),
                       const SizedBox(height: 22),
                       SizedBox(
@@ -133,9 +141,17 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                             backgroundColor: const Color(0xFF133E97),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                           ),
-                          child: const Text('다음', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+                          child: const Text(
+                            '다음',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -150,7 +166,8 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                     'assets/images/chapter1_bg_1.png',
                     fit: BoxFit.cover,
                     cacheWidth: 800,
-                    errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFF4F5F7)),
+                    errorBuilder: (context, error, stackTrace) =>
+                        Container(color: const Color(0xFFF4F5F7)),
                   ),
                 ),
                 Positioned.fill(
@@ -183,29 +200,55 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(22),
-                              border: Border.all(color: const Color(0xFF133E97), width: 3),
-                              boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                              border: Border.all(
+                                color: const Color(0xFF133E97),
+                                width: 3,
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x33000000),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+                              padding: const EdgeInsets.fromLTRB(
+                                22,
+                                18,
+                                22,
+                                20,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 5,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF133E97),
                                       borderRadius: BorderRadius.circular(999),
                                     ),
                                     child: Text(
                                       scene.speaker!,
-                                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
                                     scene.line,
-                                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF1E1E1E),
+                                      height: 1.25,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -224,11 +267,16 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                               backgroundColor: const Color(0xFF133E97),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: Text(
                               isLast ? '문제 풀이 시작' : '다음',
-                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
                         ),
@@ -255,3 +303,4 @@ class _ChapterScene {
   final String? characterAsset;
   final String? welcomeImageAsset;
 }
+

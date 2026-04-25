@@ -20,11 +20,11 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     precacheImage(const AssetImage('assets/images/chapter3_bg_1.png'), context);
-    precacheImage(const AssetImage('assets/images/chr_how_cheering.png'), context);
+    precacheImage(const AssetImage('assets/images/chr_how_ok.png'), context);
   }
 
   void _goNext() {
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    Navigator.pushReplacementNamed(context, '/chapter4_story');
   }
 
   @override
@@ -65,9 +65,7 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
               errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
-          Positioned.fill(
-            child: Container(color: const Color(0x66000000)),
-          ),
+          Positioned.fill(child: Container(color: const Color(0x66000000))),
           SafeArea(
             child: Column(
               children: [
@@ -75,7 +73,7 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                 SizedBox(
                   height: charHeight,
                   child: Image.asset(
-                    'assets/images/chr_how_cheering.png',
+                    'assets/images/chr_how_ok.png',
                     fit: BoxFit.fitHeight,
                     cacheHeight: 600,
                   ),
@@ -99,7 +97,7 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                           _SpeakerBadge(name: '하우'),
                           SizedBox(height: 12),
                           Text(
-                            '좋아! 세 번째 별 조각이 거의 다 보이기 시작했어!',
+                            '좋아! 세 번째 별 조각을 찾으면 마지막 빛도 돌아올 거야!',
                             style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
                           ),
                         ],
@@ -121,7 +119,7 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: const Text(
-                        '홈으로',
+                        '다음으로',
                         style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
                       ),
                     ),

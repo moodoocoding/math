@@ -20,7 +20,10 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     precacheImage(const AssetImage('assets/images/chapter2_bg_1.png'), context);
-    precacheImage(const AssetImage('assets/images/chr_how_cheering.png'), context);
+    precacheImage(
+      const AssetImage('assets/images/chr_how_cheering.png'),
+      context,
+    );
   }
 
   void _goNext() {
@@ -40,7 +43,11 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 32),
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/home',
+            (route) => false,
+          ),
         ),
         centerTitle: true,
         title: const Text(
@@ -51,7 +58,11 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
           const BgmToggleButton(iconSize: 34),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 38),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
         ],
       ),
@@ -62,12 +73,11 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
               'assets/images/chapter2_bg_1.png',
               fit: BoxFit.cover,
               cacheWidth: 800,
-              errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
-          Positioned.fill(
-            child: Container(color: const Color(0x66000000)),
-          ),
+          Positioned.fill(child: Container(color: const Color(0x66000000))),
           SafeArea(
             child: Column(
               children: [
@@ -88,8 +98,17 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: const Color(0xFF133E97), width: 3),
-                      boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                      border: Border.all(
+                        color: const Color(0xFF133E97),
+                        width: 3,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: const Padding(
                       padding: EdgeInsets.fromLTRB(22, 18, 22, 20),
@@ -99,8 +118,13 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                           _SpeakerBadge(name: '하우'),
                           SizedBox(height: 12),
                           Text(
-                            '좋아! 두 번째 별 조각이 거의 다 왔어! 다음 단계로 가려면 QR 인증을 해 보자!',
-                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                            '좋아! 두 번째 별 조각을 찾으면 불빛이 더 밝아질 거야!',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1E1E1E),
+                              height: 1.25,
+                            ),
                           ),
                         ],
                       ),
@@ -118,11 +142,16 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                         backgroundColor: const Color(0xFF133E97),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Text(
                         'QR 인증하기',
-                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
@@ -151,7 +180,11 @@ class _SpeakerBadge extends StatelessWidget {
       ),
       child: Text(
         name,
-        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }

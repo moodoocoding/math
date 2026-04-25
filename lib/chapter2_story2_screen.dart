@@ -14,19 +14,14 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
 
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
-      speaker: '플레이',
-      line: '열렸어! 저울 아래에서 반짝이는 무늬판이 나타났어!',
-      characterAsset: 'assets/images/chr_play_happy.png',
-    ),
-    _Chapter2Scene(
       speaker: '하우',
-      line: '앗, 무늬판이 길을 막고 있어! 조각을 맞춰 같은 무늬를 만들어야 지나갈 수 있대!',
-      characterAsset: 'assets/images/chr_how_surprised.png',
+      line: '열렸어! 저울 아래에서 반짝이는 무늬판이 나타났어!',
+      characterAsset: 'assets/images/chr_how_clapping.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '봐! 여기 조각 6개가 있어! 이 조각으로 목표 무늬를 완성하면 될 것 같아!',
-      characterAsset: 'assets/images/chr_play_lefthand2.png',
+      line: '조각 6개를 움직여 같은 무늬를 만들면 지나갈 수 있대!',
+      characterAsset: 'assets/images/chr_play_angry.png',
     ),
   ];
 
@@ -68,7 +63,11 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 32),
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/home',
+            (route) => false,
+          ),
         ),
         centerTitle: true,
         title: const Text(
@@ -79,7 +78,11 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
           const BgmToggleButton(iconSize: 34),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 38),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
         ],
       ),
@@ -90,12 +93,11 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
               'assets/images/chapter2_bg_1.png',
               fit: BoxFit.cover,
               cacheWidth: 800,
-              errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
-          Positioned.fill(
-            child: Container(color: const Color(0x66000000)),
-          ),
+          Positioned.fill(child: Container(color: const Color(0x66000000))),
           SafeArea(
             child: Column(
               children: [
@@ -123,29 +125,33 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0xFF133E97), width: 3),
-                        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                        border: Border.all(
+                          color: const Color(0xFF133E97),
+                          width: 3,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x33000000),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF133E97),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                scene.speaker,
-                                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-                              ),
-                            ),
+                            _SpeakerBadge(name: scene.speaker),
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
-                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E1E1E),
+                                height: 1.25,
+                              ),
                             ),
                           ],
                         ),
@@ -164,11 +170,16 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
                         backgroundColor: const Color(0xFF133E97),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: Text(
-                        isLast ? '문제 풀이 시작' : '다음',
-                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+                        isLast ? '문제 풀러 가기' : '다음',
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
@@ -177,6 +188,31 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SpeakerBadge extends StatelessWidget {
+  const _SpeakerBadge({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFF133E97),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        name,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }

@@ -14,7 +14,7 @@ import 'chapter2_story2_screen.dart';
 import 'chapter2_story3_screen.dart';
 import 'chapter3_story_screen.dart';
 import 'chapter3_story2_screen.dart';
-import 'chapter3_story3_screen.dart';
+import 'chapter4_story_screen.dart';
 
 void main() {
   runApp(const MissionTourApp());
@@ -42,26 +42,40 @@ class MissionTourApp extends StatelessWidget {
         '/chapter2_story3': (context) => const Chapter2Story3Screen(),
         '/chapter3_story': (context) => const Chapter3StoryScreen(),
         '/chapter3_story2': (context) => const Chapter3Story2Screen(),
-        '/chapter3_story3': (context) => const Chapter3Story3Screen(),
-        '/mission_low': (context) => const MissionLowScreen(completedRouteName: '/chapter1_story2_tbd'),
+        '/chapter4_story': (context) => const Chapter4StoryScreen(),
+        '/chapter4_story2': (context) => const Chapter4Story2Screen(),
+        '/chapter4_story3': (context) => const Chapter4Story3Screen(),
+        '/mission_chapter4_q1_tbd': (context) =>
+            const Chapter4ProblemPlaceholderScreen(
+              question: '문제1: 아래 보기 중 같은 블록 모양은 무엇일까요?',
+              nextRouteName: '/chapter4_story2',
+            ),
+        '/mission_chapter4_q2_tbd': (context) =>
+            const Chapter4ProblemPlaceholderScreen(
+              question: '문제2: 글자판에서 찾을 수 있는 수학 낱말은 무엇일까요?',
+              nextRouteName: '/chapter4_story3',
+            ),
+        '/mission_low': (context) =>
+            const MissionLowScreen(completedRouteName: '/chapter1_story2_tbd'),
         '/mission_ch1_q2': (context) => const MissionLowScreen(
-              missionDataPath: 'assets/data/mission_chapter1_q2.json',
-              completedRouteName: '/chapter2_story',
-            ),
+          missionDataPath: 'assets/data/mission_chapter1_q2.json',
+          completedRouteName: '/chapter2_story',
+        ),
         '/mission_chapter2_q1': (context) => const MissionLowScreen(
-              missionDataPath: 'assets/data/mission_chapter2_q1.json',
-              completedRouteName: '/chapter2_story2',
-            ),
+          missionDataPath: 'assets/data/mission_chapter2_q1.json',
+          completedRouteName: '/chapter2_story2',
+        ),
         '/mission_chapter2_q2': (context) => const Chapter2PuzzleQ2Screen(),
-        '/mission_chapter2_q3_qr': (context) => const Chapter2QrVerificationScreen(),
+        '/mission_chapter2_q3_qr': (context) =>
+            const Chapter2QrVerificationScreen(),
         '/mission_chapter3_q1': (context) => const MissionLowScreen(
-              missionDataPath: 'assets/data/mission_chapter3_q1.json',
-              completedRouteName: '/chapter3_story2',
-            ),
+          missionDataPath: 'assets/data/mission_chapter3_q1.json',
+          completedRouteName: '/chapter3_story2',
+        ),
         '/mission_chapter3_q2': (context) => const MissionLowScreen(
-              missionDataPath: 'assets/data/mission_chapter3_q2.json',
-              completedRouteName: '/chapter3_story3',
-            ),
+          missionDataPath: 'assets/data/mission_chapter3_q2.json',
+          completedRouteName: '/chapter4_story',
+        ),
       },
     );
   }
@@ -85,7 +99,8 @@ class _IntroScreenState extends State<IntroScreen> {
             'assets/images/bg_intro.png',
             fit: BoxFit.cover,
             cacheWidth: 800,
-            errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFF4F5F7)),
+            errorBuilder: (context, error, stackTrace) =>
+                Container(color: const Color(0xFFF4F5F7)),
           ),
           Container(color: const Color(0x66000000)),
           SafeArea(
@@ -97,12 +112,20 @@ class _IntroScreenState extends State<IntroScreen> {
                   const Spacer(),
                   const Text(
                     '충북 수학체험센터에 온 걸 환영해!',
-                    style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     '준비되면 아래 버튼을 눌러 시작해 보자.',
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -116,9 +139,17 @@ class _IntroScreenState extends State<IntroScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4358AD),
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
-                      child: const Text('입장하기', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                      child: const Text(
+                        '입장하기',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -153,7 +184,10 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
   }
 
   Future<void> _openReservePage() async {
-    final launched = await launchUrl(_reserveUrl, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(
+      _reserveUrl,
+      mode: LaunchMode.externalApplication,
+    );
     if (!launched && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('링크를 열 수 없습니다. 잠시 후 다시 시도해 주세요.')),
@@ -179,7 +213,12 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
         top: false,
         child: Container(
           color: const Color(0xFFEDEDED),
-          padding: const EdgeInsets.fromLTRB(horizontalPadding, 10, horizontalPadding, 12),
+          padding: const EdgeInsets.fromLTRB(
+            horizontalPadding,
+            10,
+            horizontalPadding,
+            12,
+          ),
           child: _StartButton(onPressed: _goMissionLow),
         ),
       ),
@@ -190,8 +229,11 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
               'assets/images/bg_intro.png',
               fit: BoxFit.cover,
               cacheWidth: 800,
-              alignment: isUltraWide ? const Alignment(0, -0.35) : Alignment.center,
-              errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFF4F5F7)),
+              alignment: isUltraWide
+                  ? const Alignment(0, -0.35)
+                  : Alignment.center,
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: const Color(0xFFF4F5F7)),
             ),
           ),
           Positioned.fill(
@@ -207,113 +249,217 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
           ),
           SafeArea(
             child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(horizontalPadding, 18, horizontalPadding, 0),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 8, offset: Offset(0, 2))],
-                      ),
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            'assets/images/logo_cb_math.png',
-                            width: 62,
-                            height: 62,
-                            cacheWidth: 150,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(width: 10),
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('충북수학체험센터', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF163988), height: 1.1)),
-                              SizedBox(height: 2),
-                              Text('Chungbuk Math Experience Center', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF2F477D))),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      18,
+                      horizontalPadding,
+                      0,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x22000000),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFFBAC5E8), width: 2)),
-                      child: const BgmToggleButton(
-                        iconSize: 24,
-                        color: Color(0xFF6377BE),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(horizontalPadding, 30, horizontalPadding, 0),
-                child: Text('충북수학체험센터에 온 걸 환영해!', style: TextStyle(fontSize: welcomeSize, fontWeight: FontWeight.w600, color: Color(0xFF1E222A), height: 1.15)),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(horizontalPadding, 10, horizontalPadding, 0),
-                child: Text('너만의 수학 모험을 시작해 봐!', style: TextStyle(fontSize: adventureSize, fontWeight: FontWeight.w900, color: Color(0xFF1E222A), height: 1.1)),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(horizontalPadding, 20, horizontalPadding, 0),
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _MissionCard(
-                      width: cardWidth,
-                      icon: Icons.landscape_rounded,
-                      title: '미션! 수학체험센터의\n반짝별을 찾아서',
-                      subtitle: '초등 저학년 추천',
-                      backgroundColor: const Color(0xFFE9DCE9),
-                      subtitleColor: const Color(0xFFDE5C85),
-                      selected: true,
-                      onTap: _goMissionLow,
-                    ),
-                    _MissionCard(width: cardWidth, icon: Icons.auto_awesome_rounded, title: '미션! 수사모의\n보물을 찾아서', subtitle: '초등 고학년 추천', backgroundColor: const Color(0xFFF0DEEA), subtitleColor: const Color(0xFFDE5C85)),
-                    _MissionCard(width: cardWidth, icon: Icons.edit_note_rounded, title: '수학자의 비밀\n노트를 찾아라!', subtitle: '중학생 추천', backgroundColor: const Color(0xFFDDE2F5), subtitleColor: const Color(0xFF4A67BF)),
-                    _MissionCard(width: cardWidth, icon: Icons.menu_book_rounded, title: '역설, 혹은\n모호함', subtitle: '고등학생 추천', backgroundColor: const Color(0xFFDDE2F5), subtitleColor: const Color(0xFF4A67BF)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-              Container(
-                width: double.infinity,
-                color: const Color(0xFFEDEDED),
-                padding: const EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('과학체험관·수학체험센터를 한 곳에서!', style: TextStyle(fontSize: infoTitleSize, fontWeight: FontWeight.w500, color: const Color(0xFF2D2D2D))),
-                    const SizedBox(height: 6),
-                    Text('충북자연과학교육원에서 과학과 수학을 함께 체험해요.', style: TextStyle(fontSize: infoBodySize, fontWeight: FontWeight.w800, color: const Color(0xFF222222), height: 1.15)),
-                    const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: _openReservePage,
-                      child: Text(
-                        '통합예약 바로가기  →',
-                        style: TextStyle(
-                          fontSize: infoLinkSize,
-                          color: const Color(0xFF3E5FB8),
-                          fontWeight: FontWeight.w700,
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/logo_cb_math.png',
+                                width: 62,
+                                height: 62,
+                                cacheWidth: 150,
+                                fit: BoxFit.contain,
+                              ),
+                              const SizedBox(width: 10),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '충북수학체험센터',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF163988),
+                                      height: 1.1,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'Chungbuk Math Experience Center',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF2F477D),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
+                        const Spacer(),
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFFBAC5E8),
+                              width: 2,
+                            ),
+                          ),
+                          child: const BgmToggleButton(
+                            iconSize: 24,
+                            color: Color(0xFF6377BE),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      30,
+                      horizontalPadding,
+                      0,
+                    ),
+                    child: Text(
+                      '충북수학체험센터에 온 걸 환영해!',
+                      style: TextStyle(
+                        fontSize: welcomeSize,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1E222A),
+                        height: 1.15,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      10,
+                      horizontalPadding,
+                      0,
+                    ),
+                    child: Text(
+                      '너만의 수학 모험을 시작해 봐!',
+                      style: TextStyle(
+                        fontSize: adventureSize,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF1E222A),
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      20,
+                      horizontalPadding,
+                      0,
+                    ),
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        _MissionCard(
+                          width: cardWidth,
+                          icon: Icons.landscape_rounded,
+                          title: '미션! 수학체험센터의\n반짝별을 찾아서',
+                          subtitle: '초등 저학년 추천',
+                          backgroundColor: const Color(0xFFE9DCE9),
+                          subtitleColor: const Color(0xFFDE5C85),
+                          selected: true,
+                          onTap: _goMissionLow,
+                        ),
+                        _MissionCard(
+                          width: cardWidth,
+                          icon: Icons.auto_awesome_rounded,
+                          title: '미션! 수사모의\n보물을 찾아서',
+                          subtitle: '초등 고학년 추천',
+                          backgroundColor: const Color(0xFFF0DEEA),
+                          subtitleColor: const Color(0xFFDE5C85),
+                        ),
+                        _MissionCard(
+                          width: cardWidth,
+                          icon: Icons.edit_note_rounded,
+                          title: '수학자의 비밀\n노트를 찾아라!',
+                          subtitle: '중학생 추천',
+                          backgroundColor: const Color(0xFFDDE2F5),
+                          subtitleColor: const Color(0xFF4A67BF),
+                        ),
+                        _MissionCard(
+                          width: cardWidth,
+                          icon: Icons.menu_book_rounded,
+                          title: '역설, 혹은\n모호함',
+                          subtitle: '고등학생 추천',
+                          backgroundColor: const Color(0xFFDDE2F5),
+                          subtitleColor: const Color(0xFF4A67BF),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    width: double.infinity,
+                    color: const Color(0xFFEDEDED),
+                    padding: const EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      16,
+                      horizontalPadding,
+                      18,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '과학체험관·수학체험센터를 한 곳에서!',
+                          style: TextStyle(
+                            fontSize: infoTitleSize,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF2D2D2D),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '충북자연과학교육원에서 과학과 수학을 함께 체험해요.',
+                          style: TextStyle(
+                            fontSize: infoBodySize,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF222222),
+                            height: 1.15,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        GestureDetector(
+                          onTap: _openReservePage,
+                          child: Text(
+                            '통합예약 바로가기  →',
+                            style: TextStyle(
+                              fontSize: infoLinkSize,
+                              color: const Color(0xFF3E5FB8),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
               ),
-              const SizedBox(height: 8),
-            ],
-          ),
             ),
           ),
         ],
@@ -323,7 +469,16 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
 }
 
 class _MissionCard extends StatelessWidget {
-  const _MissionCard({required this.width, required this.icon, required this.title, required this.subtitle, required this.backgroundColor, required this.subtitleColor, this.selected = false, this.onTap});
+  const _MissionCard({
+    required this.width,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.backgroundColor,
+    required this.subtitleColor,
+    this.selected = false,
+    this.onTap,
+  });
   final double width;
   final IconData icon;
   final String title;
@@ -351,12 +506,25 @@ class _MissionCard extends StatelessWidget {
       child: Container(
         width: width,
         constraints: BoxConstraints(minHeight: minHeight),
-        padding: EdgeInsets.fromLTRB(isUltraWide ? 24 : (isWide ? 18 : 14), isUltraWide ? 22 : (isWide ? 16 : 14), isUltraWide ? 24 : (isWide ? 18 : 14), isUltraWide ? 20 : (isWide ? 14 : 12)),
+        padding: EdgeInsets.fromLTRB(
+          isUltraWide ? 24 : (isWide ? 18 : 14),
+          isUltraWide ? 22 : (isWide ? 16 : 14),
+          isUltraWide ? 24 : (isWide ? 18 : 14),
+          isUltraWide ? 20 : (isWide ? 14 : 12),
+        ),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(16),
-          border: selected ? Border.all(color: const Color(0xFF4A66B6), width: 5) : null,
-          boxShadow: const [BoxShadow(color: Color(0x18000000), blurRadius: 8, offset: Offset(0, 3))],
+          border: selected
+              ? Border.all(color: const Color(0xFF4A66B6), width: 5)
+              : null,
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x18000000),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -364,25 +532,40 @@ class _MissionCard extends StatelessWidget {
             Container(
               width: iconCircleSize,
               height: iconCircleSize,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
               child: Icon(icon, size: iconSize, color: const Color(0xFFDE4C78)),
             ),
             SizedBox(height: isUltraWide ? 20 : (isWide ? 14 : 12)),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.w900, color: const Color(0xFF2D2F36), height: 1.2),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFF2D2F36),
+                height: 1.2,
+              ),
             ),
             SizedBox(height: isUltraWide ? 16 : (isWide ? 10 : 8)),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: isUltraWide ? 18 : (isWide ? 12 : 10), vertical: isUltraWide ? 8 : (isWide ? 5 : 4)),
+              padding: EdgeInsets.symmetric(
+                horizontal: isUltraWide ? 18 : (isWide ? 12 : 10),
+                vertical: isUltraWide ? 8 : (isWide ? 5 : 4),
+              ),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
                 subtitle,
-                style: TextStyle(fontSize: subtitleSize, fontWeight: FontWeight.w800, color: subtitleColor),
+                style: TextStyle(
+                  fontSize: subtitleSize,
+                  fontWeight: FontWeight.w800,
+                  color: subtitleColor,
+                ),
               ),
             ),
           ],
@@ -393,20 +576,14 @@ class _MissionCard extends StatelessWidget {
 }
 
 class _PuzzlePiece {
-  _PuzzlePiece({
-    required this.id,
-    required this.imagePath,
-  });
+  _PuzzlePiece({required this.id, required this.imagePath});
 
   final String id;
   final String imagePath;
 }
 
 class _PlacedPiece {
-  _PlacedPiece({
-    required this.id,
-    required this.imagePath,
-  });
+  _PlacedPiece({required this.id, required this.imagePath});
 
   final String id;
   final String imagePath;
@@ -443,9 +620,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   static const List<int> _centerCells = [5, 6, 9, 10];
   // ignore: unused_field
   static const Map<int, int> _centerCellExpectedRotation = {
-    5: 0,  // 좌상
-    6: 1,  // 우상
-    9: 3,  // 좌하
+    5: 0, // 좌상
+    6: 1, // 우상
+    9: 3, // 좌하
     10: 2, // 우하
   };
   static const Map<int, int> _centerCellTargetRotation = {
@@ -456,7 +633,10 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   };
 
   late final List<_PuzzlePiece> _pieceTemplates;
-  final List<_PlacedPiece?> _boardCells = List<_PlacedPiece?>.filled(_totalCells, null);
+  final List<_PlacedPiece?> _boardCells = List<_PlacedPiece?>.filled(
+    _totalCells,
+    null,
+  );
   int? _selectedCell;
 
   @override
@@ -528,9 +708,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
 
   void _rotateSelectedCellPiece() {
     if (_selectedCell == null || _boardCells[_selectedCell!] == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('보드에 놓인 조각을 먼저 선택해 주세요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('보드에 놓인 조각을 먼저 선택해 주세요.')));
       return;
     }
 
@@ -544,7 +724,8 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
 
   bool _isCenterPiece(_PlacedPiece piece) => piece.id == 'piece4';
 
-  int _targetRotationForCell(int cellIndex) => _centerCellTargetRotation[cellIndex]!;
+  int _targetRotationForCell(int cellIndex) =>
+      _centerCellTargetRotation[cellIndex]!;
 
   bool _hasCorrectCenterPieces() {
     int? sharedOffset;
@@ -553,7 +734,8 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
       final piece = _boardCells[cellIndex];
       if (piece == null || !_isCenterPiece(piece)) return false;
 
-      final offset = (piece.rotationQuarterTurns - _targetRotationForCell(cellIndex)) % 4;
+      final offset =
+          (piece.rotationQuarterTurns - _targetRotationForCell(cellIndex)) % 4;
       sharedOffset ??= offset;
       if (sharedOffset != offset) return false;
     }
@@ -592,14 +774,14 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: Text(correct ? '성공!' : '다시 도전!'),
         content: Text(
-          correct
-              ? '목표 모양을 정확히 만들었어요!'
-              : '아직 목표 모양과 달라요. 조각을 다시 옮겨 보세요.',
+          correct ? '목표 모양을 정확히 만들었어요!' : '아직 목표 모양과 달라요. 조각을 다시 옮겨 보세요.',
           style: const TextStyle(height: 1.35),
         ),
         actions: [
           TextButton(
-            onPressed: correct ? _handlePuzzleSolved : () => Navigator.pop(context),
+            onPressed: correct
+                ? _handlePuzzleSolved
+                : () => Navigator.pop(context),
             child: const Text('확인'),
           ),
         ],
@@ -618,7 +800,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
       borderRadius: BorderRadius.circular(10),
       child: Container(
         decoration: BoxDecoration(
-          border: selected ? Border.all(color: const Color(0xFF2F6BDD), width: 3) : null,
+          border: selected
+              ? Border.all(color: const Color(0xFF2F6BDD), width: 3)
+              : null,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Transform.rotate(
@@ -653,36 +837,43 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
       imagePath: piece.imagePath,
       fromTray: true,
     );
+    Widget trayItem({double opacity = 1}) {
+      return Opacity(
+        opacity: opacity,
+        child: Container(
+          width: size + 14,
+          height: size + 14,
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF2F6FF),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFAEC4F5), width: 1.5),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x1A000000),
+                blurRadius: 4,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Center(
+            child: _buildPieceVisual(
+              pieceId: piece.id,
+              imagePath: piece.imagePath,
+              rotationQuarterTurns: 0,
+              selected: false,
+              size: size - 4,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Draggable<_DragPayload>(
       data: payload,
-      feedback: Material(
-        color: Colors.transparent,
-        child: _buildPieceVisual(
-          pieceId: piece.id,
-          imagePath: piece.imagePath,
-          rotationQuarterTurns: 0,
-          selected: false,
-          size: size,
-        ),
-      ),
-      childWhenDragging: Opacity(
-        opacity: 0.35,
-        child: _buildPieceVisual(
-          pieceId: piece.id,
-          imagePath: piece.imagePath,
-          rotationQuarterTurns: 0,
-          selected: false,
-          size: size,
-        ),
-      ),
-      child: _buildPieceVisual(
-        pieceId: piece.id,
-        imagePath: piece.imagePath,
-        rotationQuarterTurns: 0,
-        selected: false,
-        size: size,
-      ),
+      feedback: Material(color: Colors.transparent, child: trayItem()),
+      childWhenDragging: trayItem(opacity: 0.35),
+      child: trayItem(),
     );
   }
 
@@ -755,12 +946,18 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
             final piece = _boardCells[index];
             return DragTarget<_DragPayload>(
               onWillAcceptWithDetails: (details) => true,
-              onAcceptWithDetails: (details) => _placePayloadOnCell(details.data, index),
+              onAcceptWithDetails: (details) =>
+                  _placePayloadOnCell(details.data, index),
               builder: (context, candidateData, rejectedData) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: candidateData.isNotEmpty ? const Color(0xFFE2F7E7) : Colors.white,
-                    border: Border.all(color: const Color(0xFF9DB4E8), width: 1.6),
+                    color: candidateData.isNotEmpty
+                        ? const Color(0xFFE2F7E7)
+                        : Colors.white,
+                    border: Border.all(
+                      color: const Color(0xFF9DB4E8),
+                      width: 1.6,
+                    ),
                   ),
                   child: piece == null
                       ? null
@@ -804,7 +1001,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
           itemBuilder: (context, index) {
             final isCenter = _centerCells.contains(index);
             final pieceId = isCenter ? 'piece4' : 'piece1';
-            final rotationQuarterTurns = isCenter ? _targetRotationForCell(index) : 0;
+            final rotationQuarterTurns = isCenter
+                ? _targetRotationForCell(index)
+                : 0;
 
             return Container(
               decoration: BoxDecoration(
@@ -841,10 +1040,56 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         children: [
           const Text(
             '목표 모양',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF7A5A00)),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF7A5A00),
+            ),
           ),
           const SizedBox(height: 8),
           _buildTargetPreview(side: width - 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPuzzleStepChip({required String stepNo, required String label}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFB8CAEE), width: 1.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              color: Color(0xFF2F6BDD),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              stepNo,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF29427A),
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ],
       ),
     );
@@ -867,7 +1112,11 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
           const BgmToggleButton(iconSize: 36),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 38),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
         ],
       ),
@@ -876,7 +1125,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= 1000;
-            final trayPieceSize = wide ? 68.0 : 62.0;
+            final trayPieceSize = wide ? 64.0 : 62.0;
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
@@ -884,11 +1133,17 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE9F2FF),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
+                      border: Border.all(
+                        color: const Color(0xFFA8C1F5),
+                        width: 2,
+                      ),
                     ),
                     child: const Text(
                       '문제2: 조각 6개를 움직여 목표 무늬를 완성하세요.',
@@ -916,11 +1171,23 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                     child: wide
                         ? LayoutBuilder(
                             builder: (context, rightConstraints) {
-                              final sidePanelWidth = (rightConstraints.maxWidth * 0.28).clamp(220.0, 300.0).toDouble();
-                              final boardSide = math.min(
-                                rightConstraints.maxHeight - 6,
-                                rightConstraints.maxWidth - sidePanelWidth - 14,
-                              ).clamp(260.0, 560.0).toDouble();
+                              final sidePanelWidth =
+                                  (rightConstraints.maxWidth * 0.28)
+                                      .clamp(220.0, 300.0)
+                                      .toDouble();
+                              final wideTrayPieceSize =
+                                  ((sidePanelWidth - 40) / 3 - 14)
+                                      .clamp(44.0, trayPieceSize)
+                                      .toDouble();
+                              final boardSide = math
+                                  .min(
+                                    rightConstraints.maxHeight - 6,
+                                    rightConstraints.maxWidth -
+                                        sidePanelWidth -
+                                        14,
+                                  )
+                                  .clamp(260.0, 560.0)
+                                  .toDouble();
 
                               return Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -943,24 +1210,47 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                             padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(14),
-                                              border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color: const Color(0xFFC8D8F2),
+                                                width: 2,
+                                              ),
                                             ),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 const Text(
                                                   '조각 보관함',
-                                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF355AA8)),
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: Color(0xFF355AA8),
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 10),
                                                 Expanded(
                                                   child: GridView.count(
-                                                    crossAxisCount: 2,
+                                                    physics:
+                                                        const NeverScrollableScrollPhysics(),
+                                                    crossAxisCount: 3,
                                                     crossAxisSpacing: 8,
                                                     mainAxisSpacing: 8,
                                                     childAspectRatio: 1,
-                                                    children: _pieceTemplates.map((piece) => _buildTrayPiece(piece, size: trayPieceSize)).toList(growable: false),
+                                                    children: _pieceTemplates
+                                                        .map(
+                                                          (
+                                                            piece,
+                                                          ) => _buildTrayPiece(
+                                                            piece,
+                                                            size:
+                                                                wideTrayPieceSize,
+                                                          ),
+                                                        )
+                                                        .toList(
+                                                          growable: false,
+                                                        ),
                                                   ),
                                                 ),
                                               ],
@@ -977,9 +1267,18 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                         : SingleChildScrollView(
                             child: Column(
                               children: [
-                                _buildBoard(boardWidth: (constraints.maxWidth - 20).clamp(260.0, 560.0).toDouble()),
+                                _buildBoard(
+                                  boardWidth: (constraints.maxWidth - 20)
+                                      .clamp(260.0, 560.0)
+                                      .toDouble(),
+                                ),
                                 const SizedBox(height: 10),
-                                _buildTargetCard(width: (constraints.maxWidth * 0.62).clamp(200.0, 300.0)),
+                                _buildTargetCard(
+                                  width: (constraints.maxWidth * 0.62).clamp(
+                                    200.0,
+                                    300.0,
+                                  ),
+                                ),
                                 const SizedBox(height: 12),
                                 Container(
                                   width: double.infinity,
@@ -987,24 +1286,40 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                                    border: Border.all(
+                                      color: const Color(0xFFC8D8F2),
+                                      width: 2,
+                                    ),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         '조각 보관함',
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF355AA8)),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xFF355AA8),
+                                        ),
                                       ),
                                       const SizedBox(height: 10),
                                       GridView.count(
                                         shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         crossAxisCount: 3,
                                         crossAxisSpacing: 8,
                                         mainAxisSpacing: 8,
                                         childAspectRatio: 1,
-                                        children: _pieceTemplates.map((piece) => _buildTrayPiece(piece, size: trayPieceSize)).toList(growable: false),
+                                        children: _pieceTemplates
+                                            .map(
+                                              (piece) => _buildTrayPiece(
+                                                piece,
+                                                size: trayPieceSize,
+                                              ),
+                                            )
+                                            .toList(growable: false),
                                       ),
                                     ],
                                   ),
@@ -1021,12 +1336,21 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                           onPressed: _resetPuzzle,
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(56),
-                            side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            side: const BorderSide(
+                              color: Color(0xFF5C7EC5),
+                              width: 2,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: const Text(
                             '다시하기',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF355AA8),
+                            ),
                           ),
                         ),
                       ),
@@ -1037,12 +1361,21 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                           icon: const Icon(Icons.rotate_right_rounded),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(56),
-                            side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            side: const BorderSide(
+                              color: Color(0xFF5C7EC5),
+                              width: 2,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           label: const Text(
                             '돌리기',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF355AA8),
+                            ),
                           ),
                         ),
                       ),
@@ -1054,11 +1387,16 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                             minimumSize: const Size.fromHeight(56),
                             backgroundColor: const Color(0xFF2F6BDD),
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: const Text(
                             '완성 확인',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
                       ),
@@ -1073,12 +1411,21 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                         icon: const Icon(Icons.skip_next_rounded),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(42),
-                          side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          side: const BorderSide(
+                            color: Color(0xFF5C7EC5),
+                            width: 2,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         label: const Text(
                           '테스트용: 문제 건너뛰고 다음으로',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF355AA8),
+                          ),
                         ),
                       ),
                     ),
@@ -1097,13 +1444,19 @@ class Chapter2QrVerificationScreen extends StatefulWidget {
   const Chapter2QrVerificationScreen({super.key});
 
   @override
-  State<Chapter2QrVerificationScreen> createState() => _Chapter2QrVerificationScreenState();
+  State<Chapter2QrVerificationScreen> createState() =>
+      _Chapter2QrVerificationScreenState();
 }
 
-class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScreen>
+class _Chapter2QrVerificationScreenState
+    extends State<Chapter2QrVerificationScreen>
     with WidgetsBindingObserver {
   static const Set<String> _allowedSchemes = {'https', 'http'};
-  static const Set<String> _allowedHosts = {'www.cbnse.go.kr', 'cbnse.go.kr', 'm.cbnse.go.kr'};
+  static const Set<String> _allowedHosts = {
+    'www.cbnse.go.kr',
+    'cbnse.go.kr',
+    'm.cbnse.go.kr',
+  };
 
   final MobileScannerController _scannerController = MobileScannerController(
     autoStart: false,
@@ -1171,44 +1524,8 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
   bool _isAllowedHost(String host) {
     final normalized = host.trim().toLowerCase();
     if (normalized.isEmpty) return false;
-    return _allowedHosts.contains(normalized) || normalized.endsWith('.cbnse.go.kr');
-  }
-
-  Widget _buildPuzzleStepChip({
-    required String stepNo,
-    required String label,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFB8CAEE), width: 1.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 22,
-            height: 22,
-            decoration: const BoxDecoration(
-              color: Color(0xFF2F6BDD),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              stepNo,
-              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(color: Color(0xFF29427A), fontSize: 14, fontWeight: FontWeight.w800),
-          ),
-        ],
-      ),
-    );
+    return _allowedHosts.contains(normalized) ||
+        normalized.endsWith('.cbnse.go.kr');
   }
 
   bool _matchesAcceptedUri(Uri uri) {
@@ -1220,7 +1537,9 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
       for (final value in values) {
         final decoded = Uri.decodeFull(value.trim());
         if (decoded.isEmpty) continue;
-        final nestedCandidate = decoded.contains('://') ? decoded : 'https://$decoded';
+        final nestedCandidate = decoded.contains('://')
+            ? decoded
+            : 'https://$decoded';
         final nested = Uri.tryParse(nestedCandidate);
         if (nested != null && _isAllowedHost(nested.host)) {
           return true;
@@ -1313,9 +1632,9 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
   Future<void> _submitManualQr() async {
     final rawValue = _manualQrController.text.trim();
     if (rawValue.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('URL 또는 QR 값을 입력해 주세요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('URL 또는 QR 값을 입력해 주세요.')));
       return;
     }
 
@@ -1424,7 +1743,10 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
             children: [
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE9F2FF),
                   borderRadius: BorderRadius.circular(14),
@@ -1463,14 +1785,16 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                    border: Border.all(
+                      color: const Color(0xFFC8D8F2),
+                      width: 2,
+                    ),
                   ),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final scannerSide = math.min(
-                        constraints.maxWidth,
-                        constraints.maxHeight,
-                      ).clamp(260.0, 560.0);
+                      final scannerSide = math
+                          .min(constraints.maxWidth, constraints.maxHeight)
+                          .clamp(260.0, 560.0);
 
                       return Center(
                         child: SizedBox(
@@ -1488,8 +1812,14 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                                   },
                                   onDetect: (capture) {
                                     final rawValue = capture.barcodes
-                                        .map((barcode) => barcode.rawValue?.trim() ?? '')
-                                        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                        .map(
+                                          (barcode) =>
+                                              barcode.rawValue?.trim() ?? '',
+                                        )
+                                        .firstWhere(
+                                          (value) => value.isNotEmpty,
+                                          orElse: () => '',
+                                        );
                                     if (rawValue.isEmpty) return;
                                     _handleDetection(rawValue);
                                   },
@@ -1498,7 +1828,10 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: const Color(0x99FFFFFF), width: 3),
+                                      border: Border.all(
+                                        color: const Color(0x99FFFFFF),
+                                        width: 3,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1519,7 +1852,10 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                    border: Border.all(
+                      color: const Color(0xFFC8D8F2),
+                      width: 2,
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -1539,7 +1875,10 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                           icon: const Icon(Icons.verified_outlined),
                           label: const Text(
                             '직접 입력으로 인증',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
                       ),
@@ -1550,16 +1889,28 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pushReplacementNamed(context, '/chapter3_story'),
+                    onPressed: () => Navigator.pushReplacementNamed(
+                      context,
+                      '/chapter3_story',
+                    ),
                     icon: const Icon(Icons.skip_next_rounded),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(42),
-                      side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      side: const BorderSide(
+                        color: Color(0xFF5C7EC5),
+                        width: 2,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     label: const Text(
                       '테스트용: 인증 건너뛰고 다음으로',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF355AA8),
+                      ),
                     ),
                   ),
                 ),
@@ -1567,7 +1918,10 @@ class _Chapter2QrVerificationScreenState extends State<Chapter2QrVerificationScr
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
@@ -1606,8 +1960,18 @@ class _StartButton extends StatelessWidget {
       height: 66,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4358AD), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), elevation: 2),
-        child: const Text('시작하기', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF4358AD),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 2,
+        ),
+        child: const Text(
+          '시작하기',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+        ),
       ),
     );
   }

@@ -79,7 +79,11 @@ class AppBgmController {
     final resumePosition = _savedPositions[asset];
     _currentAsset = asset;
     _currentTrack = track;
-    await _player.play(AssetSource(asset), volume: volume, position: resumePosition);
+    await _player.play(
+      AssetSource(asset),
+      volume: volume,
+      position: resumePosition,
+    );
   }
 
   static double _effectiveVolume(AppBgmTrack track) {

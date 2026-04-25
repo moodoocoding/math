@@ -15,28 +15,33 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
       speaker: '하우',
-      line: '첫 번째 별 조각을 찾았어! 다음 조각을 찾으러 서둘러 가자!',
-      characterAsset: 'assets/images/chr_together.png',
+      line: '와! 첫 번째 별 조각을 찾으니까 불빛이 다시 켜졌어!',
+      characterAsset: 'assets/images/chr_how_surprised (2).png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '어? 체험센터 불빛이 또 하나 꺼졌어! 더 늦기 전에 두 번째 별 조각을 찾아야 해!',
-      characterAsset: 'assets/images/chr_play_worry.png',
+      line: '좋아! 다음 조각을 찾으면 체험센터가 더 밝아질 거야!',
+      characterAsset: 'assets/images/chr_play_thumbs_up.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '첫 번째 조각 뒤에 다음 단서가 있어! 두 번째 별 조각은 수학놀이실에 있대!',
+      line: '첫 번째 조각 뒤에 다음 단서가 있어!',
       characterAsset: 'assets/images/chr_how_lefttalk.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '와! 여기가 수학놀이실이구나! 그런데 저기 반짝이는 저울이 보여!',
-      characterAsset: 'assets/images/chr_play_surprised.png',
+      line: '두 번째 별 조각은 수학놀이실에 있대!',
+      characterAsset: 'assets/images/chr_play_idea.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '찾았다! 그런데 저울 아래 서랍이 꼭 닫혀 있어! 더 무거운 쪽을 맞혀야 열 수 있대!',
-      characterAsset: 'assets/images/chr_how_thinking.png',
+      line: '와! 여기가 수학놀이실이구나! 저기 반짝이는 저울이 보여!',
+      characterAsset: 'assets/images/chr_how_surprised.png',
+    ),
+    _Chapter2Scene(
+      speaker: '플레이',
+      line: '더 무거운 쪽을 맞히면 다음 장치가 열릴 거야!',
+      characterAsset: 'assets/images/chr_play_explaining.png',
     ),
   ];
 
@@ -68,13 +73,21 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
     final isLast = _sceneIndex == _scenes.length - 1;
     final media = MediaQuery.of(context);
     final width = media.size.width;
-    final availableHeight = media.size.height - media.padding.top - kToolbarHeight;
-    final desiredCharacterHeight = _sceneIndex == 0 ? width * 0.40 : width * 0.34;
+    final availableHeight =
+        media.size.height - media.padding.top - kToolbarHeight;
+    final desiredCharacterHeight = _sceneIndex == 0
+        ? width * 0.40
+        : width * 0.34;
     final maxCharacterHeight = availableHeight * 0.46;
-    final sceneCharHeight = desiredCharacterHeight.clamp(220.0, maxCharacterHeight).toDouble();
+    final sceneCharHeight = desiredCharacterHeight
+        .clamp(220.0, maxCharacterHeight)
+        .toDouble();
     final dialogFontSize = width < 1100 ? 26.0 : 28.0;
-    final buttonBottomPadding = (media.padding.bottom > 0 ? media.padding.bottom : 12.0) + 10.0;
-    final backgroundAsset = _sceneIndex <= 2 ? 'assets/images/chapter1_bg_1.png' : 'assets/images/chapter2_bg_1.png';
+    final buttonBottomPadding =
+        (media.padding.bottom > 0 ? media.padding.bottom : 12.0) + 10.0;
+    final backgroundAsset = _sceneIndex <= 2
+        ? 'assets/images/chapter1_bg_1.png'
+        : 'assets/images/chapter2_bg_1.png';
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +97,11 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 32),
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/home',
+            (route) => false,
+          ),
         ),
         centerTitle: true,
         title: const Text(
@@ -95,7 +112,11 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
           const BgmToggleButton(iconSize: 34),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 38),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
         ],
       ),
@@ -106,12 +127,11 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
               backgroundAsset,
               fit: BoxFit.cover,
               cacheWidth: 800,
-              errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
-          Positioned.fill(
-            child: Container(color: const Color(0x66000000)),
-          ),
+          Positioned.fill(child: Container(color: const Color(0x66000000))),
           SafeArea(
             child: Column(
               children: [
@@ -126,12 +146,17 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                       fit: BoxFit.fitHeight,
                       cacheHeight: 600,
                       gaplessPlayback: false,
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                        child: Text(
-                          '캐릭터 이미지를 불러오지 못했어요',
-                          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
-                        ),
-                      ),
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Center(
+                            child: Text(
+                              '캐릭터 이미지를 불러오지 못했어요',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
                     ),
                   ),
                 ),
@@ -146,29 +171,33 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0xFF133E97), width: 3),
-                        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4))],
+                        border: Border.all(
+                          color: const Color(0xFF133E97),
+                          width: 3,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x33000000),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF133E97),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                scene.speaker,
-                                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-                              ),
-                            ),
+                            _SpeakerBadge(name: scene.speaker),
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
-                              style: TextStyle(fontSize: dialogFontSize, fontWeight: FontWeight.w800, color: const Color(0xFF1E1E1E), height: 1.25),
+                              style: TextStyle(
+                                fontSize: dialogFontSize,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF1E1E1E),
+                                height: 1.25,
+                              ),
                             ),
                           ],
                         ),
@@ -187,11 +216,16 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                         backgroundColor: const Color(0xFF133E97),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: Text(
-                        isLast ? '문제 풀이 시작' : '다음',
-                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+                        isLast ? '문제 풀러 가기' : '다음',
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
@@ -200,6 +234,31 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SpeakerBadge extends StatelessWidget {
+  const _SpeakerBadge({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFF133E97),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        name,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
