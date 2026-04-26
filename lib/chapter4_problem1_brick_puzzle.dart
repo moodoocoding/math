@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
+import 'bgm_controller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '?섑븰 釉뚮┃ ?쇱쫹',
+      title: '수학 브릭 퍼즐',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// 釉뚮┃ ?곗씠??紐⑤뜽
+/// 브릭 데이터 모델
 class Brick {
   final String id;
   final Color color;
@@ -51,11 +52,26 @@ class Brick {
   }
 }
 
-/// ?レ옄 ?꾩븞 ?곗씠??紐⑤뜽
+/// 보드에 배치된 브릭 인스턴스 정보
+class PlacedBrick {
+  final String instanceId;
+  final Brick brick;
+  final int anchorRow;
+  final int anchorCol;
+
+  PlacedBrick({
+    required this.instanceId,
+    required this.brick,
+    required this.anchorRow,
+    required this.anchorCol,
+  });
+}
+
+/// 숫자 도안 데이터 모델
 class NumberBoard {
   final String number;
-  final List<List<bool>> grid; // true??移몃쭔 梨꾩썙????
-  late final List<List<String?>> occupied; // ?대뒓 釉뚮┃???볦뿬?덈뒗吏 異붿쟻
+  final List<List<bool>> grid; // true인 칸만 채워야 함
+  late List<List<String?>> occupied; // 어느 브릭이 놓여있는지 추적
 
   NumberBoard({
     required this.number,
@@ -68,12 +84,12 @@ class NumberBoard {
   }
 
   bool canPlace(Brick brick, int row, int col) {
-    // 紐⑤뱺 ???踰붿쐞 ?댁뿉 ?덈뒗吏, true 移몄씤吏, 鍮꾩뼱?덈뒗吏 ?뺤씤
+    // 모든 타일이 범위 내에 있는지, true 칸인지, 비어있는지 확인
     for (var (r, c) in brick.shapeCells) {
       int actualRow = row + r;
       int actualCol = col + c;
 
-      // 踰붿쐞 ?뺤씤
+      // 범위 확인
       if (actualRow < 0 ||
           actualRow >= grid.length ||
           actualCol < 0 ||
@@ -81,12 +97,12 @@ class NumberBoard {
         return false;
       }
 
-      // ?꾩븞 ?곸뿭 ?뺤씤 (true??移몄뿉留??볦쓣 ???덉쓬)
+      // 도안 영역 확인 (true인 칸에만 놓을 수 있음)
       if (!grid[actualRow][actualCol]) {
         return false;
       }
 
-      // ?대? 李⑥엳??移??뺤씤
+      // 이미 차지된 칸 확인
       if (occupied[actualRow][actualCol] != null) {
         return false;
       }
@@ -94,21 +110,43 @@ class NumberBoard {
     return true;
   }
 
-  void place(Brick brick, int row, int col) {
+  final Map<String, PlacedBrick> placedBricks = {}; // instanceId -> PlacedBrick
+
+  String place(Brick brick, int row, int col) {
+    final instanceId = "${DateTime.now().microsecondsSinceEpoch}_${brick.id}";
+    placedBricks[instanceId] = PlacedBrick(
+      instanceId: instanceId,
+      brick: brick,
+      anchorRow: row,
+      anchorCol: col,
+    );
+
     for (var (r, c) in brick.shapeCells) {
       int actualRow = row + r;
       int actualCol = col + c;
-      occupied[actualRow][actualCol] = brick.id;
+      occupied[actualRow][actualCol] = instanceId;
+    }
+    return instanceId;
+  }
+
+  void removeInstance(String instanceId) {
+    placedBricks.remove(instanceId);
+    for (int i = 0; i < occupied.length; i++) {
+      for (int j = 0; j < occupied[i].length; j++) {
+        if (occupied[i][j] == instanceId) {
+          occupied[i][j] = null;
+        }
+      }
     }
   }
 
   void remove(Brick brick) {
-    for (int i = 0; i < occupied.length; i++) {
-      for (int j = 0; j < occupied[i].length; j++) {
-        if (occupied[i][j] == brick.id) {
-          occupied[i][j] = null;
-        }
-      }
+    final idsToRemove = placedBricks.values
+        .where((pb) => pb.brick.id == brick.id)
+        .map((pb) => pb.instanceId)
+        .toList();
+    for (var id in idsToRemove) {
+      removeInstance(id);
     }
   }
 
@@ -124,6 +162,7 @@ class NumberBoard {
   }
 
   void reset() {
+    placedBricks.clear();
     occupied = List.generate(
       grid.length,
       (i) => List.generate(grid[i].length, (j) => null),
@@ -131,7 +170,7 @@ class NumberBoard {
   }
 }
 
-/// 硫붿씤 ?쇱쫹 ?붾㈃
+/// 메인 퍼즐 화면
 class BrickPuzzleScreen extends StatefulWidget {
   const BrickPuzzleScreen({super.key, this.completedRouteName});
 
@@ -149,13 +188,13 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
   @override
   void initState() {
     super.initState();
+    AppBgmController.playProblem();
     _initializeBricks();
     _initializeBoards();
   }
 
   void _initializeBricks() {
     bricks = [
-      // Simulation result: these reusable templates can fill all number boards.
       Brick(
         id: 'i4v',
         color: const Color(0xFF4A9BFF),
@@ -203,7 +242,6 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
     }
   }
   void _initializeBoards() {
-    // 梨뺥꽣4: ?쒖씠???믪쓬 - ?レ옄 1, 2, 3, 4??紐⑥뼇????蹂듭옟??
     boards = {
       'number1': NumberBoard(
         number: '1',
@@ -216,7 +254,6 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           [false, true, true, true, false, false],
         ],
       ),
-      // ?レ옄 2??紐⑥뼇 (??蹂듭옟??
       'number2': NumberBoard(
         number: '2',
         grid: [
@@ -228,7 +265,6 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           [false, false, false, false, false, false],
         ],
       ),
-      // ?レ옄 3??紐⑥뼇
       'number3': NumberBoard(
         number: '3',
         grid: [
@@ -240,7 +276,6 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           [false, false, false, false, false, false],
         ],
       ),
-      // ?レ옄 4??紐⑥뼇
       'number4': NumberBoard(
         number: '4',
         grid: [
@@ -256,6 +291,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
   }
 
   void _resetPuzzle() {
+    AppSfxController.playClick();
     setState(() {
       for (var brick in bricks) {
         brick.currentBoard = 'storage';
@@ -277,11 +313,14 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
   }
 
   void _checkAnswer() {
+    AppSfxController.playClick();
     bool allFilled = boards.values.every((board) => board.isFilled());
 
     if (allFilled) {
+      AppSfxController.playCorrect();
       _showSuccessDialog();
     } else {
+      AppSfxController.playWrong();
       _showTryAgainDialog();
     }
   }
@@ -308,51 +347,66 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                '?럦 ?뺣떟?낅땲?? ?럦',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFF18BEB6),
+              const SizedBox(height: 30),
+              Center(
+                child: Image.asset(
+                  'assets/images/chr_play_correct.png',
+                  height: 180,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 20),
               const Text(
-                '?꾨꼍?섍쾶 ?꾩꽦?덈꽕??\n?뺣쭚 ?섑뻽?댁슂!',
+                '🎉 정답입니다! 🎉',
+                style: TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF13968F),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '완벽하게 완성했네요!\n정말 잘했어요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF091F59),
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  if (widget.completedRouteName != null) {
-                    Navigator.pushReplacementNamed(
-                      context,
-                      widget.completedRouteName!,
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF133E97),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  '?뺤씤',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      if (widget.completedRouteName != null) {
+                        Navigator.pushReplacementNamed(
+                          context,
+                          widget.completedRouteName!,
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF133E97),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -385,45 +439,60 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                '?꾩쭅?댁뿉??',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFFE05C57),
+              const SizedBox(height: 30),
+              Center(
+                child: Image.asset(
+                  'assets/images/chr_how_fail.png',
+                  height: 180,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 20),
               const Text(
-                '?ㅼ떆 ??踰??쒕룄??蹂댁꽭??\n醫 ???앷컖?댁꽌 留욎떠遊먯슂!',
+                '아직이에요!',
+                style: TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFFD64A45),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '다시 한 번 시도해 보세요!\n좀 더 생각해서 맞춰봐요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF091F59),
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE05C57),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  '?뺤씤',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD64A45),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -435,6 +504,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
   }
 
   void _showHint() {
+    AppSfxController.playClick();
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -449,33 +519,42 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                '?뮕 ?뚰듃',
+                '💡 힌트',
                 style: TextStyle(
-                  fontSize: 36,
+                  fontSize: 44,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFF6F63D1),
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 20),
+              Image.asset(
+                'assets/images/chr_play_idea.png',
+                height: 160,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 20),
               const Text(
-                '??釉뚮┃遺??癒쇱? 諛곗튂??蹂댁꽭??\n?묒? 釉뚮┃? ?⑥? 怨듦컙??梨꾩슦?붾뜲 ?꾩????쇱슂.',
+                '큰 브릭부터 먼저 배치해 보세요!\n작은 브릭은 남은 공간을 채우는 데 유용해요.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 30,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF091F59),
                   height: 1.5,
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 30),
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text(
-                  '?뺤씤',
+                  '확인',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF6F63D1),
+                    fontFamily: 'GangwonEduAll',
                   ),
                 ),
               ),
@@ -950,14 +1029,14 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
       },
       builder: (context, candidates, rejects) {
         final isHovering = candidates.isNotEmpty;
-        return Container(
+        final cell = Container(
           width: cellSize,
           height: cellSize,
           margin: EdgeInsets.all(cellSize * 0.04),
           decoration: BoxDecoration(
             color: isActive
                 ? (occupiedBy != null
-                    ? _getBrickColorById(occupiedBy)
+                    ? (board.placedBricks[occupiedBy]?.brick.color ?? Colors.grey)
                     : isHovering
                         ? borderColor.withValues(alpha: 0.18)
                         : Colors.white.withValues(alpha: 0.62))
@@ -971,6 +1050,43 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
             borderRadius: BorderRadius.circular(4),
           ),
         );
+
+        if (isActive && occupiedBy != null) {
+          final placedBrick = board.placedBricks[occupiedBy]!;
+          final relRow = row - placedBrick.anchorRow;
+          final relCol = col - placedBrick.anchorCol;
+
+          return Draggable<Brick>(
+            data: placedBrick.brick,
+            onDragStarted: () {
+              setState(() {
+                board.removeInstance(occupiedBy);
+              });
+            },
+            feedback: Material(
+              color: Colors.transparent,
+              child: Opacity(
+                opacity: 0.7,
+                child: Transform.translate(
+                  offset: Offset(-relCol * cellSize, -relRow * cellSize),
+                  child: _buildBrickGrid(placedBrick.brick, cellSize),
+                ),
+              ),
+            ),
+            childWhenDragging: Container(
+              width: cellSize,
+              height: cellSize,
+              margin: EdgeInsets.all(cellSize * 0.04),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: cell,
+          );
+        }
+
+        return cell;
       },
     );
   }
@@ -991,14 +1107,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
     }
   }
 
-  Color _getBrickColorById(String brickId) {
-    for (var brick in bricks) {
-      if (brick.id == brickId) {
-        return brick.color;
-      }
-    }
-    return Colors.grey;
-  }
+
 }
 
 

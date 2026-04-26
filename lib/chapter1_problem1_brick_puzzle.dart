@@ -314,45 +314,60 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                '🎉 정답입니다! 🎉',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFF18BEB6),
+              const SizedBox(height: 30),
+              Center(
+                child: Image.asset(
+                  'assets/images/chr_play_correct.png',
+                  height: 180,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 20),
               const Text(
+                '🎉 정답입니다! 🎉',
+                style: TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF13968F),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
                 '완벽하게 완성했네요!\n정말 잘했어요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF091F59),
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF133E97),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  '확인',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF133E97),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -385,45 +400,60 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                '아직이에요!',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFFE05C57),
+              const SizedBox(height: 30),
+              Center(
+                child: Image.asset(
+                  'assets/images/chr_how_fail.png',
+                  height: 180,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 20),
               const Text(
+                '아직이에요!',
+                style: TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFFD64A45),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
                 '다시 한 번 시도해 보세요!\n좀 더 생각해서 맞춰봐요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF091F59),
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE05C57),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  '확인',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD64A45),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -451,20 +481,28 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               const Text(
                 '💡 힌트',
                 style: TextStyle(
-                  fontSize: 36,
+                  fontSize: 44,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFF6F63D1),
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 20),
+              Image.asset(
+                'assets/images/chr_play_idea.png',
+                height: 160,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 20),
               const Text(
-                '큰 브릭부터 먼저 배치해 보세요!\n작은 브릭은 남은 공간을 채우는데 도움이 돼요.',
+                '목표 무늬를 잘 살펴보고,\n조각들을 회전시켜서 맞춰보세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 30,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF091F59),
                   height: 1.5,
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(height: 30),

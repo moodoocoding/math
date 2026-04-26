@@ -270,10 +270,11 @@ class StoryScreen extends StatelessWidget {
           step['text'].toString(),
           textAlign: TextAlign.center,
           style: const TextStyle(
-            fontSize: 28,
+            fontSize: 32,
             fontWeight: FontWeight.w700,
             color: Color(0xFF15347F),
             height: 1.3,
+            fontFamily: 'GangwonEduAll',
           ),
         ),
         const SizedBox(height: 24),
@@ -510,8 +511,9 @@ class _QuizScreenState extends State<QuizScreen> {
   void _showHint(String? hint) {
     final screenWidth = MediaQuery.of(context).size.width;
     final dialogWidth = (screenWidth * 0.62).clamp(360.0, 760.0);
-    final titleSize = screenWidth < 1100 ? 44.0 : 54.0;
-    final hintSize = screenWidth < 1100 ? 34.0 : 42.0;
+    final titleSize = 44.0;
+    final hintSize = 30.0;
+    final buttonSize = 28.0;
 
     showDialog<void>(
       context: context,
@@ -524,46 +526,43 @@ class _QuizScreenState extends State<QuizScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '힌트',
-                    style: TextStyle(
-                      fontSize: titleSize,
-                      fontWeight: FontWeight.w900,
-                    ),
+                Text(
+                  '💡 힌트',
+                  style: TextStyle(
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF6F63D1),
+                    fontFamily: 'GangwonEduAll',
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
                 Image.asset(
-                  'assets/images/chr_how_idea.png',
-                  height: screenWidth < 1100 ? 130 : 160,
+                  'assets/images/chr_play_idea.png',
+                  height: screenWidth < 1100 ? 150 : 180,
                   fit: BoxFit.contain,
-                  cacheHeight: 400,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
                 Text(
                   (hint == null || hint.trim().isEmpty) ? '준비된 힌트가 없어요.' : hint,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: hintSize,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF232323),
-                    height: 1.2,
+                    color: const Color(0xFF091F59),
+                    height: 1.3,
+                    fontFamily: 'GangwonEduAll',
                   ),
                 ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      '확인',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF6F63D1),
-                      ),
+                const SizedBox(height: 30),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    '확인',
+                    style: TextStyle(
+                      fontSize: buttonSize,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF6F63D1),
+                      fontFamily: 'GangwonEduAll',
                     ),
                   ),
                 ),
@@ -674,6 +673,7 @@ class _QuizScreenState extends State<QuizScreen> {
                           color: correct
                               ? const Color(0xFF13968F) // Desaturated cyan
                               : const Color(0xFFD64A45), // Adjusted red
+                          fontFamily: 'GangwonEduAll',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -685,6 +685,7 @@ class _QuizScreenState extends State<QuizScreen> {
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF4B5563), // Dark gray
                           height: 1.3,
+                          fontFamily: 'GangwonEduAll',
                         ),
                       ),
                     ],
@@ -852,299 +853,315 @@ class _QuizScreenState extends State<QuizScreen> {
         ? (isCompact ? 22.0 : 28.0)
         : 14.0;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: LinearProgressIndicator(
-              minHeight: 14,
-              value: widget.progress.clamp(0.0, 1.0),
-              backgroundColor: const Color(0xFFE1E1E4),
-              color: const Color(0xFFF0B126),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              questionText,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: questionFontSize,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF091F59),
-                height: 1.2,
-              ),
-            ),
-          ),
-          if (hasSimulationImages)
-            _buildSimulationArea(
-              (step['simulation_images'] as List<dynamic>).cast<String>(),
-            ),
-          if (showHanoiVisual) ...[
-            const SizedBox(height: 14),
-            _InteractiveHanoiVisualPanel(
-              height: hanoiHeight,
-              pegs: _hanoiPegs,
-              selectedPeg: _selectedHanoiPeg,
-              moveCount: _hanoiMoveCount,
-              onPegTap: _handleHanoiPegTap,
-              onReset: () {
-                setState(_resetHanoi);
-              },
-            ),
-          ],
-          if (visualType == 'rod_numeral') ...[
-            const SizedBox(height: 12),
-            _RodNumeralVisualPanel(
-              height: rodVisualHeight,
-              tens: (step['rod_tens'] as int?) ?? 2,
-              ones: (step['rod_ones'] as int?) ?? 3,
-            ),
-          ],
-          if (visualType == 'magic_square') ...[
-            const SizedBox(height: 12),
-            _MagicSquareVisualPanel(
-              height: magicSquareVisualHeight,
-              blankIndexes: _magicSquareBlankIndexes,
-              values: _magicSquareInputs,
-              onBlankTap: _showMagicSquareKeypad,
-              activeBlankIndex: _activeMagicSquareCell,
-            ),
-          ],
-          if (renderChoicesAsShapes) ...[
-            const SizedBox(height: 12),
-            _TessellationFloorPreview(height: floorPreviewHeight),
-          ],
-          SizedBox(height: choicesTopGap),
-          if (quizType == 'mcq' && !isMagicSquare)
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 4,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: useFourAcrossChoices ? 4 : 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: useFourAcrossChoices
-                    ? (isCompact ? 5.8 : 7.0)
-                    : (isCompact ? 5.5 : 7.5),
-              ),
-              itemBuilder: (context, index) {
-                final selected = selectedChoiceIndex == index;
-                final color = _optionColors[index % _optionColors.length];
-                final isEnabled = index < choices.length;
-                final choiceText = isEnabled
-                    ? choices[index].toString()
-                    : '준비 중';
-                final shapeType = _parseShapeChoiceType(choiceText);
-                final textColor = color.computeLuminance() > 0.55
-                    ? const Color(0xFF163988)
-                    : Colors.white;
-
-                return AnimatedScale(
-                  scale: selected ? 1.0 : 0.98,
-                  duration: const Duration(milliseconds: 120),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 140),
-                    curve: Curves.easeOut,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: selected
-                          ? Border.all(color: const Color(0xFF0B1F61), width: 5)
-                          : null,
-                      boxShadow: selected
-                          ? const [
-                              BoxShadow(
-                                color: Color(0x33133E97),
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
-                              ),
-                            ]
-                          : null,
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: LinearProgressIndicator(
+                    minHeight: 14,
+                    value: widget.progress.clamp(0.0, 1.0),
+                    backgroundColor: const Color(0xFFE1E1E4),
+                    color: const Color(0xFFF0B126),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    questionText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: questionFontSize,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF091F59),
+                      height: 1.2,
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: isEnabled
-                            ? () => setState(() => selectedChoiceIndex = index)
-                            : null,
-                        borderRadius: BorderRadius.circular(10),
-                        child: Ink(
+                  ),
+                ),
+                if (hasSimulationImages)
+                  _buildSimulationArea(
+                    (step['simulation_images'] as List<dynamic>).cast<String>(),
+                  ),
+                if (showHanoiVisual) ...[
+                  const SizedBox(height: 14),
+                  _InteractiveHanoiVisualPanel(
+                    height: hanoiHeight,
+                    pegs: _hanoiPegs,
+                    selectedPeg: _selectedHanoiPeg,
+                    moveCount: _hanoiMoveCount,
+                    onPegTap: _handleHanoiPegTap,
+                    onReset: () {
+                      setState(_resetHanoi);
+                    },
+                  ),
+                ],
+                if (visualType == 'rod_numeral') ...[
+                  const SizedBox(height: 12),
+                  _RodNumeralVisualPanel(
+                    height: rodVisualHeight,
+                    tens: (step['rod_tens'] as int?) ?? 2,
+                    ones: (step['rod_ones'] as int?) ?? 3,
+                  ),
+                ],
+                if (visualType == 'magic_square') ...[
+                  const SizedBox(height: 12),
+                  _MagicSquareVisualPanel(
+                    height: magicSquareVisualHeight,
+                    blankIndexes: _magicSquareBlankIndexes,
+                    values: _magicSquareInputs,
+                    onBlankTap: _showMagicSquareKeypad,
+                    activeBlankIndex: _activeMagicSquareCell,
+                  ),
+                ],
+                if (renderChoicesAsShapes) ...[
+                  const SizedBox(height: 12),
+                  _TessellationFloorPreview(height: floorPreviewHeight),
+                ],
+                SizedBox(height: choicesTopGap),
+                if (quizType == 'mcq' && !isMagicSquare)
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 4,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: useFourAcrossChoices ? 4 : 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: useFourAcrossChoices
+                          ? (isCompact ? 5.8 : 7.0)
+                          : (isCompact ? 5.5 : 7.5),
+                    ),
+                    itemBuilder: (context, index) {
+                      final selected = selectedChoiceIndex == index;
+                      final color = _optionColors[index % _optionColors.length];
+                      final isEnabled = index < choices.length;
+                      final choiceText = isEnabled
+                          ? choices[index].toString()
+                          : '준비 중';
+                      final shapeType = _parseShapeChoiceType(choiceText);
+                      final textColor = color.computeLuminance() > 0.55
+                          ? const Color(0xFF163988)
+                          : Colors.white;
+
+                      return AnimatedScale(
+                        scale: selected ? 1.0 : 0.98,
+                        duration: const Duration(milliseconds: 120),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 140),
+                          curve: Curves.easeOut,
                           decoration: BoxDecoration(
-                            color: isEnabled ? color : const Color(0xFFB8B8BE),
                             borderRadius: BorderRadius.circular(10),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x22000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
+                            border: selected
+                                ? Border.all(color: const Color(0xFF0B1F61), width: 5)
+                                : null,
+                            boxShadow: selected
+                                ? const [
+                                    BoxShadow(
+                                      color: Color(0x33133E97),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          child: Stack(
-                            children: [
-                              Center(
-                                child: renderChoicesAsShapes
-                                    ? _ShapeOptionSymbol(
-                                        type: shapeType,
-                                        color: textColor,
-                                        size: useFourAcrossChoices
-                                            ? (isCompact ? 22 : 26)
-                                            : optionShapeSize,
-                                        selected: selected,
-                                      )
-                                    : Text(
-                                        choiceText,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: isEnabled
+                                  ? () => setState(() => selectedChoiceIndex = index)
+                                  : null,
+                              borderRadius: BorderRadius.circular(10),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  color: isEnabled ? color : const Color(0xFFB8B8BE),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x22000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 18),
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child: renderChoicesAsShapes
+                                          ? _ShapeOptionSymbol(
+                                              type: shapeType,
+                                              color: textColor,
+                                              size: useFourAcrossChoices
+                                                  ? (isCompact ? 22 : 26)
+                                                  : optionShapeSize,
+                                              selected: selected,
+                                            )
+                                          : Text(
+                                              choiceText,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: textColor,
+                                                fontSize: useFourAcrossChoices
+                                                    ? (isCompact ? 22 : 26)
+                                                    : optionTextSize,
+                                                fontWeight: FontWeight.w900,
+                                                shadows: selected
+                                                    ? const [
+                                                        Shadow(
+                                                          color: Color(0x55000000),
+                                                          blurRadius: 4,
+                                                        ),
+                                                      ]
+                                                    : null,
+                                              ),
+                                            ),
+                                    ),
+                                    if (selected)
+                                      Positioned(
+                                        right: 10,
+                                        top: 10,
+                                        child: Icon(
+                                          Icons.check_circle_rounded,
                                           color: textColor,
-                                          fontSize: useFourAcrossChoices
-                                              ? (isCompact ? 22 : 26)
-                                              : optionTextSize,
-                                          fontWeight: FontWeight.w900,
-                                          shadows: selected
-                                              ? const [
-                                                  Shadow(
-                                                    color: Color(0x55000000),
-                                                    blurRadius: 4,
-                                                  ),
-                                                ]
-                                              : null,
+                                          size: 30,
                                         ),
                                       ),
-                              ),
-                              if (selected)
-                                Positioned(
-                                  right: 10,
-                                  top: 10,
-                                  child: Icon(
-                                    Icons.check_circle_rounded,
-                                    color: textColor,
-                                    size: 30,
-                                  ),
+                                  ],
                                 ),
-                            ],
+                              ),
+                            ),
                           ),
+                        ),
+                      );
+                    },
+                  )
+                else if (!isMagicSquare)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFF243B78), width: 2),
+                    ),
+                    child: TextField(
+                      controller: _inputController,
+                      onChanged: (value) => inputAnswer = value,
+                      style: TextStyle(
+                        fontSize: isCompact ? 22 : 26,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF091F59),
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: quizType == 'qr' ? 'QR 결과를 입력하세요' : '답을 입력하세요',
+                        hintStyle: TextStyle(
+                          fontSize: isCompact ? 20 : 24,
+                          color: const Color(0xFF8A93AE),
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-                );
-              },
-            )
-          else if (!isMagicSquare)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF243B78), width: 2),
-              ),
-              child: TextField(
-                controller: _inputController,
-                onChanged: (value) => inputAnswer = value,
-                style: TextStyle(
-                  fontSize: isCompact ? 22 : 26,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF091F59),
-                ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: quizType == 'qr' ? 'QR 결과를 입력하세요' : '답을 입력하세요',
-                  hintStyle: TextStyle(
-                    fontSize: isCompact ? 20 : 24,
-                    color: const Color(0xFF8A93AE),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+                const SizedBox(height: 4),
+              ],
             ),
-          const SizedBox(height: 12),
-          Row(
+          ),
+        ),
+        // ── 항상 하단에 고정되는 버튼 영역 ──
+        Container(
+          color: const Color(0xFFF5F8FF),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _showHint(step['hint']?.toString()),
-                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 28),
-                  label: Text(
-                    '힌트',
-                    style: TextStyle(
-                      fontSize: actionFontSize,
-                      fontWeight: FontWeight.w800,
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showHint(step['hint']?.toString()),
+                      icon: const Icon(Icons.chat_bubble_outline_rounded, size: 28),
+                      label: Text(
+                        '힌트',
+                        style: TextStyle(
+                          fontSize: actionFontSize,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF163988),
+                        side: const BorderSide(color: Color(0xFF21396C), width: 2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: Size.fromHeight(actionButtonHeight),
+                      ),
                     ),
                   ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF163988),
-                    side: const BorderSide(color: Color(0xFF21396C), width: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isAnswerReady(quizType, step)
+                          ? () => _submitAnswer(step, quizType)
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF123E97),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: Size.fromHeight(actionButtonHeight),
+                      ),
+                      child: Text(
+                        '정답 제출',
+                        style: TextStyle(
+                          fontSize: actionFontSize,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
-                    minimumSize: Size.fromHeight(actionButtonHeight),
+                  ),
+                ],
+              ),
+              if (kDebugMode) ...[
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: widget.onNext,
+                    icon: const Icon(Icons.skip_next_rounded),
+                    label: Text(
+                      '테스트용: 문제 건너뛰고 다음으로',
+                      style: TextStyle(
+                        fontSize: isCompact ? 14 : 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF355AA8),
+                      side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: const Size.fromHeight(42),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _isAnswerReady(quizType, step)
-                      ? () => _submitAnswer(step, quizType)
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF123E97),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    minimumSize: Size.fromHeight(actionButtonHeight),
-                  ),
-                  child: Text(
-                    '정답 제출',
-                    style: TextStyle(
-                      fontSize: actionFontSize,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
+              ],
             ],
           ),
-          if (kDebugMode) ...[
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: widget.onNext,
-                icon: const Icon(Icons.skip_next_rounded),
-                label: Text(
-                  '테스트용: 문제 건너뛰고 다음으로',
-                  style: TextStyle(
-                    fontSize: isCompact ? 14 : 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF355AA8),
-                  side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  minimumSize: const Size.fromHeight(42),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

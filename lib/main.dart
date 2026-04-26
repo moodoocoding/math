@@ -1259,10 +1259,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                   (rightConstraints.maxWidth * 0.28)
                                       .clamp(220.0, 300.0)
                                       .toDouble();
-                              final wideTrayPieceSize =
-                                  ((sidePanelWidth - 40) / 3 - 14)
-                                      .clamp(44.0, trayPieceSize)
-                                      .toDouble();
+                              // wideTrayPieceSize is now computed inside LayoutBuilder per tray
                               final boardSide = math
                                   .min(
                                     rightConstraints.maxHeight - 6,
@@ -1286,24 +1283,72 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                     width: sidePanelWidth,
                                     child: Column(
                                       children: [
-                                        _buildTargetCard(width: sidePanelWidth),
-                                        const SizedBox(height: 10),
+                                        // 목표 모양: 사용 가능 높이에 비례해 크기 결정
                                         Expanded(
+                                          flex: 5,
+                                          child: LayoutBuilder(
+                                            builder: (ctx, sideC) {
+                                              final previewSide = math
+                                                  .min(
+                                                    sideC.maxWidth - 20,
+                                                    sideC.maxHeight - 48,
+                                                  )
+                                                  .clamp(60.0, 260.0)
+                                                  .toDouble();
+                                              return Container(
+                                                width: double.infinity,
+                                                padding: const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFFFF7D6),
+                                                  borderRadius: BorderRadius.circular(14),
+                                                  border: Border.all(
+                                                    color: const Color(0xFFECC94B),
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  children: [
+                                                    const Text(
+                                                      '목표 모양',
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight: FontWeight.w900,
+                                                        color: Color(0xFF7A5A00),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Expanded(
+                                                      child: Center(
+                                                        child: _buildTargetPreview(
+                                                          side: previewSide + 12,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        // 조각 보관함: LayoutBuilder로 2행 3열이 딱 맞도록 비율 계산
+                                        Expanded(
+                                          flex: 5,
                                           child: Container(
                                             width: double.infinity,
                                             padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
+                                              borderRadius: BorderRadius.circular(14),
                                               border: Border.all(
                                                 color: const Color(0xFFC8D8F2),
                                                 width: 2,
                                               ),
                                             ),
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 const Text(
                                                   '조각 보관함',
@@ -1313,28 +1358,30 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                     color: Color(0xFF355AA8),
                                                   ),
                                                 ),
-                                                const SizedBox(height: 10),
+                                                const SizedBox(height: 8),
                                                 Expanded(
-                                                  child: GridView.count(
-                                                    physics:
-                                                        const NeverScrollableScrollPhysics(),
-                                                    crossAxisCount: 3,
-                                                    crossAxisSpacing: 8,
-                                                    mainAxisSpacing: 8,
-                                                    childAspectRatio: 1,
-                                                    children: _pieceTemplates
-                                                        .map(
-                                                          (
-                                                            piece,
-                                                          ) => _buildTrayPiece(
-                                                            piece,
-                                                            size:
-                                                                wideTrayPieceSize,
-                                                          ),
-                                                        )
-                                                        .toList(
-                                                          growable: false,
-                                                        ),
+                                                  child: LayoutBuilder(
+                                                    builder: (ctx, trayC) {
+                                                      final cellW = (trayC.maxWidth - 2 * 8) / 3;
+                                                      final cellH = (trayC.maxHeight - 8) / 2;
+                                                      final ratio = (cellW / cellH).clamp(0.4, 3.0);
+                                                      final pSize = (math.min(cellW, cellH) * 0.72).clamp(28.0, 64.0);
+                                                      return GridView.count(
+                                                        physics: const NeverScrollableScrollPhysics(),
+                                                        crossAxisCount: 3,
+                                                        crossAxisSpacing: 8,
+                                                        mainAxisSpacing: 8,
+                                                        childAspectRatio: ratio,
+                                                        children: _pieceTemplates
+                                                            .map(
+                                                              (piece) => _buildTrayPiece(
+                                                                piece,
+                                                                size: pSize,
+                                                              ),
+                                                            )
+                                                            .toList(growable: false),
+                                                      );
+                                                    },
                                                   ),
                                                 ),
                                               ],

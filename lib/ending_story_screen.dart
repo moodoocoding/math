@@ -109,6 +109,7 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
                     fontSize: 38,
                     fontWeight: FontWeight.w900,
                     color: Color(0xFF133E97),
+                    fontFamily: 'Pretendard',
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -120,6 +121,7 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF4B5563),
                     height: 1.5,
+                    fontFamily: 'Pretendard',
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -250,7 +252,13 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
-                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E1E1E),
+                                height: 1.25,
+                                fontFamily: 'GangwonEduAll',
+                              ),
                             ),
                           ],
                         ),
@@ -303,7 +311,12 @@ class _SpeakerBadge extends StatelessWidget {
       ),
       child: Text(
         name,
-        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          fontFamily: 'Pretendard',
+        ),
       ),
     );
   }
