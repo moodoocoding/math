@@ -30,7 +30,7 @@ class MissionTourApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '미션투어',
+      title: '충북수학체험센터',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF4F5F7),
         fontFamily: 'Pretendard',
