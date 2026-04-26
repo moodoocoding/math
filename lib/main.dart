@@ -876,24 +876,14 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
 
   void _checkPuzzle() {
     final correct = _isCorrect();
-    showDialog<void>(
+    showPremiumFeedbackDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Text(correct ? '성공!' : '다시 도전!'),
-        content: Text(
-          correct ? '목표 모양을 정확히 만들었어요!' : '아직 목표 모양과 달라요. 조각을 다시 옮겨 보세요.',
-          style: const TextStyle(height: 1.35),
-        ),
-        actions: [
-          TextButton(
-            onPressed: correct
-                ? _handlePuzzleSolved
-                : () => Navigator.pop(context),
-            child: const Text('확인'),
-          ),
-        ],
-      ),
+      isCorrect: correct,
+      title: correct ? '성공!' : '다시 도전!',
+      message: correct
+          ? '목표 모양을 정확히 만들었어요!'
+          : '아직 목표 모양과 달라요. 조각을 다시 옮겨 보세요.',
+      onConfirm: correct ? _handlePuzzleSolved : () {},
     );
   }
 
@@ -1728,32 +1718,23 @@ class _Chapter2QrVerificationScreenState
     required String title,
     required String message,
   }) async {
-    await showDialog<void>(
+    await showPremiumFeedbackDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Text(title),
-        content: Text(message, style: const TextStyle(height: 1.35)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('확인'),
-          ),
-        ],
-      ),
+      isCorrect: success,
+      title: title,
+      message: message,
+      onConfirm: () async {
+        if (!mounted) return;
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/chapter3_story');
+        } else {
+          setState(() {
+            _handlingDetection = false;
+          });
+          await _startScanner();
+        }
+      },
     );
-
-    if (!mounted) return;
-
-    if (success) {
-      Navigator.pushReplacementNamed(context, '/chapter3_story');
-    } else {
-      setState(() {
-        _handlingDetection = false;
-      });
-      await _startScanner();
-    }
   }
 
   Future<void> _handleDetection(String rawValue) async {
@@ -2133,4 +2114,114 @@ class _StartButton extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> showPremiumFeedbackDialog({
+  required BuildContext context,
+  required bool isCorrect,
+  required String title,
+  required String message,
+  required VoidCallback onConfirm,
+}) async {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final dialogWidth = (screenWidth * 0.45).clamp(360.0, 500.0);
+  final imageHeight = screenWidth < 1100 ? 180.0 : 220.0;
+  final titleSize = screenWidth < 1100 ? 32.0 : 38.0;
+  final messageSize = screenWidth < 1100 ? 20.0 : 24.0;
+  final confirmSize = screenWidth < 1100 ? 22.0 : 26.0;
+
+  if (isCorrect) {
+    AppSfxController.playCorrect();
+  } else {
+    AppSfxController.playWrong();
+  }
+
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    barrierColor: Colors.black.withValues(alpha: 0.75),
+    builder: (context) {
+      return Dialog(
+        elevation: 20,
+        shadowColor: Colors.black54,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Container(
+          width: dialogWidth,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              Center(
+                child: Image.asset(
+                  isCorrect
+                      ? 'assets/images/chr_play_correct.png'
+                      : 'assets/images/chr_how_fail.png',
+                  height: imageHeight,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: titleSize,
+                  fontWeight: FontWeight.w900,
+                  color: isCorrect
+                      ? const Color(0xFF13968F)
+                      : const Color(0xFFD64A45),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: messageSize,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onConfirm();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF133E97),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    '확인',
+                    style: TextStyle(
+                      fontSize: confirmSize,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
