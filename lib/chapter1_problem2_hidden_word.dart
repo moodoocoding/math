@@ -1,9 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
-import 'sfx_controller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -477,7 +475,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(bottom: BorderSide(color: const Color(0xFFF4C430).withOpacity(0.5), width: 2)),
+                border: Border(bottom: BorderSide(color: const Color(0xFFF4C430).withValues(alpha: 0.5), width: 2)),
               ),
               child: Column(
                 children: [
@@ -665,7 +663,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 return Container(
                   decoration: BoxDecoration(
                     color: isFoundCell
-                        ? const Color(0xFFB3E5FC).withOpacity(0.8)
+                        ? const Color(0xFFB3E5FC).withValues(alpha: 0.8)
                         : isSelected
                             ? const Color(0xFFFFF9C4)
                             : Colors.white,
