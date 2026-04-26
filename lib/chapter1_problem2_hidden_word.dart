@@ -718,94 +718,92 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
         final boardSize = math.min(constraints.maxWidth, constraints.maxHeight);
         final cellSize = boardSize / 8;
 
-    return GestureDetector(
-      onPanStart: (details) {
-        final pos = _getGridPosition(details.localPosition, cellSize);
-        if (pos != null) {
-          setState(() {
-            currentSelection = [pos];
-          });
-        }
-      },
-      onPanUpdate: (details) {
-        final pos = _getGridPosition(details.localPosition, cellSize);
-        if (pos != null && _canAddToSelection(pos)) {
-          setState(() {
-            currentSelection.add(pos);
-          });
-        }
-      },
-      onPanEnd: (details) {
-        _confirmSelection();
-      },
-      child: Container(
-        width: boardSize,
-        height: boardSize,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: const Color(0xFF163988), width: 3),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Stack(
-          children: [
-            // 글자 격자
-            GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 8,
-              ),
-              itemCount: 64,
-              itemBuilder: (context, index) {
-                int row = index ~/ 8;
-                int col = index % 8;
-                bool isSelected =
-                    currentSelection.contains((row, col));
-                bool isFoundCell = _isCellInFoundWord(row, col);
+        return GestureDetector(
+          onPanStart: (details) {
+            final pos = _getGridPosition(details.localPosition, cellSize);
+            if (pos != null) {
+              setState(() {
+                currentSelection = [pos];
+              });
+            }
+          },
+          onPanUpdate: (details) {
+            final pos = _getGridPosition(details.localPosition, cellSize);
+            if (pos != null && _canAddToSelection(pos)) {
+              setState(() {
+                currentSelection.add(pos);
+              });
+            }
+          },
+          onPanEnd: (details) {
+            _confirmSelection();
+          },
+          child: Container(
+            width: boardSize,
+            height: boardSize,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: const Color(0xFF163988), width: 3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Stack(
+              children: [
+                // 글자 격자
+                GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 8,
+                  ),
+                  itemCount: 64,
+                  itemBuilder: (context, index) {
+                    int row = index ~/ 8;
+                    int col = index % 8;
+                    bool isSelected = currentSelection.contains((row, col));
+                    bool isFoundCell = _isCellInFoundWord(row, col);
 
-                return GestureDetector(
-                  onTap: () {
-                    if (_canAddToSelection((row, col))) {
-                      setState(() {
-                        currentSelection.add((row, col));
-                        _confirmSelection();
-                      });
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isFoundCell
-                          ? const Color(0xFFB3E5FC).withValues(alpha: 0.8)
-                          : isSelected
-                              ? const Color(0xFFFFF9C4)
-                              : Colors.white,
-                      border: Border.all(
-                        color: const Color(0xFFBDBDBD),
-                        width: 1,
-                      ),
-                    ),
-                    child: Center(
-                          child: Center(
-                            child: Text(
-                              board[row][col],
-                              style: TextStyle(
-                                fontSize: cellSize * 0.5,
-                                fontWeight: FontWeight.w900,
-                                color: isFoundCell
-                                    ? const Color(0xFF01579B)
-                                    : const Color(0xFF091F59),
-                              ),
+                    return GestureDetector(
+                      onTap: () {
+                        if (_canAddToSelection((row, col))) {
+                          setState(() {
+                            currentSelection.add((row, col));
+                            _confirmSelection();
+                          });
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isFoundCell
+                              ? const Color(0xFFB3E5FC).withValues(alpha: 0.8)
+                              : isSelected
+                                  ? const Color(0xFFFFF9C4)
+                                  : Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFFBDBDBD),
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            board[row][col],
+                            style: TextStyle(
+                              fontSize: cellSize * 0.5,
+                              fontWeight: FontWeight.w900,
+                              color: isFoundCell
+                                  ? const Color(0xFF01579B)
+                                  : const Color(0xFF091F59),
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
   }
 
   /// 터치 위치에서 격자 위치 계산
