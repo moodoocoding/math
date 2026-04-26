@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'bgm_toggle_button.dart';
+import 'bgm_controller.dart';
+import 'sfx_controller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '?⑥? ?깅쭚 李얘린 ?쇱쫹',
+      title: '수학 낱말 찾기 퍼즐',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
@@ -23,13 +25,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// ?깅쭚 ?곗씠??紐⑤뜽
+/// 낱말 데이터 모델
 class WordData {
   final String word;
   final int startRow;
   final int startCol;
   final String direction; // 'horizontal' or 'vertical'
-  late final List<(int, int)> positions; // ?깅쭚??李⑥??섎뒗 紐⑤뱺 移?
+  late final List<(int, int)> positions; // 낱말이 차지하는 모든 칸
 
   WordData({
     required this.word,
@@ -37,7 +39,7 @@ class WordData {
     required this.startCol,
     required this.direction,
   }) {
-    // ?깅쭚??紐⑤뱺 移?醫뚰몴 怨꾩궛
+    // 낱말의 모든 칸 좌표 계산
     positions = [];
     for (int i = 0; i < word.length; i++) {
       if (direction == 'horizontal') {
@@ -48,18 +50,18 @@ class WordData {
     }
   }
 
-  /// ???깅쭚??二쇱뼱吏?移몃뱾???좏깮怨??뺥솗???쇱튂?섎뒗吏 ?뺤씤
+  /// 이 낱말이 주어진 칸들의 선택과 정확히 일치하는지 확인
   bool matchesSelection(List<(int, int)> selected) {
     if (selected.length != word.length) return false;
 
-    // 媛숈? ?쒖꽌濡??쇱튂?섎뒗吏 ?뺤씤
+    // 같은 순서로 일치하는지 확인
     for (int i = 0; i < positions.length; i++) {
       if (positions[i] != selected[i]) return false;
     }
     return true;
   }
 
-  /// ??닚?쇰줈???쇱튂?섎뒗吏 ?뺤씤 (嫄곗슱??
+  /// 역순으로도 일치하는지 확인 (거꾸로)
   bool matchesSelectionReverse(List<(int, int)> selected) {
     if (selected.length != word.length) return false;
 
@@ -72,7 +74,7 @@ class WordData {
   }
 }
 
-/// 硫붿씤 寃뚯엫 ?붾㈃
+/// 메인 게임 화면
 class HiddenWordPuzzleScreen extends StatefulWidget {
   const HiddenWordPuzzleScreen({super.key, this.completedRouteName});
 
@@ -84,12 +86,12 @@ class HiddenWordPuzzleScreen extends StatefulWidget {
 }
 
 class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
-  late List<List<String>> board; // 8x8 湲?먰뙋
-  late List<WordData> words; // 李얠쓣 ?깅쭚??
-  late Set<String> foundWords; // 李얠? ?깅쭚 紐⑸줉
-  late List<(int, int)> currentSelection; // ?꾩옱 ?좏깮 以묒씤 移몃뱾
-  late Map<String, List<(int, int)>> foundPositions; // 李얠? ?깅쭚???꾩튂??
-  int lastHintIndex = -1; // 留덉?留됱쑝濡??뚰듃???깅쭚 ?몃뜳??
+  late List<List<String>> board; // 8x8 글자판
+  late List<WordData> words; // 찾을 낱말들
+  late Set<String> foundWords; // 찾은 낱말 목록
+  late List<(int, int)> currentSelection; // 현재 선택 중인 칸들
+  late Map<String, List<(int, int)>> foundPositions; // 찾은 낱말들의 위치들
+  int lastHintIndex = -1; // 마지막으로 힌트 준 낱말 인덱스
 
   static const String koreanChars =
       '가나다라마바사아자차카타파하거너더러머버서어저처커터퍼허고노도로모보소오조초코토포호';
@@ -97,6 +99,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   @override
   void initState() {
     super.initState();
+    AppBgmController.playProblem();
     _initializeGame();
   }
 
@@ -111,16 +114,16 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   }
 
   void _generateBoard() {
-    // 癒쇱? 蹂대뱶瑜??꾩쓽??湲?먮줈 梨꾩슦湲?
-    final random = DateTime.now().microsecond;
+    // 먼저 보드를 임의의 글자로 채우기
+    final random = math.Random();
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
         board[i][j] =
-            koreanChars[(random + i * 8 + j) % koreanChars.length];
+            koreanChars[random.nextInt(koreanChars.length)];
       }
     }
 
-    // Chapter 4 words. Each word has at least two letters so it can be selected.
+    // 챕터 4 단어들 설정
     words.add(WordData(
       word: '도형',
       startRow: 0,
@@ -174,37 +177,31 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     }
   }
 
-  /// ?좏깮 媛?ν븳吏 ?뺤씤 (媛濡??먮뒗 ?몃줈 吏곸꽑)
+  /// 선택 가능한지 확인 (가로 또는 세로 직선)
   bool _isValidSelection(List<(int, int)> selected) {
     if (selected.isEmpty) return false;
-
-    // ??移몃쭔 ?좏깮??寃쎌슦???좏슚?섏? ?딆쓬
     if (selected.length == 1) return false;
 
     int firstRow = selected[0].$1;
     int firstCol = selected[0].$2;
 
-    // 紐⑤몢 媛숈? ?됱씤吏 (媛濡?
-    bool isHorizontal =
-        selected.every((cell) => cell.$1 == firstRow);
-
-    // 紐⑤몢 媛숈? ?댁씤吏 (?몃줈)
-    bool isVertical =
-        selected.every((cell) => cell.$2 == firstCol);
+    bool isHorizontal = selected.every((cell) => cell.$1 == firstRow);
+    bool isVertical = selected.every((cell) => cell.$2 == firstCol);
 
     if (!isHorizontal && !isVertical) return false;
 
-    // ?곗냽??移몄씤吏 ?뺤씤
-    selected.sort((a, b) {
+    // 연속된 칸인지 확인을 위해 복사본 정렬
+    List<(int, int)> sorted = List.from(selected);
+    sorted.sort((a, b) {
       if (a.$1 != b.$1) return a.$1.compareTo(b.$1);
       return a.$2.compareTo(b.$2);
     });
 
-    for (int i = 1; i < selected.length; i++) {
-      int prevRow = selected[i - 1].$1;
-      int prevCol = selected[i - 1].$2;
-      int currRow = selected[i].$1;
-      int currCol = selected[i].$2;
+    for (int i = 1; i < sorted.length; i++) {
+      int prevRow = sorted[i - 1].$1;
+      int prevCol = sorted[i - 1].$2;
+      int currRow = sorted[i].$1;
+      int currCol = sorted[i].$2;
 
       if (isHorizontal && currCol != prevCol + 1) return false;
       if (isVertical && currRow != prevRow + 1) return false;
@@ -213,7 +210,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     return true;
   }
 
-  /// ?좏깮 ?뺤씤 諛??깅쭚 留ㅼ묶
+  /// 선택 확인 및 낱말 매칭
   void _confirmSelection() {
     if (!_isValidSelection(currentSelection)) {
       setState(() {
@@ -225,189 +222,84 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     for (var word in words) {
       if (foundWords.contains(word.word)) continue;
 
-      // ?뺣갑???뺤씤
-      if (word.matchesSelection(currentSelection)) {
+      if (word.matchesSelection(currentSelection) || 
+          word.matchesSelectionReverse(currentSelection)) {
+        AppSfxController.playCorrect();
         setState(() {
           foundWords.add(word.word);
           foundPositions[word.word] = List.from(word.positions);
           currentSelection = [];
         });
-        return;
-      }
-
-      // ??갑???뺤씤
-      if (word.matchesSelectionReverse(currentSelection)) {
-        setState(() {
-          foundWords.add(word.word);
-          foundPositions[word.word] = List.from(word.positions);
-          currentSelection = [];
-        });
+        
+        if (foundWords.length == words.length) {
+          _showSuccessDialog();
+        }
         return;
       }
     }
 
-    // ?쇱튂?섎뒗 ?깅쭚???놁쑝硫??좏깮 珥덇린??
     setState(() {
       currentSelection = [];
     });
   }
 
-  void _resetPuzzle() {
-    setState(() {
-      foundWords.clear();
-      foundPositions.clear();
-      currentSelection = [];
-      lastHintIndex = -1;
-    });
-  }
-
-  void _skipPuzzleForTest() {
-    if (widget.completedRouteName != null) {
-      Navigator.pushReplacementNamed(context, widget.completedRouteName!);
-    } else {
-      Navigator.maybePop(context);
-    }
-  }
-
-  void _showHint() {
-    // ?꾩쭅 李얠? 紐삵븳 ?깅쭚 李얘린
-    for (int i = 0; i < words.length; i++) {
-      if (!foundWords.contains(words[i].word)) {
-        lastHintIndex = i;
-
-        showDialog(
-          context: context,
-          builder: (context) => Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Container(
-              padding: const EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    '?뮕 ?뚰듃',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF6F63D1),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    '"${words[i].word}"를 찾아보세요!',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF091F59),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '${words[i].direction == 'horizontal' ? '가로' : '세로'} 방향으로 있습니다.',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF5B7BA6),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      '?뺤씤',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF6F63D1),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-        return;
-      }
-    }
-
-    // 紐⑤몢 李얠? 寃쎌슦
+  void _showSuccessDialog() {
+    AppSfxController.playCorrect();
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                '?럦 紐⑤몢 李얠븯?댁슂!',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('?뺤씤'),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 10,
+                offset: Offset(0, 4),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  void _checkAnswer() {
-    bool allFound = foundWords.length == words.length;
-
-    if (allFound) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Container(
-            padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 30),
+              Center(
+                child: Image.asset(
+                  'assets/images/chr_play_correct.png',
+                  height: 180,
+                  fit: BoxFit.contain,
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  '?럦 ?뺣떟?낅땲?? ?럦',
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF18BEB6),
-                  ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '🎉 정답입니다! 🎉',
+                style: TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF13968F),
+                  fontFamily: 'GangwonEduAll',
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  '紐⑤뱺 ?깅쭚??李얠븯?댁슂!\n?뺣쭚 ?섑뻽?댁슂!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF091F59),
-                  ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '모든 낱말을 찾았어요!\n정말 잘했어요!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
                 ),
-                const SizedBox(height: 30),
-                ElevatedButton(
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
                     if (widget.completedRouteName != null) {
@@ -419,84 +311,138 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF133E97),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: const Text(
-                    '?뺤씤',
+                    '확인',
                     style: TextStyle(
-                      fontSize: 26,
+                      fontSize: 28,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
+
+  void _resetPuzzle() {
+    AppSfxController.playClick();
+    setState(() {
+      foundWords = {};
+      foundPositions = {};
+      currentSelection = [];
+    });
+  }
+
+  void _showHint() {
+    AppSfxController.playClick();
+    int nextHintIndex = (lastHintIndex + 1) % words.length;
+    // 이미 찾은 단어면 다음 단어로
+    int count = 0;
+    while (foundWords.contains(words[nextHintIndex].word) && count < words.length) {
+      nextHintIndex = (nextHintIndex + 1) % words.length;
+      count++;
+    }
+
+    if (count == words.length) return;
+
+    lastHintIndex = nextHintIndex;
+    final hintWord = words[nextHintIndex].word;
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '💡 힌트',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF6F63D1),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                '\'$hintWord\'을(를) 찾아보세요!',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인', style: TextStyle(fontSize: 22)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _skipPuzzleForTest() {
+    if (widget.completedRouteName != null) {
+      Navigator.pushReplacementNamed(context, widget.completedRouteName!);
+    }
+  }
+
+  void _checkAnswer() {
+    if (foundWords.length == words.length) {
+      _showSuccessDialog();
     } else {
-      int remaining = words.length - foundWords.length;
+      AppSfxController.playWrong();
       showDialog(
         context: context,
         builder: (context) => Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
             padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  '?꾩쭅?댁뿉??',
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFFE05C57),
-                  ),
+                Image.asset(
+                  'assets/images/chr_how_fail.png',
+                  height: 150,
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  '아직 다 못 찾았어요!',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFFD64A45),
+                    fontFamily: 'GangwonEduAll',
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Text(
-                  '?꾩쭅 $remaining媛쒖쓽 ?깅쭚???⑥븯?댁슂.\n怨꾩냽 李얠븘蹂댁꽭??',
-                  textAlign: TextAlign.center,
+                  '남은 낱말 수: ${words.length - foundWords.length}개',
                   style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF091F59),
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'GangwonEduAll',
                   ),
                 ),
                 const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE05C57),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: const Text(
-                    '?뺤씤',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('확인', style: TextStyle(fontSize: 22)),
                 ),
               ],
             ),
@@ -506,7 +452,6 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     }
   }
 
-  /// ?뱀젙 移몄씠 李얠? ?깅쭚???ы븿?섎뒗吏 ?뺤씤
   bool _isCellInFoundWord(int row, int col) {
     for (var positions in foundPositions.values) {
       if (positions.contains((row, col))) {
@@ -526,33 +471,19 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF163988),
-        surfaceTintColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 38),
-          onPressed: () => Navigator.pop(context),
-        ),
-        centerTitle: true,
-        title: const Text(
-          '미션! 수학체험센터의 반짝별을 찾아서',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
-        ),
+        title: const Text('미션! 수학 낱말 찾기', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
-          const BgmToggleButton(iconSize: 40),
+          const BgmToggleButton(iconSize: 32),
           IconButton(
-            icon: const Icon(Icons.home_rounded, size: 44),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/home',
-              (route) => false,
-            ),
+            icon: const Icon(Icons.home, size: 32),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
           ),
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // 상단 노란색 바 제거 (공간 확보)
             Container(
               width: double.infinity,
               margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
@@ -599,21 +530,16 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
             ),
 
-            // ?섎떒: 踰꾪듉
+            // 하단: 버튼
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(
                 horizontal: screenSize.width * 0.03,
                 vertical: isCompact ? 12 : 16,
               ),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(
-                  top: BorderSide(
-                    color: const Color(0xFFE1E1E4),
-                    width: 1,
-                  ),
-                ),
+                border: Border(top: BorderSide(color: Color(0xFFE1E1E4), width: 1)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -623,68 +549,38 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _showHint,
-                          icon: const Icon(Icons.lightbulb_outline, size: 24),
-                          label: Text(
-                            '힌트',
-                            style: TextStyle(
-                              fontSize: isCompact ? 18 : 22,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                          icon: const Icon(Icons.lightbulb_outline),
+                          label: const Text('힌트'),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF6F63D1),
-                            side: const BorderSide(
-                              color: Color(0xFF6F63D1),
-                              width: 2,
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: isCompact ? 10 : 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
-                      SizedBox(width: screenSize.width * 0.02),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _resetPuzzle,
-                          icon: const Icon(Icons.refresh, size: 24),
-                          label: Text(
-                            '다시하기',
-                            style: TextStyle(
-                              fontSize: isCompact ? 18 : 22,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('다시하기'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF8A8A8A),
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: isCompact ? 10 : 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
-                      SizedBox(width: screenSize.width * 0.02),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _checkAnswer,
-                          icon: const Icon(Icons.check_circle, size: 24),
-                          label: Text(
-                            '정답 확인',
-                            style: TextStyle(
-                              fontSize: isCompact ? 18 : 22,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                          icon: const Icon(Icons.check_circle),
+                          label: const Text('정답 확인'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF123E97),
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: isCompact ? 10 : 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
@@ -700,18 +596,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                         label: const Text('테스트용: 문제 건너뛰고 다음으로'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFF315FB8),
-                          side: const BorderSide(
-                            color: Color(0xFF5B80D7),
-                            width: 2,
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          textStyle: TextStyle(
-                            fontSize: isCompact ? 14 : 18,
-                            fontWeight: FontWeight.w800,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          side: const BorderSide(color: Color(0xFF5B80D7), width: 2),
                         ),
                       ),
                     ),
@@ -725,7 +610,6 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     );
   }
 
-  /// ?깅쭚 移대뱶 ?꾩젽
   Widget _buildWordCard(String word, bool found, bool isCompact, Size screenSize) {
     return Container(
       margin: EdgeInsets.only(right: screenSize.width * 0.02),
@@ -759,46 +643,41 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     );
   }
 
-  /// 寃뚯엫 蹂대뱶 ?꾩젽
   Widget _buildGameBoard(Size screenSize, bool isCompact) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // 가용 공간 중 작은 쪽을 기준으로 정사각형 보드 크기 결정
-        final boardSize = math.min(constraints.maxWidth, constraints.maxHeight);
+        final boardSize = math.min(constraints.maxWidth, constraints.maxHeight) * 0.95;
         final cellSize = boardSize / 8;
 
-    return GestureDetector(
-      onPanStart: (details) {
-        final pos = _getGridPosition(details.localPosition, cellSize);
-        if (pos != null) {
-          setState(() {
-            currentSelection = [pos];
-          });
-        }
-      },
-      onPanUpdate: (details) {
-        final pos = _getGridPosition(details.localPosition, cellSize);
-        if (pos != null && _canAddToSelection(pos)) {
-          setState(() {
-            currentSelection.add(pos);
-          });
-        }
-      },
-      onPanEnd: (details) {
-        _confirmSelection();
-      },
-      child: Container(
-        width: boardSize,
-        height: boardSize,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: const Color(0xFF163988), width: 3),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Stack(
-          children: [
-            // 湲??寃⑹옄
-            GridView.builder(
+        return GestureDetector(
+          onPanStart: (details) {
+            final pos = _getGridPosition(details.localPosition, cellSize);
+            if (pos != null) {
+              setState(() {
+                currentSelection = [pos];
+              });
+            }
+          },
+          onPanUpdate: (details) {
+            final pos = _getGridPosition(details.localPosition, cellSize);
+            if (pos != null && _canAddToSelection(pos)) {
+              setState(() {
+                currentSelection.add(pos);
+              });
+            }
+          },
+          onPanEnd: (details) {
+            _confirmSelection();
+          },
+          child: Container(
+            width: boardSize,
+            height: boardSize,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: const Color(0xFF163988), width: 3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 8,
@@ -807,108 +686,64 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               itemBuilder: (context, index) {
                 int row = index ~/ 8;
                 int col = index % 8;
-                bool isSelected =
-                    currentSelection.contains((row, col));
+                bool isSelected = currentSelection.contains((row, col));
                 bool isFoundCell = _isCellInFoundWord(row, col);
 
-                return GestureDetector(
-                  onTap: () {
-                    if (_canAddToSelection((row, col))) {
-                      setState(() {
-                        currentSelection.add((row, col));
-                        _confirmSelection();
-                      });
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isFoundCell
-                          ? const Color(0xFFB3E5FC).withValues(alpha: 0.8)
-                          : isSelected
-                              ? const Color(0xFFFFF9C4)
-                              : Colors.white,
-                      border: Border.all(
-                        color: const Color(0xFFBDBDBD),
-                        width: 1,
+                return Container(
+                  decoration: BoxDecoration(
+                    color: isFoundCell
+                        ? const Color(0xFFB3E5FC).withOpacity(0.8)
+                        : isSelected
+                            ? const Color(0xFFFFF9C4)
+                            : Colors.white,
+                    border: Border.all(color: const Color(0xFFBDBDBD), width: 1),
+                  ),
+                  child: Center(
+                    child: Text(
+                      board[row][col],
+                      style: TextStyle(
+                        fontSize: cellSize * 0.5,
+                        fontWeight: FontWeight.w900,
+                        color: isFoundCell ? const Color(0xFF01579B) : const Color(0xFF091F59),
                       ),
                     ),
-                          child: Center(
-                            child: Text(
-                              board[row][col],
-                              style: TextStyle(
-                                fontSize: cellSize * 0.5,
-                                fontWeight: FontWeight.w900,
-                                color: isFoundCell
-                                    ? const Color(0xFF01579B)
-                                    : const Color(0xFF091F59),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
                   ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
   }
 
-  /// ?곗튂 ?꾩튂?먯꽌 寃⑹옄 ?꾩튂 怨꾩궛
   (int, int)? _getGridPosition(Offset localPosition, double cellSize) {
     int col = (localPosition.dx / cellSize).floor();
     int row = (localPosition.dy / cellSize).floor();
-
-    if (row >= 0 && row < 8 && col >= 0 && col < 8) {
-      return (row, col);
-    }
+    if (row >= 0 && row < 8 && col >= 0 && col < 8) return (row, col);
     return null;
   }
 
-  /// ?좏깮??移몄쓣 異붽??????덈뒗吏 ?뺤씤
   bool _canAddToSelection((int, int) newCell) {
     if (currentSelection.contains(newCell)) return false;
+    if (currentSelection.isEmpty) return true;
 
-    if (currentSelection.length == 1) {
-      int row1 = currentSelection[0].$1;
-      int col1 = currentSelection[0].$2;
-      int row2 = newCell.$1;
-      int col2 = newCell.$2;
-
-      // ?몄젒??移몄씤吏 ?뺤씤
-      bool isAdjacent = (row1 == row2 && (col1 - col2).abs() == 1) ||
-          (col1 == col2 && (row1 - row2).abs() == 1);
-
-      return isAdjacent;
-    }
-
-    // ?대? ?щ윭 移몄쓣 ?좏깮??寃쎌슦
     int lastRow = currentSelection.last.$1;
     int lastCol = currentSelection.last.$2;
 
-    // 留덉?留?移멸낵 ?몄젒?댁빞 ??
     bool isAdjacent = (lastRow == newCell.$1 && (lastCol - newCell.$2).abs() == 1) ||
         (lastCol == newCell.$2 && (lastRow - newCell.$1).abs() == 1);
 
     if (!isAdjacent) return false;
 
-    // 吏곸꽑 諛⑺뼢 ?좎? ?뺤씤
     if (currentSelection.length >= 2) {
       int row0 = currentSelection[0].$1;
       int col0 = currentSelection[0].$2;
-
       bool isHorizontal = currentSelection.every((cell) => cell.$1 == row0);
       bool isVertical = currentSelection.every((cell) => cell.$2 == col0);
-
-      if (!isHorizontal && !isVertical) return false;
-
-      // 吏곸꽑 諛⑺뼢?쇰줈留?異붽? 媛??
       if (isHorizontal && newCell.$1 != row0) return false;
       if (isVertical && newCell.$2 != col0) return false;
     }
-
     return true;
   }
 }
