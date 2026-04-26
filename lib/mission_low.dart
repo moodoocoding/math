@@ -831,8 +831,8 @@ class _QuizScreenState extends State<QuizScreen> {
     final optionShapeSize = isCompact ? 30.0 : 34.0;
     final actionFontSize = isCompact ? 20.0 : 24.0;
     final actionButtonHeight = isMagicSquare ? 52.0 : 56.0;
-    final hanoiHeight = (screenHeight * (isCompact ? 0.56 : 0.60))
-        .clamp(430.0, 720.0)
+    final hanoiHeight = (screenHeight * (isCompact ? 0.48 : 0.52))
+        .clamp(360.0, 680.0)
         .toDouble();
     final floorPreviewHeight = (screenHeight * (isCompact ? 0.50 : 0.54))
         .clamp(360.0, 660.0)
@@ -850,8 +850,8 @@ class _QuizScreenState extends State<QuizScreen> {
         visualType == 'rod_numeral' ||
         visualType == 'magic_square';
     final choicesTopGap = hasTopVisualSection
-        ? (isCompact ? 22.0 : 28.0)
-        : 14.0;
+        ? (isCompact ? 10.0 : 16.0)
+        : 10.0;
 
     return Column(
       children: [
@@ -860,16 +860,7 @@ class _QuizScreenState extends State<QuizScreen> {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
             child: Column(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: LinearProgressIndicator(
-                    minHeight: 14,
-                    value: widget.progress.clamp(0.0, 1.0),
-                    backgroundColor: const Color(0xFFE1E1E4),
-                    color: const Color(0xFFF0B126),
-                  ),
-                ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 8),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
