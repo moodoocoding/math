@@ -108,7 +108,13 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                           SizedBox(height: 12),
                           Text(
                             '좋아! 세 번째 별 조각을 찾으면 마지막 빛도 돌아올 거야!',
-                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1E1E1E),
+                              height: 1.25,
+                              fontFamily: 'GangwonEduAll',
+                            ),
                           ),
                         ],
                       ),

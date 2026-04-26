@@ -32,7 +32,7 @@ class MissionTourApp extends StatelessWidget {
       title: '미션투어',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF4F5F7),
-        fontFamily: 'sans-serif',
+        fontFamily: 'Pretendard',
       ),
       home: const IntroScreen(),
       routes: {

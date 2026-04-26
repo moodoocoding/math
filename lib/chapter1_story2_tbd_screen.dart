@@ -198,6 +198,7 @@ class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
                                 fontWeight: FontWeight.w800,
                                 color: Color(0xFF1E1E1E),
                                 height: 1.25,
+                                fontFamily: 'GangwonEduAll',
                               ),
                             ),
                           ],

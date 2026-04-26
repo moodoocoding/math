@@ -124,6 +124,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF1E1E1E),
                               height: 1.25,
+                              fontFamily: 'GangwonEduAll',
                             ),
                           ),
                         ],
