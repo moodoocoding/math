@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'bgm_toggle_button.dart';
@@ -371,6 +372,29 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                           child: const BgmToggleButton(
                             iconSize: 24,
                             color: Color(0xFF6377BE),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFFBAC5E8),
+                              width: 2,
+                            ),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              Icons.power_settings_new,
+                              size: 24,
+                              color: Color(0xFF6377BE),
+                            ),
+                            onPressed: () {
+                              SystemNavigator.pop();
+                            },
                           ),
                         ),
                       ],
