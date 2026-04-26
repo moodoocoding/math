@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
@@ -447,7 +448,9 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
     final isCompact = screenSize.height < 600;
+    final isMobile = screenWidth < 600;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F8FF),
@@ -532,46 +535,82 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 color: Colors.white,
                 border: Border(top: BorderSide(color: Color(0xFFE1E1E4), width: 1)),
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _showHint,
-                      icon: const Icon(Icons.lightbulb_outline),
-                      label: const Text('힌트'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF6F63D1),
-                        side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _showHint,
+                          icon: Icon(Icons.lightbulb_outline, size: isMobile ? 20 : 24),
+                          label: Text(
+                            '힌트',
+                            style: TextStyle(fontSize: isMobile ? 16 : 18),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF6F63D1),
+                            side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _resetPuzzle,
+                          icon: Icon(Icons.refresh, size: isMobile ? 20 : 24),
+                          label: Text(
+                            '다시하기',
+                            style: TextStyle(fontSize: isMobile ? 16 : 18),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF8A8A8A),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _checkAnswer,
+                          icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
+                          label: Text(
+                            '정답 확인',
+                            style: TextStyle(fontSize: isMobile ? 16 : 18),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF123E97),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          if (widget.completedRouteName != null) {
+                            Navigator.pushReplacementNamed(context, widget.completedRouteName!);
+                          }
+                        },
+                        icon: const Icon(Icons.skip_next_rounded),
+                        label: const Text('테스트용: 문제 건너뛰고 다음으로'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF355AA8),
+                          side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _resetPuzzle,
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('다시하기'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8A8A8A),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _checkAnswer,
-                      icon: const Icon(Icons.check_circle),
-                      label: const Text('정답 확인'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF123E97),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ),

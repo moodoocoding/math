@@ -101,6 +101,10 @@ class _IntroScreenState extends State<IntroScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final isMobile = screenWidth < 600;
+
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -113,57 +117,59 @@ class _IntroScreenState extends State<IntroScreen> {
             errorBuilder: (context, error, stackTrace) =>
                 Container(color: const Color(0xFFF4F5F7)),
           ),
-          // Smoother gradient overlay for better text readability
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0x22000000), // Lighter at top
-                  Color(0x99000000), // Darker at bottom
+                  Color(0x22000000),
+                  Color(0x99000000),
                 ],
               ),
             ),
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.06,
+                vertical: screenSize.height * 0.04,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Spacer(),
-                  const Text(
+                  const Spacer(flex: 3),
+                  Text(
                     '충북 수학체험센터에 온 걸 환영해!',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 38,
+                      fontSize: isMobile ? screenWidth * 0.085 : 38,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
-                      shadows: [
+                      height: 1.2,
+                      shadows: const [
                         Shadow(color: Colors.black26, blurRadius: 12, offset: Offset(0, 4)),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
+                  SizedBox(height: isMobile ? 12 : 16),
+                  Text(
                     '준비되면 아래 버튼을 눌러 시작해 보자.',
                     style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 19,
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: isMobile ? screenWidth * 0.045 : 19,
                       fontWeight: FontWeight.w600,
-                      shadows: [
+                      shadows: const [
                         Shadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  // Premium Gradient Button
+                  const Spacer(flex: 1),
                   Container(
                     width: double.infinity,
-                    height: 68,
+                    height: isMobile ? 60 : 70,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x44000000),
@@ -187,13 +193,13 @@ class _IntroScreenState extends State<IntroScreen> {
                         shadowColor: Colors.transparent,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         '입장하기',
                         style: TextStyle(
-                          fontSize: 26,
+                          fontSize: isMobile ? 22 : 26,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.5,
                         ),
@@ -245,16 +251,23 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const horizontalPadding = 18.0;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+    final isMobile = screenWidth < 600;
     final isUltraWide = screenWidth / screenHeight >= 2.1;
-    final cardWidth = (screenWidth - (horizontalPadding * 2) - 10) / 2;
-    final welcomeSize = isUltraWide ? 44.0 : 28.0;
-    final adventureSize = isUltraWide ? 46.0 : 28.0;
-    final infoTitleSize = isUltraWide ? 28.0 : 18.0;
-    final infoBodySize = isUltraWide ? 40.0 : 22.0;
-    final infoLinkSize = isUltraWide ? 24.0 : 16.0;
+
+    const horizontalPadding = 18.0;
+    // Mobile: 1 card per row, Tablet: 2 cards per row
+    final cardWidth = isMobile
+        ? (screenWidth - (horizontalPadding * 2))
+        : (screenWidth - (horizontalPadding * 2) - 16) / 2;
+
+    final welcomeSize = isMobile ? screenWidth * 0.075 : (isUltraWide ? 44.0 : 28.0);
+    final adventureSize = isMobile ? screenWidth * 0.085 : (isUltraWide ? 46.0 : 32.0);
+    final infoTitleSize = isMobile ? 13.0 : 16.0;
+    final infoBodySize = isMobile ? 16.0 : 20.0;
+    final infoLinkSize = isMobile ? 14.0 : 18.0;
 
     return Scaffold(
       body: Stack(
@@ -263,8 +276,8 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
             child: Image.asset(
               'assets/images/bg_intro.png',
               fit: BoxFit.cover,
-              cacheWidth: 1800, // Higher cache width for better resolution
-              filterQuality: FilterQuality.high, // Improve anti-aliasing
+              cacheWidth: 1800,
+              filterQuality: FilterQuality.high,
               alignment: isUltraWide
                   ? const Alignment(0, -0.35)
                   : Alignment.center,
@@ -285,6 +298,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
           ),
           SafeArea(
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -297,105 +311,118 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x1A000000),
-                                blurRadius: 12,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: BackdropFilter(
-                              filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                              child: Container(
-                                padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.55),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                        Flexible(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x1A000000),
+                                  blurRadius: 12,
+                                  offset: Offset(0, 4),
                                 ),
-                                child: Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/logo_cb_math.png',
-                                width: 62,
-                                height: 62,
-                                cacheWidth: 300,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 10),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '충북수학체험센터',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFF163988),
-                                      height: 1.1,
-                                    ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: BackdropFilter(
+                                filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.55),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
                                   ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    'Chungbuk Math Experience Center',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF2F477D),
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/logo_cb_math.png',
+                                        width: isMobile ? 48 : 62,
+                                        height: isMobile ? 48 : 62,
+                                        cacheWidth: 300,
+                                        fit: BoxFit.contain,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Flexible(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              '충북수학체험센터',
+                                              style: TextStyle(
+                                                fontSize: isMobile ? 18 : 22,
+                                                fontWeight: FontWeight.w800,
+                                                color: const Color(0xFF163988),
+                                                height: 1.1,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              'Math Experience Center',
+                                              style: TextStyle(
+                                                fontSize: isMobile ? 11 : 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: const Color(0xFF2F477D),
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const Spacer(),
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFFBAC5E8),
-                              width: 2,
+                        const SizedBox(width: 12),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: isMobile ? 40 : 44,
+                              height: isMobile ? 40 : 44,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFBAC5E8),
+                                  width: 2,
+                                ),
+                              ),
+                              child: BgmToggleButton(
+                                iconSize: isMobile ? 20 : 24,
+                                color: const Color(0xFF6377BE),
+                              ),
                             ),
-                          ),
-                          child: const BgmToggleButton(
-                            iconSize: 24,
-                            color: Color(0xFF6377BE),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFFBAC5E8),
-                              width: 2,
+                            const SizedBox(width: 8),
+                            Container(
+                              width: isMobile ? 40 : 44,
+                              height: isMobile ? 40 : 44,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFBAC5E8),
+                                  width: 2,
+                                ),
+                              ),
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  Icons.power_settings_new,
+                                  size: isMobile ? 20 : 24,
+                                  color: const Color(0xFF6377BE),
+                                ),
+                                onPressed: () {
+                                  SystemNavigator.pop();
+                                },
+                              ),
                             ),
-                          ),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(
-                              Icons.power_settings_new,
-                              size: 24,
-                              color: Color(0xFF6377BE),
-                            ),
-                            onPressed: () {
-                              SystemNavigator.pop();
-                            },
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -403,7 +430,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       horizontalPadding,
-                      30,
+                      isMobile ? 24 : 30,
                       horizontalPadding,
                       0,
                     ),
@@ -430,7 +457,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       horizontalPadding,
-                      10,
+                      8,
                       horizontalPadding,
                       0,
                     ),
@@ -457,13 +484,13 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
                       horizontalPadding,
-                      20,
+                      24,
                       horizontalPadding,
-                      0,
+                      24,
                     ),
                     child: Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 16,
+                      runSpacing: 16,
                       children: [
                         _MissionCard(
                           width: cardWidth,
@@ -1873,211 +1900,176 @@ class _Chapter2QrVerificationScreenState
       ),
       backgroundColor: const Color(0xFFF6FAFF),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9F2FF),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
-                ),
-                child: const Column(
-                  children: [
-                    Text(
-                      '다음 단계 QR 인증',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF163988),
-                      ),
-                      textAlign: TextAlign.center,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = constraints.maxWidth;
+            final isMobile = screenWidth < 600;
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 14 : 18,
+                      vertical: isMobile ? 12 : 16,
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      '다음 단계로 이동하려면 현장 QR 코드를 스캔해 인증해 보세요.',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF163988),
-                        height: 1.25,
-                      ),
-                      textAlign: TextAlign.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE9F2FF),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: const Color(0xFFC8D8F2),
-                      width: 2,
+                    child: Column(
+                      children: [
+                        Text(
+                          '다음 단계 QR 인증',
+                          style: TextStyle(
+                            fontSize: isMobile ? (screenWidth * 0.07).clamp(22, 28) : 28,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF163988),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '다음 단계로 이동하려면 현장 QR 코드를 스캔해 인증해 보세요.',
+                          style: TextStyle(
+                            fontSize: isMobile ? (screenWidth * 0.05).clamp(16, 20) : 20,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF163988),
+                            height: 1.25,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final scannerSide = math
-                          .min(constraints.maxWidth, constraints.maxHeight)
-                          .clamp(260.0, 560.0);
-
-                      return Center(
-                        child: SizedBox(
-                          width: scannerSide,
-                          height: scannerSide,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                MobileScanner(
-                                  controller: _scannerController,
-                                  errorBuilder: (context, error, child) {
-                                    return _buildScannerError(error);
-                                  },
-                                  onDetect: (capture) {
-                                    final rawValue = capture.barcodes
-                                        .map(
-                                          (barcode) =>
-                                              barcode.rawValue?.trim() ?? '',
-                                        )
-                                        .firstWhere(
-                                          (value) => value.isNotEmpty,
-                                          orElse: () => '',
-                                        );
-                                    if (rawValue.isEmpty) return;
-                                    _handleDetection(rawValue);
-                                  },
-                                ),
-                                IgnorePointer(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: const Color(0x99FFFFFF),
-                                        width: 3,
-                                      ),
-                                    ),
+                  const SizedBox(height: 14),
+                  Container(
+                    width: double.infinity,
+                    height: isMobile ? 320 : 400,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                    ),
+                    child: Center(
+                      child: SizedBox(
+                        width: isMobile ? 260 : 320,
+                        height: isMobile ? 260 : 320,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              MobileScanner(
+                                controller: _scannerController,
+                                errorBuilder: (context, error, child) {
+                                  return _buildScannerError(error);
+                                },
+                                onDetect: (capture) {
+                                  final rawValue = capture.barcodes
+                                      .map((barcode) => barcode.rawValue?.trim() ?? '')
+                                      .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                  if (rawValue.isEmpty) return;
+                                  _handleDetection(rawValue);
+                                },
+                              ),
+                              IgnorePointer(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: const Color(0x99FFFFFF), width: 3),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              if (kDebugMode) ...[
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFFC8D8F2),
-                      width: 2,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: _manualQrController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                          hintText: '테스트용: URL/QR 값을 직접 입력',
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: _submitManualQr,
-                          icon: const Icon(Icons.verified_outlined),
-                          label: const Text(
-                            '직접 입력으로 인증',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pushReplacementNamed(
-                      context,
-                      '/chapter3_story',
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
                     ),
-                    icon: const Icon(Icons.skip_next_rounded),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(42),
-                      side: const BorderSide(
-                        color: Color(0xFF5C7EC5),
-                        width: 2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    label: const Text(
-                      '테스트용: 인증 건너뛰고 다음으로',
+                    child: Text(
+                      _lastScannedValue == null
+                          ? '충북수학체험센터 QR 코드를 비추면 자동으로 인증 여부를 확인합니다.'
+                          : '최근 스캔 결과: $_lastScannedValue',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF355AA8),
+                        fontSize: isMobile ? 16 : 18,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF163988),
+                        height: 1.3,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-              ],
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
-                ),
-                child: Text(
-                  _lastScannedValue == null
-                      ? '충북수학체험센터 QR 코드를 비추면 자동으로 인증 여부를 확인합니다.'
-                      : '최근 스캔 결과: $_lastScannedValue',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF29427A),
-                    height: 1.3,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                      ),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: _manualQrController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              hintText: '테스트용: URL/QR 값을 직접 입력',
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _submitManualQr,
+                              icon: const Icon(Icons.verified_outlined),
+                              label: const Text(
+                                '직접 입력으로 인증',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.pushReplacementNamed(context, '/chapter3_story'),
+                        icon: const Icon(Icons.skip_next_rounded),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(42),
+                          side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        label: const Text(
+                          '테스트용: 인증 건너뛰고 다음으로',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

@@ -250,50 +250,66 @@ class StoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final imageHeight = screenWidth < 900 ? screenWidth * 0.45 : 360.0;
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final isMobile = screenWidth < 600;
+    final imageHeight = isMobile ? screenSize.height * 0.35 : (screenWidth < 900 ? screenWidth * 0.45 : 360.0);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: double.infinity,
-          height: imageHeight,
-          child: Image.asset(
-            'assets/images/chr_background.png',
-            fit: BoxFit.contain,
-            cacheHeight: 600,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          step['text'].toString(),
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF15347F),
-            height: 1.3,
-            fontFamily: 'GangwonEduAll',
-          ),
-        ),
-        const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: onNext,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF123E97),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: imageHeight,
+              child: Image.asset(
+                'assets/images/chr_background.png',
+                fit: BoxFit.contain,
+                cacheHeight: 600,
+              ),
             ),
-          ),
-          child: Text(
-            isLast ? '완료' : '다음',
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
-          ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                step['text'].toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isMobile ? (screenWidth * 0.07).clamp(20, 28) : 32,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF15347F),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: onNext,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF123E97),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 24 : 32,
+                  vertical: isMobile ? 12 : 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                isLast ? '완료' : '다음',
+                style: TextStyle(
+                  fontSize: isMobile ? 22 : 26,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -824,25 +840,28 @@ class _QuizScreenState extends State<QuizScreen> {
         .toLowerCase();
     final useFourAcrossChoices =
         (quizType == 'mcq' && choices.length == 4) || choicesLayout == '4x1';
+    final isMobile = screenWidth < 600;
     final isCompact = screenWidth < 1100;
     final questionText = step['question'].toString();
-    final questionFontSize = isCompact ? 24.0 : 30.0;
-    final optionTextSize = isCompact ? 30.0 : 34.0;
-    final optionShapeSize = isCompact ? 30.0 : 34.0;
-    final actionFontSize = isCompact ? 20.0 : 24.0;
-    final actionButtonHeight = isMagicSquare ? 52.0 : 56.0;
-    final hanoiHeight = (screenHeight * (isCompact ? 0.48 : 0.52))
-        .clamp(360.0, 680.0)
+    final questionFontSize = isMobile ? (screenWidth * 0.06).clamp(18.0, 22.0) : (isCompact ? 24.0 : 30.0);
+    final optionTextSize = isMobile ? (screenWidth * 0.07).clamp(24.0, 28.0) : (isCompact ? 30.0 : 34.0);
+    final optionShapeSize = isMobile ? (screenWidth * 0.07).clamp(24.0, 28.0) : (isCompact ? 30.0 : 34.0);
+    final actionFontSize = isMobile ? 18.0 : (isCompact ? 20.0 : 24.0);
+    final actionButtonHeight = isMobile ? 48.0 : (isMagicSquare ? 52.0 : 56.0);
+    
+    final hanoiHeight = (screenHeight * (isMobile ? 0.42 : (isCompact ? 0.48 : 0.52)))
+        .clamp(isMobile ? 280.0 : 360.0, 680.0)
         .toDouble();
-    final floorPreviewHeight = (screenHeight * (isCompact ? 0.50 : 0.54))
-        .clamp(360.0, 660.0)
+    final floorPreviewHeight = (screenHeight * (isMobile ? 0.44 : (isCompact ? 0.50 : 0.54)))
+        .clamp(isMobile ? 300.0 : 360.0, 660.0)
         .toDouble();
-    final rodVisualHeight = (screenHeight * (isCompact ? 0.52 : 0.56))
-        .clamp(390.0, 680.0)
+    final rodVisualHeight = (screenHeight * (isMobile ? 0.46 : (isCompact ? 0.52 : 0.56)))
+        .clamp(isMobile ? 320.0 : 390.0, 680.0)
         .toDouble();
-    final magicSquareVisualHeight = (screenHeight * (isCompact ? 0.56 : 0.60))
-        .clamp(430.0, 720.0)
+    final magicSquareVisualHeight = (screenHeight * (isMobile ? 0.50 : (isCompact ? 0.56 : 0.60)))
+        .clamp(isMobile ? 350.0 : 430.0, 720.0)
         .toDouble();
+        
     final hasTopVisualSection =
         hasSimulationImages ||
         showHanoiVisual ||
@@ -850,7 +869,7 @@ class _QuizScreenState extends State<QuizScreen> {
         visualType == 'rod_numeral' ||
         visualType == 'magic_square';
     final choicesTopGap = hasTopVisualSection
-        ? (isCompact ? 10.0 : 16.0)
+        ? (isMobile ? 8.0 : (isCompact ? 10.0 : 16.0))
         : 10.0;
 
     return Column(
@@ -929,8 +948,8 @@ class _QuizScreenState extends State<QuizScreen> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       childAspectRatio: useFourAcrossChoices
-                          ? (isCompact ? 5.8 : 7.0)
-                          : (isCompact ? 5.5 : 7.5),
+                          ? (isMobile ? 3.0 : (isCompact ? 5.8 : 7.0))
+                          : (isMobile ? 3.5 : (isCompact ? 5.5 : 7.5)),
                     ),
                     itemBuilder: (context, index) {
                       final selected = selectedChoiceIndex == index;
@@ -993,7 +1012,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                               type: shapeType,
                                               color: textColor,
                                               size: useFourAcrossChoices
-                                                  ? (isCompact ? 22 : 26)
+                                                  ? (isCompact ? 22.0 : 26.0)
                                                   : optionShapeSize,
                                               selected: selected,
                                             )
@@ -1003,7 +1022,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                               style: TextStyle(
                                                 color: textColor,
                                                 fontSize: useFourAcrossChoices
-                                                    ? (isCompact ? 22 : 26)
+                                                    ? (isCompact ? 22.0 : 26.0)
                                                     : optionTextSize,
                                                 fontWeight: FontWeight.w900,
                                                 shadows: selected

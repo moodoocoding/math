@@ -52,8 +52,15 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
   Widget build(BuildContext context) {
     final scene = _scenes[_sceneIndex];
     final isLast = _sceneIndex == _scenes.length - 1;
-    final width = MediaQuery.of(context).size.width;
-    final charHeight = width < 1100 ? width * 0.44 : 430.0;
+    final screenSize = MediaQuery.of(context).size;
+    final width = screenSize.width;
+    final isMobile = width < 600;
+    final charHeight = isMobile 
+        ? (screenSize.height * 0.42).clamp(180.0, 320.0)
+        : (width < 1100 ? width * 0.44 : 430.0);
+    
+    final dialogFontSize = isMobile ? (width * 0.055).clamp(18.0, 24.0) : 28.0;
+    final buttonFontSize = isMobile ? 22.0 : 26.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -151,10 +158,10 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
-                              style: const TextStyle(
-                                fontSize: 28,
+                              style: TextStyle(
+                                fontSize: dialogFontSize,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF1E1E1E),
+                                color: const Color(0xFF1E1E1E),
                                 height: 1.25,
                                 fontFamily: 'GangwonEduAll',
                               ),
@@ -182,8 +189,8 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
                       ),
                       child: Text(
                         isLast ? '문제 풀러 가기' : '다음',
-                        style: const TextStyle(
-                          fontSize: 26,
+                        style: TextStyle(
+                          fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

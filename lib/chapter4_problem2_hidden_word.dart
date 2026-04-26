@@ -463,7 +463,9 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
     final isCompact = screenSize.height < 600;
+    final isMobile = screenWidth < 600;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F8FF),
@@ -548,8 +550,11 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _showHint,
-                          icon: const Icon(Icons.lightbulb_outline),
-                          label: const Text('힌트'),
+                          icon: Icon(Icons.lightbulb_outline, size: isMobile ? 20 : 24),
+                          label: Text(
+                            '힌트',
+                            style: TextStyle(fontSize: isMobile ? 16 : 18),
+                          ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF6F63D1),
                             side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
@@ -561,8 +566,11 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _resetPuzzle,
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('다시하기'),
+                          icon: Icon(Icons.refresh, size: isMobile ? 20 : 24),
+                          label: Text(
+                            '다시하기',
+                            style: TextStyle(fontSize: isMobile ? 16 : 18),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF8A8A8A),
                             foregroundColor: Colors.white,
@@ -574,8 +582,11 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _checkAnswer,
-                          icon: const Icon(Icons.check_circle),
-                          label: const Text('정답 확인'),
+                          icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
+                          label: Text(
+                            '정답 확인',
+                            style: TextStyle(fontSize: isMobile ? 16 : 18),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF123E97),
                             foregroundColor: Colors.white,

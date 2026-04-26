@@ -173,6 +173,11 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
       );
     }
 
+    final screenSize = MediaQuery.of(context).size;
+    final width = screenSize.width;
+    final isMobile = width < 600;
+    final dialogFontSize = isMobile ? (width * 0.06).clamp(20.0, 26.0) : 32.0;
+    final buttonFontSize = isMobile ? 22.0 : 26.0;
     final scene = _scenes[_sceneIndex];
     final isLast = _sceneIndex == _scenes.length - 1;
 
@@ -252,10 +257,10 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
-                              style: const TextStyle(
-                                fontSize: 32,
+                              style: TextStyle(
+                                fontSize: dialogFontSize,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF1E1E1E),
+                                color: const Color(0xFF1E1E1E),
                                 height: 1.25,
                                 fontFamily: 'GangwonEduAll',
                               ),
@@ -281,7 +286,7 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
                       ),
                       child: Text(
                         isLast ? '엔딩 보기' : '다음',
-                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+                        style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),
                   ),

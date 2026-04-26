@@ -79,12 +79,14 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
         ? width * 0.40
         : width * 0.34;
     final maxCharacterHeight = availableHeight * 0.46;
-    final sceneCharHeight = desiredCharacterHeight
-        .clamp(220.0, maxCharacterHeight)
-        .toDouble();
-    final dialogFontSize = width < 1100 ? 26.0 : 28.0;
-    final buttonBottomPadding =
-        (media.padding.bottom > 0 ? media.padding.bottom : 12.0) + 10.0;
+    final isMobile = width < 600;
+    final sceneCharHeight = isMobile 
+        ? (availableHeight * 0.4).clamp(180.0, 300.0)
+        : desiredCharacterHeight.clamp(220.0, maxCharacterHeight).toDouble();
+
+    final dialogFontSize = isMobile ? (width * 0.055).clamp(18.0, 24.0) : (width < 1100 ? 26.0 : 28.0);
+    final buttonFontSize = isMobile ? 22.0 : 26.0;
+    final buttonBottomPadding = isMobile ? 16.0 : (media.padding.bottom > 0 ? media.padding.bottom : 12.0) + 10.0;
     final backgroundAsset = _sceneIndex <= 2
         ? 'assets/images/chapter1_bg_1.png'
         : 'assets/images/chapter2_bg_1.png';
@@ -223,8 +225,8 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                       ),
                       child: Text(
                         isLast ? '문제 풀러 가기' : '다음',
-                        style: const TextStyle(
-                          fontSize: 26,
+                        style: TextStyle(
+                          fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

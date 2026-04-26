@@ -71,8 +71,15 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
   Widget build(BuildContext context) {
     final scene = _scenes[_sceneIndex];
     final isLast = _sceneIndex == _scenes.length - 1;
-    final width = MediaQuery.of(context).size.width;
-    final charHeight = width < 1100 ? width * 0.46 : 460.0;
+    final screenSize = MediaQuery.of(context).size;
+    final width = screenSize.width;
+    final isMobile = width < 600;
+    final charHeight = isMobile 
+        ? (screenSize.height * 0.42).clamp(180.0, 320.0)
+        : (width < 1100 ? width * 0.46 : 460.0);
+    
+    final dialogFontSize = isMobile ? (width * 0.055).clamp(18.0, 24.0) : 28.0;
+    final buttonFontSize = isMobile ? 22.0 : 26.0;
     final isWelcome = scene.welcomeImageAsset != null;
 
     Color getSpeakerColor(String? name) {
@@ -134,10 +141,10 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                       Text(
                         scene.line,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 44,
+                        style: TextStyle(
+                          fontSize: isMobile ? (width * 0.08).clamp(24.0, 32.0) : 44,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF163988),
+                          color: const Color(0xFF163988),
                         ),
                       ),
                       const SizedBox(height: 22),
@@ -153,10 +160,10 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             '다음',
                             style: TextStyle(
-                              fontSize: 26,
+                              fontSize: buttonFontSize,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -259,10 +266,10 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     scene.line,
-                                    style: const TextStyle(
-                                      fontSize: 28,
+                                    style: TextStyle(
+                                      fontSize: dialogFontSize,
                                       fontWeight: FontWeight.w800,
-                                      color: Color(0xFF1E1E1E),
+                                      color: const Color(0xFF1E1E1E),
                                       height: 1.25,
                                       fontFamily: 'GangwonEduAll',
                                     ),
@@ -290,8 +297,8 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                             ),
                             child: Text(
                               isLast ? '문제 풀이 시작' : '다음',
-                              style: const TextStyle(
-                                fontSize: 26,
+                              style: TextStyle(
+                                fontSize: buttonFontSize,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),

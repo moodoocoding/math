@@ -569,7 +569,9 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
     final isCompact = screenSize.height < 600;
+    final isMobile = screenWidth < 600;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F8FF),
@@ -675,20 +677,17 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _showHint,
-                          icon: const Icon(Icons.lightbulb_outline, size: 24),
+                          icon: Icon(Icons.lightbulb_outline, size: isMobile ? 20 : 24),
                           label: Text(
                             '힌트',
                             style: TextStyle(
-                              fontSize: isCompact ? 18 : 22,
+                              fontSize: isMobile ? 16 : 20,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF6F63D1),
-                            side: const BorderSide(
-                              color: Color(0xFF6F63D1),
-                              width: 2,
-                            ),
+                            side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
                             padding: EdgeInsets.symmetric(vertical: isCompact ? 10 : 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -700,11 +699,11 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _resetPuzzle,
-                          icon: const Icon(Icons.refresh, size: 24),
+                          icon: Icon(Icons.refresh, size: isMobile ? 20 : 24),
                           label: Text(
                             '다시하기',
                             style: TextStyle(
-                              fontSize: isCompact ? 18 : 22,
+                              fontSize: isMobile ? 16 : 20,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -722,11 +721,11 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _checkAnswer,
-                          icon: const Icon(Icons.check_circle, size: 24),
+                          icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
                           label: Text(
                             '정답 확인',
                             style: TextStyle(
-                              fontSize: isCompact ? 18 : 22,
+                              fontSize: isMobile ? 16 : 20,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
