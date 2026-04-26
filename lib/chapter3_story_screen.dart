@@ -168,7 +168,13 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
                             const SizedBox(height: 12),
                             Text(
                               scene.line,
-                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E), height: 1.25),
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E1E1E),
+                                height: 1.25,
+                                fontFamily: 'GangwonEduAll',
+                              ),
                             ),
                           ],
                         ),

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
 
@@ -550,20 +551,11 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // 상단 노란색 바 제거 (공간 확보)
             Container(
               width: double.infinity,
-              height: 14,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF6B51E),
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(8),
-                ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(8, 12, 8, 10),
-              padding: EdgeInsets.symmetric(vertical: isCompact ? 14 : 20),
+              margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+              padding: EdgeInsets.symmetric(vertical: isCompact ? 8 : 12),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -572,7 +564,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 '문제2: 글자판에서 찾을 수 있는 수학 낱말은 무엇일까요?',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isCompact ? 28 : 38,
+                  fontSize: isCompact ? 24 : 32,
                   fontWeight: FontWeight.w900,
                   color: const Color(0xFF091F59),
                 ),
@@ -766,8 +758,11 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
 
   /// 寃뚯엫 蹂대뱶 ?꾩젽
   Widget _buildGameBoard(Size screenSize, bool isCompact) {
-    final boardSize = screenSize.height * 0.55;
-    final cellSize = boardSize / 8;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 가용 공간 중 작은 쪽을 기준으로 정사각형 보드 크기 결정
+        final boardSize = math.min(constraints.maxWidth, constraints.maxHeight);
+        final cellSize = boardSize / 8;
 
     return GestureDetector(
       onPanStart: (details) {
@@ -834,26 +829,28 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                         width: 1,
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        board[row][col],
-                        style: TextStyle(
-                          fontSize: cellSize * 0.5,
-                          fontWeight: FontWeight.w800,
-                          color: isFoundCell
-                              ? const Color(0xFF01579B)
-                              : const Color(0xFF091F59),
+                          child: Center(
+                            child: Text(
+                              board[row][col],
+                              style: TextStyle(
+                                fontSize: cellSize * 0.5,
+                                fontWeight: FontWeight.w900,
+                                color: isFoundCell
+                                    ? const Color(0xFF01579B)
+                                    : const Color(0xFF091F59),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
+        },
+      );
   }
 
   /// ?곗튂 ?꾩튂?먯꽌 寃⑹옄 ?꾩튂 怨꾩궛

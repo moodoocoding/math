@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 void main() {
@@ -520,7 +521,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(
                 horizontal: screenSize.width * 0.04,
-                vertical: isCompact ? 12 : 16,
+                vertical: isCompact ? 8 : 12,
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -711,8 +712,11 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
 
   /// 게임 보드 위젯
   Widget _buildGameBoard(Size screenSize, bool isCompact) {
-    final boardSize = screenSize.height * 0.55;
-    final cellSize = boardSize / 8;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 가용 공간 중 작은 쪽을 기준으로 정사각형 보드 크기 결정
+        final boardSize = math.min(constraints.maxWidth, constraints.maxHeight);
+        final cellSize = boardSize / 8;
 
     return GestureDetector(
       onPanStart: (details) {
@@ -780,25 +784,28 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       ),
                     ),
                     child: Center(
-                      child: Text(
-                        board[row][col],
-                        style: TextStyle(
-                          fontSize: cellSize * 0.5,
-                          fontWeight: FontWeight.w800,
-                          color: isFoundCell
-                              ? const Color(0xFF01579B)
-                              : const Color(0xFF091F59),
+                          child: Center(
+                            child: Text(
+                              board[row][col],
+                              style: TextStyle(
+                                fontSize: cellSize * 0.5,
+                                fontWeight: FontWeight.w900,
+                                color: isFoundCell
+                                    ? const Color(0xFF01579B)
+                                    : const Color(0xFF091F59),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
+        },
+      );
   }
 
   /// 터치 위치에서 격자 위치 계산
