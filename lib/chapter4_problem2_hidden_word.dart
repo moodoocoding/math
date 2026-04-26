@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'bgm_toggle_button.dart';
 
 void main() {
@@ -689,30 +690,32 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _skipPuzzleForTest,
-                      icon: const Icon(Icons.skip_next_rounded),
-                      label: const Text('테스트용: 문제 건너뛰고 다음으로'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF315FB8),
-                        side: const BorderSide(
-                          color: Color(0xFF5B80D7),
-                          width: 2,
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        textStyle: TextStyle(
-                          fontSize: isCompact ? 14 : 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _skipPuzzleForTest,
+                        icon: const Icon(Icons.skip_next_rounded),
+                        label: const Text('테스트용: 문제 건너뛰고 다음으로'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF315FB8),
+                          side: const BorderSide(
+                            color: Color(0xFF5B80D7),
+                            width: 2,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          textStyle: TextStyle(
+                            fontSize: isCompact ? 14 : 18,
+                            fontWeight: FontWeight.w800,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
