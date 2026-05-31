@@ -1759,7 +1759,55 @@ class _TessellationFloorPainter extends CustomPainter {
           Offset(gapCx - textPainter.width / 2, gapCy - textPainter.height / 2),
         );
       }
-      // 3. 기타 테셀레이션 불가능한 도형들 (원, 별) -> 격자 격자선 없이 탄젠트 근접 배치 렌더링
+      // 3. 별 (정오각별 테셀레이션 실패 묘사 - 꼭짓점 접합 구조)
+      else if (selectedShape == _ShapeChoiceType.star) {
+        final double cx = size.width / 2;
+        final double cy = size.height / 2;
+        final double R = size.width / 6.5; // 별 외접원 반지름
+
+        // 3-1. 중앙 정오각별 렌더링
+        _drawStar(canvas, Offset(cx, cy), R, tilePaintA);
+        final strokePaint = Paint()
+          ..color = gridPaint.color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5;
+        _drawStar(canvas, Offset(cx, cy), R, strokePaint);
+
+        // 3-2. 중앙 별의 5개 꼭짓점(깃)에 맞닿아 접하도록 5개의 외부 별 배치 (꼭짓점 공유 묘사)
+        for (int i = 0; i < 5; i++) {
+          final double angle = -math.pi / 2 + (i * 2 * math.pi / 5);
+          final double outerCx = cx + 2 * R * math.cos(angle);
+          final double outerCy = cy + 2 * R * math.sin(angle);
+          final Offset outerCenter = Offset(outerCx, outerCy);
+
+          _drawStar(canvas, outerCenter, R, i.isEven ? tilePaintB : tilePaintA);
+          _drawStar(canvas, outerCenter, R, strokePaint);
+        }
+
+        // 3-3. 별과 별 사이에 남는 거대한 기하학적 빈틈(다이아몬드 및 오각형 모양의 틈)을 경고 문구로 시각화
+        final textPainter = TextPainter(
+          text: const TextSpan(
+            text: '⚠️ 거대한 빈틈!',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFFC62828),
+              backgroundColor: Colors.white,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout();
+        // 중앙 별 바로 옆(골이 형성되는 위치)에 빈틈 경고 배치
+        final double gapAngle = -math.pi / 2 + math.pi / 5; // 꼭짓점 사이의 골 방향 (36도)
+        final double D = R * 1.1;
+        canvas.drawCircle(Offset(cx + D * math.cos(gapAngle), cy + D * math.sin(gapAngle)), 8.0, Paint()..color = const Color(0xFFC62828).withValues(alpha: 0.15));
+        textPainter.paint(
+          canvas,
+          Offset(cx + D * math.cos(gapAngle) - textPainter.width / 2, cy + D * math.sin(gapAngle) - textPainter.height / 2),
+        );
+      }
+      // 4. 원 (기타 테셀레이션 불가능한 도형 - 탄젠트 5x5 접합 렌더링)
       else {
         final shapeSize = cellHeight;
 
