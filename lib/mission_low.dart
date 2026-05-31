@@ -1499,7 +1499,7 @@ class _TessellationFloorPreview extends StatelessWidget {
         hint = '별은 모양이 복잡해서 빈틈이 생겨요 ❌';
         canTile = false;
       case _ShapeChoiceType.pentagon:
-        hint = '정오각형은 어떻게 이어 붙여도 각도가 맞지 않아 빈틈이 생겨요 ❌';
+        hint = '정오각형은 빈틈 없이 이으려 하면 옆의 도형과 겹쳐버려요! ❌';
         canTile = false;
       default:
         hint = '도형을 골라서 바닥에 깔아봐!';
@@ -1597,20 +1597,23 @@ class _TessellationFloorPainter extends CustomPainter {
     final cellWidth = size.width / columns;
     final cellHeight = size.height / rows;
 
-    // ── 기본 모눈 격자선 상시 렌더링 (도형 아래에 보임) ──
-    final baseGridPaint = Paint()
-      ..color = const Color(0xFFC3CEF0) // 모눈종이 격자선 연청색
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
+    // ── 기본 모눈 격자선 ──
+    // 사각형(네모)이거나 선택 전일 때만 격자 격자선을 그립니다. (오각형/원/별 등은 격자 구조의 한계를 벗어나 수학적 일관성을 지키기 위함)
+    if (selectedShape == null || selectedShape == _ShapeChoiceType.square) {
+      final baseGridPaint = Paint()
+        ..color = const Color(0xFFC3CEF0) // 모눈종이 격자선 연청색
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2;
 
-    for (var row = 0; row < rows; row++) {
-      final topY = row * cellHeight;
-      final bottomY = (row + 1) * cellHeight;
-      for (var col = 0; col < columns; col++) {
-        final leftX = col * cellWidth;
-        final rightX = (col + 1) * cellWidth;
-        final tileRect = Rect.fromLTRB(leftX, topY, rightX, bottomY);
-        canvas.drawRect(tileRect, baseGridPaint);
+      for (var row = 0; row < rows; row++) {
+        final topY = row * cellHeight;
+        final bottomY = (row + 1) * cellHeight;
+        for (var col = 0; col < columns; col++) {
+          final leftX = col * cellWidth;
+          final rightX = (col + 1) * cellWidth;
+          final tileRect = Rect.fromLTRB(leftX, topY, rightX, bottomY);
+          canvas.drawRect(tileRect, baseGridPaint);
+        }
       }
     }
 
@@ -1651,16 +1654,114 @@ class _TessellationFloorPainter extends CustomPainter {
             canvas.drawRect(tile, gridPaint);
           }
         }
-      } 
-      // 2. 테셀레이션 불가능한 도형들 -> 빈틈 및 겹침 렌더링
-      else {
-        // 정오각형은 겹침(overlap) 및 틈새 오류를 시각화하기 위해 의도적으로 cellHeight의 1.15배로 확대 렌더링
-        final double shapeSize;
-        if (selectedShape == _ShapeChoiceType.pentagon) {
-          shapeSize = cellHeight * 1.15;
-        } else {
-          shapeSize = cellHeight;
+      }
+      // 2. 오각형 (정오각형 변-대-변 테셀레이션 실패 묘사 - 로제트 구조)
+      else if (selectedShape == _ShapeChoiceType.pentagon) {
+        final double cx = size.width / 2;
+        final double cy = size.height / 2;
+        final double R = size.width / 5.5; // 오각형 외접원 반지름
+
+        // 2-1. 중앙 정오각형 생성 및 렌더링
+        final List<Offset> centralVertices = [];
+        for (int i = 0; i < 5; i++) {
+          final double angle = -math.pi / 2 + (i * 2 * math.pi / 5);
+          centralVertices.add(Offset(cx + R * math.cos(angle), cy + R * math.sin(angle)));
         }
+
+        final Path centralPath = Path();
+        centralPath.moveTo(centralVertices[0].dx, centralVertices[0].dy);
+        for (int j = 1; j < 5; j++) {
+          centralPath.lineTo(centralVertices[j].dx, centralVertices[j].dy);
+        }
+        centralPath.close();
+        canvas.drawPath(centralPath, tilePaintA);
+        canvas.drawPath(centralPath, gridPaint);
+
+        // 2-2. 중앙 오각형의 5개 변을 기준으로 인접 오각형 5개(꽃잎 모양)를 기하학적 반사(Reflection)하여 배치
+        for (int i = 0; i < 5; i++) {
+          final Offset v1 = centralVertices[i];
+          final Offset v2 = centralVertices[(i + 1) % 5];
+          final Offset mid = Offset((v1.dx + v2.dx) / 2, (v1.dy + v2.dy) / 2);
+
+          // 바깥쪽 방향 법선 벡터 계산
+          final double phi = -math.pi / 2 + (i + 0.5) * 2 * math.pi / 5;
+          final Offset normal = Offset(math.cos(phi), math.sin(phi));
+
+          // 모든 꼭짓점을 현재 변(대칭축)에 대해 반사 대칭
+          final List<Offset> outerVertices = [];
+          for (final Offset p in centralVertices) {
+            final double dx = p.dx - mid.dx;
+            final double dy = p.dy - mid.dy;
+            final double dot = dx * normal.dx + dy * normal.dy;
+            final double rx = p.dx - 2 * dot * normal.dx;
+            final double ry = p.dy - 2 * dot * normal.dy;
+            outerVertices.add(Offset(rx, ry));
+          }
+
+          final Path outerPath = Path();
+          outerPath.moveTo(outerVertices[0].dx, outerVertices[0].dy);
+          for (int j = 1; j < 5; j++) {
+            outerPath.lineTo(outerVertices[j].dx, outerVertices[j].dy);
+          }
+          outerPath.close();
+          canvas.drawPath(outerPath, i.isEven ? tilePaintB : tilePaintA);
+          canvas.drawPath(outerPath, gridPaint);
+        }
+
+        // 2-3. 변끼리 맞닿아 꽃잎을 이룬 5개의 오각형 틈새(36도 벌어짐)에 억지로 다른 오각형을 끼워넣어 72도 겹치는 모순 묘사
+        // 1시 방향(우상단 꼭짓점인 Vertex 1 방향)에 겹침 유도용 붉은색 오각형 렌더링
+        final double gapAngle = -math.pi / 2 + 2 * math.pi / 5; // Vertex 1 방향 (-18도)
+        final double D = 2 * R * math.cos(math.pi / 5); // 1.618 * R (인접 중심 거리)
+        final double gapCx = cx + D * math.cos(gapAngle);
+        final double gapCy = cy + D * math.sin(gapAngle);
+
+        final List<Offset> gapVertices = [];
+        for (int j = 0; j < 5; j++) {
+          final double angle = gapAngle + math.pi + (j * 2 * math.pi / 5);
+          gapVertices.add(Offset(gapCx + R * math.cos(angle), gapCy + R * math.sin(angle)));
+        }
+
+        final Path gapPath = Path();
+        gapPath.moveTo(gapVertices[0].dx, gapVertices[0].dy);
+        for (int j = 1; j < 5; j++) {
+          gapPath.lineTo(gapVertices[j].dx, gapVertices[j].dy);
+        }
+        gapPath.close();
+
+        // 겹침 오류용 강렬한 반투명 붉은 칠과 빨간 외곽 테두리
+        final Paint gapPaint = Paint()
+          ..color = const Color(0xFFEF9A9A).withValues(alpha: 0.55)
+          ..style = PaintingStyle.fill;
+        final Paint gapBorderPaint = Paint()
+          ..color = const Color(0xFFC62828)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5;
+
+        canvas.drawPath(gapPath, gapPaint);
+        canvas.drawPath(gapPath, gapBorderPaint);
+
+        // 겹쳐진 기하학적 모순을 아이들이 직관적으로 알 수 있도록 경고 태그 렌더링
+        final textPainter = TextPainter(
+          text: const TextSpan(
+            text: '⚠️ 겹침!',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFFC62828),
+              backgroundColor: Colors.white,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout();
+        textPainter.paint(
+          canvas,
+          Offset(gapCx - textPainter.width / 2, gapCy - textPainter.height / 2),
+        );
+      }
+      // 3. 기타 테셀레이션 불가능한 도형들 (원, 별) -> 격자 격자선 없이 탄젠트 근접 배치 렌더링
+      else {
+        final shapeSize = cellHeight;
 
         for (var row = 0; row < rows; row++) {
           final centerY = row * cellHeight + cellHeight / 2;
