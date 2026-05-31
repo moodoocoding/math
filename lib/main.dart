@@ -1627,13 +1627,6 @@ class Chapter2QrVerificationScreen extends StatefulWidget {
 class _Chapter2QrVerificationScreenState
     extends State<Chapter2QrVerificationScreen>
     with WidgetsBindingObserver {
-  static const Set<String> _allowedSchemes = {'https', 'http'};
-  static const Set<String> _allowedHosts = {
-    'www.cbnse.go.kr',
-    'cbnse.go.kr',
-    'm.cbnse.go.kr',
-  };
-
   final MobileScannerController _scannerController = MobileScannerController(
     autoStart: false,
     detectionSpeed: DetectionSpeed.noDuplicates,
@@ -1697,51 +1690,12 @@ class _Chapter2QrVerificationScreenState
     }
   }
 
-  bool _isAllowedHost(String host) {
-    final normalized = host.trim().toLowerCase();
-    if (normalized.isEmpty) return false;
-    return _allowedHosts.contains(normalized) ||
-        normalized.endsWith('.cbnse.go.kr');
-  }
-
-  bool _matchesAcceptedUri(Uri uri) {
-    final scheme = uri.scheme.toLowerCase();
-    if (scheme.isNotEmpty && !_allowedSchemes.contains(scheme)) return false;
-    if (_isAllowedHost(uri.host)) return true;
-
-    for (final values in uri.queryParametersAll.values) {
-      for (final value in values) {
-        final decoded = Uri.decodeFull(value.trim());
-        if (decoded.isEmpty) continue;
-        final nestedCandidate = decoded.contains('://')
-            ? decoded
-            : 'https://$decoded';
-        final nested = Uri.tryParse(nestedCandidate);
-        if (nested != null && _isAllowedHost(nested.host)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
   bool _isAcceptedQrValue(String rawValue) {
     final value = rawValue.trim();
     if (value.isEmpty) return false;
 
-    // Some QR payloads include a redirected URL string; allow known domain tokens.
-    final decodedLower = Uri.decodeFull(value).toLowerCase();
-    if (decodedLower.contains('cbnse.go.kr')) return true;
-
-    Uri? uri = Uri.tryParse(value);
-    if ((uri == null || uri.host.isEmpty) && !value.contains('://')) {
-      // Some QR codes contain host/path only (without http/https).
-      uri = Uri.tryParse('https://$value');
-    }
-    if (uri == null) return false;
-
-    return _matchesAcceptedUri(uri);
+    final decoded = Uri.decodeFull(value);
+    return decoded.contains('루카');
   }
 
   Future<void> _showResultDialog({

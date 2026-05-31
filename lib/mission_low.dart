@@ -1104,8 +1104,11 @@ class _QuizScreenState extends State<QuizScreen> {
                         const SizedBox(height: 12),
                         _RodNumeralVisualPanel(
                           height: rodVisualHeight,
-                          tens: (step['rod_tens'] as int?) ?? 2,
-                          ones: (step['rod_ones'] as int?) ?? 3,
+                          tenThousands: step['rod_ten_thousands'] as int?,
+                          thousands: step['rod_thousands'] as int?,
+                          hundreds: step['rod_hundreds'] as int?,
+                          tens: step['rod_tens'] as int?,
+                          ones: step['rod_ones'] as int?,
                         ),
                       ],
                       if (visualType == 'magic_square') ...[
@@ -1820,17 +1823,89 @@ class _TessellationFloorPainter extends CustomPainter {
 class _RodNumeralVisualPanel extends StatelessWidget {
   const _RodNumeralVisualPanel({
     required this.height,
-    required this.tens,
-    required this.ones,
+    this.tenThousands,
+    this.thousands,
+    this.hundreds,
+    this.tens,
+    this.ones,
   });
 
   final double height;
-  final int tens;
-  final int ones;
+  final int? tenThousands;
+  final int? thousands;
+  final int? hundreds;
+  final int? tens;
+  final int? ones;
 
   @override
   Widget build(BuildContext context) {
     final isCompact = MediaQuery.of(context).size.width < 1100;
+    final List<Widget> children = [];
+
+    if (tenThousands != null) {
+      children.add(
+        Expanded(
+          child: _RodGroupCard(
+            label: '만의 자리',
+            count: tenThousands!,
+            horizontal: true,
+          ),
+        ),
+      );
+    }
+    if (thousands != null) {
+      if (children.isNotEmpty) children.add(const SizedBox(width: 12));
+      children.add(
+        Expanded(
+          child: _RodGroupCard(
+            label: '천의 자리',
+            count: thousands!,
+            horizontal: false,
+          ),
+        ),
+      );
+    }
+    if (hundreds != null) {
+      if (children.isNotEmpty) children.add(const SizedBox(width: 12));
+      children.add(
+        Expanded(
+          child: _RodGroupCard(
+            label: '백의 자리',
+            count: hundreds!,
+            horizontal: true,
+          ),
+        ),
+      );
+    }
+
+    final activeTens = tens ?? (tenThousands == null && thousands == null && hundreds == null && ones == null ? 2 : null);
+    final activeOnes = ones ?? (tenThousands == null && thousands == null && hundreds == null && tens == null ? 3 : null);
+
+    if (activeTens != null) {
+      if (children.isNotEmpty) children.add(const SizedBox(width: 12));
+      children.add(
+        Expanded(
+          child: _RodGroupCard(
+            label: '십의 자리',
+            count: activeTens,
+            horizontal: false,
+          ),
+        ),
+      );
+    }
+    if (activeOnes != null) {
+      if (children.isNotEmpty) children.add(const SizedBox(width: 12));
+      children.add(
+        Expanded(
+          child: _RodGroupCard(
+            label: '일의 자리',
+            count: activeOnes,
+            horizontal: true,
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       height: height,
@@ -1853,23 +1928,7 @@ class _RodNumeralVisualPanel extends StatelessWidget {
           SizedBox(height: isCompact ? 8 : 12),
           Expanded(
             child: Row(
-              children: [
-                Expanded(
-                  child: _RodGroupCard(
-                    label: '십의 자리',
-                    count: tens,
-                    horizontal: false,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _RodGroupCard(
-                    label: '일의 자리',
-                    count: ones,
-                    horizontal: true,
-                  ),
-                ),
-              ],
+              children: children,
             ),
           ),
         ],
