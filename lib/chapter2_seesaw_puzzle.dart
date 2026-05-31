@@ -45,8 +45,14 @@ class _CardDef {
   bool isValidAt(int ri, int d) =>
       d >= 1 && d + _maxCol(ri) <= 5;
 
-  List<_Abs> cells(int ri, int d) =>
-      rotations[ri].map((c) => (d + c.$1, c.$2 + 1)).toList();
+  List<_Abs> cells(int ri, int d, {bool isLeft = false}) {
+    if (isLeft) {
+      final mc = _maxCol(ri);
+      return rotations[ri].map((c) => (d + mc - c.$1, c.$2 + 1)).toList();
+    } else {
+      return rotations[ri].map((c) => (d + c.$1, c.$2 + 1)).toList();
+    }
+  }
 
   int torque(int ri, int d) =>
       cells(ri, d).fold(0, (s, c) => s + c.$1);
@@ -215,7 +221,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   // ── 계산값 ─────────────────────────────────────────
   List<_Abs> get _leftCells {
     if (_leftIdx == null) return const [];
-    return _kCards[_leftIdx!].cells(_leftRot, _leftDist);
+    return _kCards[_leftIdx!].cells(_leftRot, _leftDist, isLeft: true);
   }
 
   int get _leftTorque {
@@ -970,7 +976,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   Widget _gridRow(int row, double sz, double gap) {
     final activeLeftCells = _leftIdx != null && _leftPlaced
-        ? _kCards[_leftIdx!].cells(_leftRot, _leftDist).take(_leftVisibleCells).toSet()
+        ? _kCards[_leftIdx!].cells(_leftRot, _leftDist, isLeft: true).take(_leftVisibleCells).toSet()
         : <_Abs>{};
 
     final activeRightCells = _rightIdx != null && _rightPlaced
@@ -979,7 +985,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
     final dragRotLeft = _hoverLeftIdx != null ? _getDragRotation(_kCards[_hoverLeftIdx!], true) : 0;
     final hoverLeftCells = _hoverLeftIdx != null && _hoverLeftDist != null
-        ? _kCards[_hoverLeftIdx!].cells(dragRotLeft, _hoverLeftDist!).toSet()
+        ? _kCards[_hoverLeftIdx!].cells(dragRotLeft, _hoverLeftDist!, isLeft: true).toSet()
         : <_Abs>{};
 
     final dragRotRight = _hoverRightIdx != null ? _getDragRotation(_kCards[_hoverRightIdx!], false) : 0;
@@ -1037,7 +1043,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               builder: (context, candidateData, rejectedData) {
                 final isHover = hoverLeftCells.any((c) => c.$1 == d && c.$2 == row);
                 final isPlaced = activeLeftCells.any((c) => c.$1 == d && c.$2 == row);
-                final isOccupied = _leftPlaced && _kCards[_leftIdx!].cells(_leftRot, _leftDist).any((c) => c.$1 == d && c.$2 == row);
+                final isOccupied = _leftPlaced && _kCards[_leftIdx!].cells(_leftRot, _leftDist, isLeft: true).any((c) => c.$1 == d && c.$2 == row);
 
                 Widget cellWidget = _Cell(
                   size: sz,
