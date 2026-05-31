@@ -775,6 +775,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
                 return Draggable<_CardDef>(
                   data: card,
+                  dragAnchorStrategy: pointerDragAnchorStrategy,
                   maxSimultaneousDrags: 1,
                   feedback: Material(
                     color: Colors.transparent,
@@ -1056,6 +1057,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (isOccupied) {
                   cellWidget = Draggable<_CardDef>(
                     data: _kCards[_leftIdx!],
+                    dragAnchorStrategy: pointerDragAnchorStrategy,
                     maxSimultaneousDrags: 1,
                     feedback: Material(
                       color: Colors.transparent,
@@ -1184,6 +1186,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (isOccupied) {
                   cellWidget = Draggable<_CardDef>(
                     data: _kCards[_rightIdx!],
+                    dragAnchorStrategy: pointerDragAnchorStrategy,
                     maxSimultaneousDrags: 1,
                     feedback: Material(
                       color: Colors.transparent,
