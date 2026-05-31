@@ -67,12 +67,12 @@ class Chapter4Story2Screen extends StatelessWidget {
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '이번엔 AI와 코딩에 관한 퀴즈를 풀고, 낱말 찾기를 해야 하나 봐!',
+      line: '이번엔 AI와 코딩 퀴즈, 낱말 찾기를 거쳐 인공지능 로봇과 가위바위보 대결 후 QR 인증을 마쳐야 하나 봐!',
       characterAsset: 'assets/images/chr_play_right.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '퀴즈를 풀고 글자 속에 숨은 AI와 코딩 낱말을 찾아보자!',
+      line: '퀴즈와 낱말 찾기를 성공하고, 똑똑한 인공지능 로봇과의 대결도 이겨서 QR 인증을 획득하자!',
       characterAsset: 'assets/images/chr_how_presenting.png',
     ),
   ];

@@ -25,6 +25,7 @@ import 'chapter3_story_quiz_screen.dart';
 import 'chapter3_math_quiz_screen.dart';
 import 'chapter3_word_search_screen.dart';
 import 'chapter4_coding_quiz_screen.dart';
+import 'chapter4_rps_qr_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,6 +76,9 @@ class MissionTourApp extends StatelessWidget {
               completedRouteName: '/mission_chapter4_q2',
             ),
         '/mission_chapter4_q2': (context) => const HiddenWordPuzzleScreen(
+              completedRouteName: '/mission_chapter4_rps_qr',
+            ),
+        '/mission_chapter4_rps_qr': (context) => const Chapter4RpsQrScreen(
               completedRouteName: '/chapter4_story3',
             ),
         '/mission_low': (context) =>
