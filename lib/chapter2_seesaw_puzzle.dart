@@ -742,17 +742,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10, left: 2),
-            child: Text(
-              '도형 조각',
-              style: TextStyle(
-                fontSize: isMobile ? 15 : 18,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF163988),
-              ),
-            ),
-          ),
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.zero,
@@ -847,7 +836,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       child: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(6, 6, 6, 18),
+            padding: const EdgeInsets.all(6),
             child: Center(
               child: CustomPaint(
                 size: Size.square(tileSize * 0.55),
@@ -864,22 +853,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             Center(
               child: Icon(Icons.lock_rounded,
                   color: Colors.white.withAlpha(180), size: tileSize * 0.28)),
-          Positioned(
-            bottom: 4,
-            left: 0,
-            right: 0,
-            child: Text(
-              card.name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                color: isUsed
-                    ? card.color.withValues(alpha: 0.4)
-                    : card.color,
-              ),
-            ),
-          ),
         ],
       ),
     );
