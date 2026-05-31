@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
@@ -402,6 +403,36 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
                   },
                 ),
               ),
+              if (kDebugMode) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      if (widget.completedRouteName != null) {
+                        Navigator.pushReplacementNamed(context, widget.completedRouteName!);
+                      }
+                    },
+                    icon: const Icon(Icons.skip_next_rounded),
+                    label: const Text(
+                      '테스트용: 퀴즈 전체 건너뛰고 다음으로',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF355AA8),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF355AA8),
+                      side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: const Size.fromHeight(42),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

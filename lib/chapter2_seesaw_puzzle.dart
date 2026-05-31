@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
@@ -1338,6 +1339,25 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         children: [
           // 기존 토크 표시(왼쪽 하단)는 요구에 따라 전면 삭제됨
           const Spacer(),
+          if (kDebugMode) ...[
+            OutlinedButton.icon(
+              onPressed: () => Navigator.pushReplacementNamed(context, widget.completedRouteName),
+              icon: const Icon(Icons.skip_next_rounded, size: 20),
+              label: const Text(
+                '테스트용 스킵',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF355AA8),
+                side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
           // 버튼 정렬 (기존 브릭 퍼즐 버튼 구성 매칭)
           OutlinedButton.icon(
             onPressed: _showHint,
