@@ -293,6 +293,16 @@ class _Chapter4CodingQuizScreenState extends State<Chapter4CodingQuizScreen> {
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         actions: [
+          if (kDebugMode)
+            IconButton(
+              icon: const Icon(Icons.skip_next_rounded, size: 36, color: Color(0xFF355AA8)),
+              tooltip: '테스트용 스킵',
+              onPressed: () {
+                if (widget.completedRouteName != null) {
+                  Navigator.pushReplacementNamed(context, widget.completedRouteName!);
+                }
+              },
+            ),
           const BgmToggleButton(iconSize: 32),
           IconButton(
             icon: const Icon(Icons.home_rounded, size: 34),
@@ -338,7 +348,7 @@ class _Chapter4CodingQuizScreenState extends State<Chapter4CodingQuizScreen> {
 
               // 질문 카드
               Expanded(
-                flex: 4,
+                flex: 3,
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
@@ -369,14 +379,14 @@ class _Chapter4CodingQuizScreenState extends State<Chapter4CodingQuizScreen> {
 
               // 세로 2열 6지선다 보기 영역
               Expanded(
-                flex: 5,
+                flex: 6,
                 child: GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 14,
-                    childAspectRatio: 2.8,
+                    childAspectRatio: 3.4,
                   ),
                   itemCount: currentQuestion.choices.length,
                   itemBuilder: (context, index) {
@@ -415,36 +425,6 @@ class _Chapter4CodingQuizScreenState extends State<Chapter4CodingQuizScreen> {
                   },
                 ),
               ),
-              if (kDebugMode) ...[
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      if (widget.completedRouteName != null) {
-                        Navigator.pushReplacementNamed(context, widget.completedRouteName!);
-                      }
-                    },
-                    icon: const Icon(Icons.skip_next_rounded),
-                    label: const Text(
-                      '테스트용: 퀴즈 전체 건너뛰고 다음으로',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF355AA8),
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF355AA8),
-                      side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      minimumSize: const Size.fromHeight(42),
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
