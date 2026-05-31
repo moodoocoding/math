@@ -1643,6 +1643,10 @@ class _Chapter2QrVerificationScreenState
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     WidgetsBinding.instance.addObserver(this);
     AppBgmController.stop();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1853,6 +1857,10 @@ class _Chapter2QrVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
