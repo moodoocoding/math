@@ -1638,6 +1638,7 @@ class _Chapter2QrVerificationScreenState
   bool _isStartingScanner = false;
   String? _lastScannedValue;
   final TextEditingController _manualQrController = TextEditingController();
+  int _previewRotationTurns = 3; // Default 3 for landscape-locked camera preview
 
   @override
   void initState() {
@@ -1694,8 +1695,23 @@ class _Chapter2QrVerificationScreenState
     final value = rawValue.trim();
     if (value.isEmpty) return false;
 
-    final decoded = Uri.decodeFull(value);
-    return decoded.contains('루카');
+    // Convert to lowercase for English "luca" check
+    final lower = value.toLowerCase();
+    if (lower.contains('luca')) return true;
+
+    // Check Korean "루카" in both NFC (루카) and NFD (ㄹㅜㅋㅏ) forms
+    if (value.contains('루카') || value.contains('\u1105\u116E\u110F\u1161')) return true;
+
+    try {
+      final decoded = Uri.decodeFull(value);
+      final decodedLower = decoded.toLowerCase();
+      if (decodedLower.contains('luca')) return true;
+      if (decoded.contains('루카') || decoded.contains('\u1105\u116E\u110F\u1161')) return true;
+    } catch (_) {
+      // Ignore decoding errors
+    }
+
+    return false;
   }
 
   Future<void> _showResultDialog({
@@ -1850,6 +1866,15 @@ class _Chapter2QrVerificationScreenState
         centerTitle: true,
         actions: [
           IconButton(
+            tooltip: '화면 회전',
+            onPressed: () {
+              setState(() {
+                _previewRotationTurns = (_previewRotationTurns + 1) % 4;
+              });
+            },
+            icon: const Icon(Icons.rotate_right_rounded, size: 32),
+          ),
+          IconButton(
             tooltip: '카메라 전환',
             onPressed: () => _scannerController.switchCamera(),
             icon: const Icon(Icons.cameraswitch_rounded, size: 32),
@@ -1922,18 +1947,21 @@ class _Chapter2QrVerificationScreenState
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              MobileScanner(
-                                controller: _scannerController,
-                                errorBuilder: (context, error, child) {
-                                  return _buildScannerError(error);
-                                },
-                                onDetect: (capture) {
-                                  final rawValue = capture.barcodes
-                                      .map((barcode) => barcode.rawValue?.trim() ?? '')
-                                      .firstWhere((value) => value.isNotEmpty, orElse: () => '');
-                                  if (rawValue.isEmpty) return;
-                                  _handleDetection(rawValue);
-                                },
+                              RotatedBox(
+                                quarterTurns: _previewRotationTurns,
+                                child: MobileScanner(
+                                  controller: _scannerController,
+                                  errorBuilder: (context, error, child) {
+                                    return _buildScannerError(error);
+                                  },
+                                  onDetect: (capture) {
+                                    final rawValue = capture.barcodes
+                                        .map((barcode) => barcode.rawValue?.trim() ?? '')
+                                        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                    if (rawValue.isEmpty) return;
+                                    _handleDetection(rawValue);
+                                  },
+                                ),
                               ),
                               IgnorePointer(
                                 child: Container(
