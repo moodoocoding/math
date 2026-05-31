@@ -224,7 +224,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                '코딩 단서들이 하나로 이어졌어요!\n파란 불빛이 다음 길을 비추고 있어요!',
+                '코딩 단서들이 하나로 이어졌어요!\n다음 체험으로 가는 길이 열렸어요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 30,

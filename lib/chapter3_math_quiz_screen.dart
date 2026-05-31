@@ -240,7 +240,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                '수학자들의 이름이 빛 글자로 떠올랐어요.\n이제 글자판 속 이름들을 찾아보세요.',
+                '수학자들의 이름이 벽에 나타났어요!\n이제 글자판에서 이름들을 찾아보세요.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
@@ -266,7 +266,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: const Text(
-                    '빛 글자 찾기',
+                    '이름 찾기',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
                   ),
                 ),

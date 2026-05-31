@@ -214,7 +214,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
               ),
               const SizedBox(height: 20),
               const Text(
-                '🎉 이름의 빛을 모두 찾았어요! 🎉',
+                '🎉 수학자 이름을 모두 찾았어요! 🎉',
                 style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w900,
@@ -320,7 +320,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                '찾아야 할 빛 이름: \'$hintWord\'',
+                '찾아야 할 이름: \'$hintWord\'',
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
@@ -329,7 +329,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                '위치 힌트: ${targetWord.startRow + 1}번째 줄, ${targetWord.startCol + 1}번째 칸에서 ${targetWord.direction == 'horizontal' ? '가로(오른쪽)' : '세로(아래쪽)'} 방향으로 빛이 이어져요.\n빨간색으로 반짝이는 글자를 따라가 보세요.',
+                '위치 힌트: ${targetWord.startRow + 1}번째 줄, ${targetWord.startCol + 1}번째 칸에서 ${targetWord.direction == 'horizontal' ? '가로(오른쪽)' : '세로(아래쪽)'} 방향으로 이름이 이어져요.\n빨간색으로 표시된 글자를 따라가 보세요.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 22,
@@ -459,7 +459,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
               child: Text(
-                '초상화에서 깨어난 6명의 수학자 이름을 글자판에서 모두 찾아보세요!',
+                '초상화 속 6명의 수학자 이름을 글자판에서 모두 찾아보세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: isCompact ? 22 : 28,

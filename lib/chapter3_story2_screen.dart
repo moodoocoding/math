@@ -183,7 +183,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '숫자판 깨우기' : '다음',
+                        isLast ? '숫자판 도전하기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

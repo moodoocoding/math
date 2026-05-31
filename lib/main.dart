@@ -921,9 +921,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
     showPremiumFeedbackDialog(
       context: context,
       isCorrect: correct,
-      title: correct ? '무늬의 빛이 맞춰졌어요!' : '아직 무늬가 깨어나지 않았어요',
+      title: correct ? '무늬가 완성됐어요!' : '아직 무늬가 맞지 않았어요',
       message: correct
-          ? '조각들이 한 그림으로 이어지며 다음 길이 밝아졌어요!'
+          ? '조각들이 한 그림으로 맞춰지며 다음 길이 열렸어요!'
           : '조각의 자리와 방향을 다시 살펴보세요.',
       onConfirm: correct ? _handlePuzzleSolved : () {},
     );
@@ -1295,7 +1295,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                       ),
                     ),
                     child: const Text(
-                      '흩어진 조각 6개를 움직여 반짝이는 목표 무늬를 완성해 보세요.',
+                      '흩어진 조각 6개를 움직여 목표 무늬를 완성해 보세요.',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,

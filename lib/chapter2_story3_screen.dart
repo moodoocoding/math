@@ -125,7 +125,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                           _SpeakerBadge(name: '하우'),
                           SizedBox(height: 12),
                           Text(
-                            '무늬판 아래에서 작은 책빛이 반짝여! 루카와 수학책을 읽고 한 줄 마음을 남기면, 안내 QR 도장이 두 번째 별 조각을 깨워 줄 거야!',
+                            '무늬판 아래에서 루카의 안내 쪽지가 나왔어! 루카와 수학책을 읽고 한 줄 감상을 남기면 QR 인증을 받을 수 있대. 그게 두 번째 별 조각을 찾는 열쇠야!',
                             style: TextStyle(
                               fontSize: dialogFontSize,
                               fontWeight: FontWeight.w800,
@@ -155,7 +155,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                         ),
                       ),
                       child: Text(
-                        '루카 QR 도장 받기',
+                        '루카 QR 인증 받기',
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,

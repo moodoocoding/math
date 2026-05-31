@@ -230,7 +230,7 @@ class _Chapter1Story2ScreenState extends State<Chapter1Story2Screen> {
                         ),
                       ),
                       child: Text(
-                        isLast ? '원반 장치 깨우기' : '다음',
+                        isLast ? '원반 장치 도전하기' : '다음',
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,

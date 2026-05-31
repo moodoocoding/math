@@ -198,7 +198,7 @@ class _Chapter4CodingQuizScreenState extends State<Chapter4CodingQuizScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: const Text(
-                    '다음 빛 글자 보기',
+                    '다음 단서 보기',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
                   ),
                 ),
@@ -242,7 +242,7 @@ class _Chapter4CodingQuizScreenState extends State<Chapter4CodingQuizScreen> {
               ),
               const SizedBox(height: 18),
               const Text(
-                '빛 글자 암호를 풀었어요! 🌟',
+                '코딩 단서를 모두 풀었어요! 🌟',
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w900,

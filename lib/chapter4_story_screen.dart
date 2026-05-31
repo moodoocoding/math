@@ -67,12 +67,12 @@ class Chapter4Story2Screen extends StatelessWidget {
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '어? 벽에 작은 빛 글자들이 떠올랐어. 마지막 별 조각이 우리에게 말을 거는 것 같아!',
+      line: '벽에 코딩과 인공지능에 대한 단서가 나타났어. 마지막 별 조각이 가까워지고 있는 것 같아!',
       characterAsset: 'assets/images/chr_play_right.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '빛 글자의 규칙을 풀고, 숨어 있는 낱말을 찾으면 별 조각이 있는 곳을 알려줄 거야!',
+      line: '단서의 뜻을 알아내고, 숨어 있는 낱말을 찾으면 별 조각이 있는 곳을 알 수 있을 거야!',
       characterAsset: 'assets/images/chr_how_presenting.png',
     ),
   ];
@@ -92,12 +92,12 @@ class Chapter4StoryBeforeRpsScreen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: '찾았다! 낱말들이 이어지면서 길 위에 파란 불빛이 생겼어!',
+      line: '찾았다! 낱말들이 이어지면서 다음에 가야 할 곳이 보이기 시작했어!',
       characterAsset: 'assets/images/chr_how_laughing.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '저 불빛이 수학융합실의 인공지능 로봇 쪽으로 이어지고 있어!',
+      line: '다음 체험은 수학융합실의 인공지능 가위바위보 로봇이야! 직접 해 보자!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
     _Chapter4Scene(
@@ -128,7 +128,7 @@ class Chapter4Story3Screen extends StatelessWidget {
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '마지막 별 조각이 깨어났어. 이제 반짝별을 다시 하늘처럼 밝히자!',
+      line: '마지막 별 조각을 찾았어! 이제 반짝별을 다시 하늘처럼 밝히자!',
       characterAsset: 'assets/images/chr_play_heart_hands.png',
     ),
   ];
