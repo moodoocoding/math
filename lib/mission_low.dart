@@ -845,7 +845,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final questionText = step['question'].toString();
     final questionFontSize = isMobile ? (screenWidth * 0.06).clamp(18.0, 22.0) : (isCompact ? 24.0 : 30.0);
     final optionTextSize = isMobile ? (screenWidth * 0.07).clamp(24.0, 28.0) : (isCompact ? 30.0 : 34.0);
-    final optionShapeSize = isMobile ? (screenWidth * 0.07).clamp(24.0, 28.0) : (isCompact ? 30.0 : 34.0);
+    final optionShapeSize = isMobile ? (screenWidth * 0.1).clamp(36.0, 48.0) : (isCompact ? 44.0 : 52.0);
     final actionFontSize = isMobile ? 18.0 : (isCompact ? 20.0 : 24.0);
     final actionButtonHeight = isMobile ? 48.0 : (isMagicSquare ? 52.0 : 56.0);
     
@@ -1012,7 +1012,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                               type: shapeType,
                                               color: textColor,
                                               size: useFourAcrossChoices
-                                                  ? (isCompact ? 22.0 : 26.0)
+                                                  ? (isCompact ? 36.0 : 44.0)
                                                   : optionShapeSize,
                                               selected: selected,
                                             )
@@ -1194,11 +1194,11 @@ class _ShapeOptionSymbol extends StatelessWidget {
     switch (type) {
       case _ShapeChoiceType.square:
         return Container(
-          width: size,
+          width: size * 1.3,
           height: size,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.zero,
           ),
         );
       case _ShapeChoiceType.circle:
