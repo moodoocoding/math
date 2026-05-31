@@ -1,0 +1,411 @@
+import 'package:flutter/material.dart';
+import 'bgm_toggle_button.dart';
+import 'bgm_controller.dart';
+
+class Chapter3MathQuizScreen extends StatefulWidget {
+  const Chapter3MathQuizScreen({super.key, this.completedRouteName});
+
+  final String? completedRouteName;
+
+  @override
+  State<Chapter3MathQuizScreen> createState() => _Chapter3MathQuizScreenState();
+}
+
+class _QuizQuestion {
+  final String question;
+  final String correctAnswer;
+  final List<String> choices;
+  final String explanation;
+
+  const _QuizQuestion({
+    required this.question,
+    required this.correctAnswer,
+    required this.choices,
+    required this.explanation,
+  });
+}
+
+class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
+  int _currentQuestionIndex = 0;
+
+  static const List<_QuizQuestion> _questions = [
+    _QuizQuestion(
+      question: '컴퓨터과학의 선구자로, 알고리즘과 계산 개념을 튜링 기계로 형식화하고, 기계 지능을 평가하는 튜링 테스트를 제안한 수학자는 누구일까요?',
+      correctAnswer: '앨런 튜링',
+      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      explanation: '앨런 튜링은 현대 컴퓨터 과학의 아버지로 불리며, 튜링 기계와 튜링 테스트를 고안하였습니다.',
+    ),
+    _QuizQuestion(
+      question: '『구수략』을 저술하고, 오일러의 직교 라틴 마방진보다 61년 앞서 마방진을 연구한 수학자는 누구일까요?',
+      correctAnswer: '최석정',
+      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      explanation: '최석정은 조선 시대의 수학자이자 정치가로, 저서 『구수략』에서 오일러보다 앞서 마방진을 연구하였습니다.',
+    ),
+    _QuizQuestion(
+      question: '이탈리아의 수학자로, 『산반서』를 저술하고 인도-아라비아 수 체계를 유럽에 소개하여 피보나치 수열로도 널리 알려진 수학자는 누구일까요?',
+      correctAnswer: '피보나치',
+      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      explanation: '피보나치는 『산반서』를 통해 아라비아 숫자를 유럽에 전파하고 아름다운 피보나치 수열을 소개하였습니다.',
+    ),
+    _QuizQuestion(
+      question: '1부터 100까지의 합을 순식간에 구한 일화로 유명하며, 정수론, 전자기학 등 수학과 과학의 다양한 분야에 큰 업적을 남겨 \'수학의 왕\'으로 불리는 수학자는 누구일까요?',
+      correctAnswer: '가우스',
+      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      explanation: '가우스는 독일의 천재 수학자로 대수학, 정수론 등을 발전시켜 역사상 가장 위대한 수학자 중 한 명으로 꼽힙니다.',
+    ),
+    _QuizQuestion(
+      question: '헤이그 특사 중 한 명이자 독립운동가로, 한국 최초의 근대 수학 교과서인 『산술신서』를 저술하여 한국 근대 수학교육의 아버지로 불리는 분은 누구일까요?',
+      correctAnswer: '이상설',
+      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      explanation: '이상설은 조국의 독립을 위해 헌신한 정치가이자, 우리나라의 근대 수학 교육을 개척한 훌륭한 수학자입니다.',
+    ),
+    _QuizQuestion(
+      question: '‘리 군(Ree group)’ 이론으로 세계 수학계에 이름을 알렸으며, 캐나다 수학회 등에서 활약하며 세계에 이름을 알린 최초의 한국인 수학자는 누구일까요?',
+      correctAnswer: '이임학',
+      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      explanation: '이임학은 세계 수학 교과서에 등장하는 고유 명사 이론인 \'리 군\' 이론을 정립한 자랑스러운 대한민국의 첫 수학자입니다.',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    AppBgmController.playProblem();
+  }
+
+  void _handleChoice(String selectedChoice) {
+    final currentQuestion = _questions[_currentQuestionIndex];
+    if (selectedChoice == currentQuestion.correctAnswer) {
+      AppSfxController.playCorrect();
+      _showCorrectDialog(currentQuestion.explanation);
+    } else {
+      AppSfxController.playWrong();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: const Text(
+              '❌ 오답입니다. 다시 한번 잘 생각해 보세요!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          backgroundColor: const Color(0xFFD64A45),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(20),
+        ),
+      );
+    }
+  }
+
+  void _showCorrectDialog(String explanation) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          width: 500,
+          padding: const EdgeInsets.all(30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/chr_play_correct.png',
+                height: 160,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.check_circle, size: 80, color: Color(0xFF4CAF50)),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                '정답입니다! 🎉',
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF13968F),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F4F6),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  explanation,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF374151),
+                    height: 1.35,
+                    fontFamily: 'GangwonEduAll',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _proceedToNext();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF133E97),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: const Text(
+                    '다음 문제',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _proceedToNext() {
+    if (_currentQuestionIndex < _questions.length - 1) {
+      setState(() {
+        _currentQuestionIndex++;
+      });
+    } else {
+      _showAllClearedDialog();
+    }
+  }
+
+  void _showAllClearedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          width: 500,
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/chr_play_cheering.png',
+                height: 160,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.emoji_events, size: 80, color: Color(0xFFFFC107)),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                '퀴즈 통과! 🌟',
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF133E97),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '수학자 인물 퀴즈를 모두 맞혔습니다!\n다음은 수학자들의 이름을 글자판에서 찾아보세요.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    if (widget.completedRouteName != null) {
+                      Navigator.pushReplacementNamed(context, widget.completedRouteName!);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF133E97),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: const Text(
+                    '낱말 찾기 시작',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final isMobile = screenWidth < 600;
+    final currentQuestion = _questions[_currentQuestionIndex];
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0F6FF),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF163988),
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 30),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+        ),
+        title: const Text(
+          '1단계: 역사 속 위대한 수학자 퀴즈',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        ),
+        actions: [
+          const BgmToggleButton(iconSize: 32),
+          IconButton(
+            icon: const Icon(Icons.home_rounded, size: 34),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: Column(
+            children: [
+              // 진행률 바
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2))],
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      '진행도: ${_currentQuestionIndex + 1} / ${_questions.length}',
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF133E97)),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: (_currentQuestionIndex + 1) / _questions.length,
+                          minHeight: 14,
+                          backgroundColor: const Color(0xFFE5E7EB),
+                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF3B82F6)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 질문 카드
+              Expanded(
+                flex: 4,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3), width: 2),
+                    boxShadow: const [BoxShadow(color: Color(0x10000000), blurRadius: 12, offset: Offset(0, 4))],
+                  ),
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Text(
+                        currentQuestion.question,
+                        style: TextStyle(
+                          fontSize: isMobile ? 22 : 28,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1E293B),
+                          height: 1.3,
+                          fontFamily: 'GangwonEduAll',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 세로 2열 6지선다 보기 영역
+              Expanded(
+                flex: 5,
+                child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 14,
+                    childAspectRatio: 2.8,
+                  ),
+                  itemCount: currentQuestion.choices.length,
+                  itemBuilder: (context, index) {
+                    final choice = currentQuestion.choices[index];
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x0C000000), blurRadius: 6, offset: Offset(0, 3)),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () => _handleChoice(choice),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF1E293B),
+                          surfaceTintColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                        child: Text(
+                          choice,
+                          style: TextStyle(
+                            fontSize: isMobile ? 20 : 26,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'GangwonEduAll',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

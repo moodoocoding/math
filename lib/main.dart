@@ -21,6 +21,10 @@ import 'chapter4_problem1_brick_puzzle.dart';
 import 'chapter4_problem2_hidden_word.dart';
 import 'ending_story_screen.dart';
 import 'chapter2_seesaw_puzzle.dart';
+import 'chapter3_story_quiz_screen.dart';
+import 'chapter3_math_quiz_screen.dart';
+import 'chapter3_word_search_screen.dart';
+import 'chapter4_coding_quiz_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,12 +57,22 @@ class MissionTourApp extends StatelessWidget {
         '/chapter2_story2': (context) => const Chapter2Story2Screen(),
         '/chapter2_story3': (context) => const Chapter2Story3Screen(),
         '/chapter3_story': (context) => const Chapter3StoryScreen(),
+        '/chapter3_story_quiz': (context) => const Chapter3StoryQuizScreen(),
+        '/mission_chapter3_quiz': (context) => const Chapter3MathQuizScreen(
+              completedRouteName: '/mission_chapter3_word_search',
+            ),
+        '/mission_chapter3_word_search': (context) => const Chapter3WordSearchScreen(
+              completedRouteName: '/chapter3_story2',
+            ),
         '/chapter3_story2': (context) => const Chapter3Story2Screen(),
         '/chapter4_story': (context) => const Chapter4StoryScreen(),
         '/chapter4_story2': (context) => const Chapter4Story2Screen(),
         '/chapter4_story3': (context) => const Chapter4Story3Screen(),
         '/mission_chapter4_q1': (context) => const BrickPuzzleScreen(
               completedRouteName: '/chapter4_story2',
+            ),
+        '/mission_chapter4_quiz': (context) => const Chapter4CodingQuizScreen(
+              completedRouteName: '/mission_chapter4_q2',
             ),
         '/mission_chapter4_q2': (context) => const HiddenWordPuzzleScreen(
               completedRouteName: '/chapter4_story3',
@@ -77,7 +91,7 @@ class MissionTourApp extends StatelessWidget {
             const Chapter2QrVerificationScreen(),
         '/mission_chapter3_q1': (context) => const MissionLowScreen(
           missionDataPath: 'assets/data/mission_chapter3_q1.json',
-          completedRouteName: '/chapter3_story2',
+          completedRouteName: '/chapter3_story_quiz',
         ),
         '/mission_chapter3_q2': (context) => const MissionLowScreen(
           missionDataPath: 'assets/data/mission_chapter3_q2.json',
@@ -1699,17 +1713,11 @@ class _Chapter2QrVerificationScreenState
     final value = rawValue.trim();
     if (value.isEmpty) return false;
 
-    // Convert to lowercase for English "luca" and "cbnse.go.kr" checks
-    final lower = value.toLowerCase();
-    if (lower.contains('luca') || lower.contains('cbnse.go.kr')) return true;
-
-    // Check Korean "루카" in both NFC (루카) and NFD (ㄹㅜㅋㅏ) forms
+    // '루카' 포함 여부만 확인 (NFC 및 NFD 형태 모두 지원)
     if (value.contains('루카') || value.contains('\u1105\u116E\u110F\u1161')) return true;
 
     try {
       final decoded = Uri.decodeFull(value);
-      final decodedLower = decoded.toLowerCase();
-      if (decodedLower.contains('luca') || decodedLower.contains('cbnse.go.kr')) return true;
       if (decoded.contains('루카') || decoded.contains('\u1105\u116E\u110F\u1161')) return true;
     } catch (_) {
       // Ignore decoding errors

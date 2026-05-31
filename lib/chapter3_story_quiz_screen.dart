@@ -1,130 +1,29 @@
 import 'package:flutter/material.dart';
-import 'bgm_controller.dart';
 import 'bgm_toggle_button.dart';
+import 'bgm_controller.dart';
 
+class Chapter3StoryQuizScreen extends StatefulWidget {
+  const Chapter3StoryQuizScreen({super.key});
 
-class Chapter4StoryScreen extends StatelessWidget {
-  const Chapter4StoryScreen({super.key});
+  @override
+  State<Chapter3StoryQuizScreen> createState() => _Chapter3StoryQuizScreenState();
+}
 
-  static const List<_Chapter4Scene> _scenes = [
-    _Chapter4Scene(
-      speaker: '플레이',
-      line: '찾았다! 세 번째 별 조각이야!',
-      characterAsset: 'assets/images/chr_play_cheering.png',
-      backgroundAsset: 'assets/images/chapter3_bg_1.png',
-    ),
-    _Chapter4Scene(
+class _Chapter3StoryQuizScreenState extends State<Chapter3StoryQuizScreen> {
+  int _sceneIndex = 0;
+
+  static const List<_Chapter3Scene> _scenes = [
+    _Chapter3Scene(
       speaker: '하우',
-      line: '와! 체험센터가 거의 다 밝아졌어!',
-      characterAsset: 'assets/images/chr_how_laughing.png',
-      backgroundAsset: 'assets/images/chapter3_bg_1.png',
-    ),
-    _Chapter4Scene(
-      speaker: '플레이',
-      line: '다음 단서가 보여! 마지막 별 조각은 수학융합실에 있대!',
-      characterAsset: 'assets/images/chr_play_waving.png',
-      backgroundAsset: 'assets/images/chapter3_bg_1.png',
-    ),
-    _Chapter4Scene(
-      speaker: '하우',
-      line: '마지막 조각만 찾으면 반짝별이 다시 빛날 거야!',
-      characterAsset: 'assets/images/chr_how_thumbs_up.png',
-    ),
-    _Chapter4Scene(
-      speaker: '플레이',
-      line: '와! 여기가 수학융합실이구나!',
-      characterAsset: 'assets/images/chr_play_laughing.png',
-    ),
-    _Chapter4Scene(
-      speaker: '하우',
-      line: '저기 빛나는 블록판이 보여! 첫 번째 장치인가 봐!',
+      line: '잠깐! 벽에 수학자들의 초상화가 걸려 있어!',
       characterAsset: 'assets/images/chr_how_running.png',
     ),
-    _Chapter4Scene(
+    _Chapter3Scene(
       speaker: '플레이',
-      line: '같은 모양의 블록을 찾으면 길이 열릴 것 같아!',
+      line: '수학자가 누구인지 맞히면 다음 장치가 열릴 것 같아!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
   ];
-
-  @override
-  Widget build(BuildContext context) {
-    return const _Chapter4StoryFlow(
-      scenes: _scenes,
-      nextRouteName: '/mission_chapter4_q1',
-    );
-  }
-}
-
-class Chapter4Story2Screen extends StatelessWidget {
-  const Chapter4Story2Screen({super.key});
-
-  static const List<_Chapter4Scene> _scenes = [
-    _Chapter4Scene(
-      speaker: '하우',
-      line: '열렸어! 안쪽에 단서가 숨어 있었어!',
-      characterAsset: 'assets/images/chr_how_surprised.png',
-    ),
-    _Chapter4Scene(
-      speaker: '플레이',
-      line: '이번엔 AI와 코딩에 관한 퀴즈를 풀고, 낱말 찾기를 해야 하나 봐!',
-      characterAsset: 'assets/images/chr_play_right.png',
-    ),
-    _Chapter4Scene(
-      speaker: '하우',
-      line: '퀴즈를 풀고 글자 속에 숨은 AI와 코딩 낱말을 찾아보자!',
-      characterAsset: 'assets/images/chr_how_presenting.png',
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return const _Chapter4StoryFlow(
-      scenes: _scenes,
-      nextRouteName: '/mission_chapter4_quiz',
-    );
-  }
-}
-
-class Chapter4Story3Screen extends StatelessWidget {
-  const Chapter4Story3Screen({super.key});
-
-  static const List<_Chapter4Scene> _scenes = [
-    _Chapter4Scene(
-      speaker: '플레이',
-      line: '드디어 마지막 별 조각을 찾았어, 반짝별을 다시 빛나게 하자!',
-      characterAsset: 'assets/images/chr_play_heart_hands.png',
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return const _Chapter4StoryFlow(
-      scenes: _scenes,
-      nextRouteName: '/ending_story',
-      finalButtonText: '엔딩 보기',
-    );
-  }
-}
-
-
-class _Chapter4StoryFlow extends StatefulWidget {
-  const _Chapter4StoryFlow({
-    required this.scenes,
-    required this.nextRouteName,
-    this.finalButtonText,
-  });
-
-  final List<_Chapter4Scene> scenes;
-  final String nextRouteName;
-  final String? finalButtonText;
-
-  @override
-  State<_Chapter4StoryFlow> createState() => _Chapter4StoryFlowState();
-}
-
-class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
-  int _sceneIndex = 0;
 
   @override
   void initState() {
@@ -135,26 +34,25 @@ class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    precacheImage(const AssetImage('assets/images/chapter4_bg_1.png'), context);
-    for (final scene in widget.scenes) {
-      precacheImage(AssetImage(scene.backgroundAsset), context);
+    precacheImage(const AssetImage('assets/images/chapter3_bg_1.png'), context);
+    for (var scene in _scenes) {
       precacheImage(AssetImage(scene.characterAsset), context);
     }
   }
 
   void _goNext() {
-    if (_sceneIndex < widget.scenes.length - 1) {
+    if (_sceneIndex < _scenes.length - 1) {
       setState(() => _sceneIndex++);
       return;
     }
-
-    Navigator.pushReplacementNamed(context, widget.nextRouteName);
+    Navigator.pushReplacementNamed(context, '/mission_chapter3_quiz');
   }
 
   @override
   Widget build(BuildContext context) {
-    final scene = widget.scenes[_sceneIndex];
-    final isLast = _sceneIndex == widget.scenes.length - 1;
+    final scene = _scenes[_sceneIndex];
+    final isLast = _sceneIndex == _scenes.length - 1;
+
     final screenSize = MediaQuery.of(context).size;
     final width = screenSize.width;
     final isMobile = width < 600;
@@ -166,14 +64,35 @@ class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
     final buttonFontSize = isMobile ? 22.0 : 26.0;
 
     return Scaffold(
-      appBar: _chapter4AppBar(context),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF163988),
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 32),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+        ),
+        centerTitle: true,
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        ),
+        actions: [
+          const BgmToggleButton(iconSize: 34),
+          IconButton(
+            icon: const Icon(Icons.home_rounded, size: 38),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              scene.backgroundAsset,
+              'assets/images/chapter3_bg_1.png',
               fit: BoxFit.cover,
-              cacheWidth: 900,
+              cacheWidth: 800,
               errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFDFE6F7)),
             ),
           ),
@@ -259,7 +178,7 @@ class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? (widget.finalButtonText ?? '다음 화면으로') : '다음',
+                        isLast ? '문제 풀러 가기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),
@@ -272,31 +191,6 @@ class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
       ),
     );
   }
-}
-
-PreferredSizeWidget _chapter4AppBar(BuildContext context) {
-  return AppBar(
-    backgroundColor: Colors.white,
-    foregroundColor: const Color(0xFF163988),
-    surfaceTintColor: Colors.white,
-    elevation: 0,
-    leading: IconButton(
-      icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 32),
-      onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
-    ),
-    centerTitle: true,
-    title: const Text(
-      '미션! 수학체험센터의 반짝별을 찾아서',
-      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
-    ),
-    actions: [
-      const BgmToggleButton(iconSize: 34),
-      IconButton(
-        icon: const Icon(Icons.home_rounded, size: 38),
-        onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
-      ),
-    ],
-  );
 }
 
 class _SpeakerBadge extends StatelessWidget {
@@ -321,16 +215,14 @@ class _SpeakerBadge extends StatelessWidget {
   }
 }
 
-class _Chapter4Scene {
-  const _Chapter4Scene({
+class _Chapter3Scene {
+  const _Chapter3Scene({
     required this.speaker,
     required this.line,
     required this.characterAsset,
-    this.backgroundAsset = 'assets/images/chapter4_bg_1.png',
   });
 
   final String speaker;
   final String line;
   final String characterAsset;
-  final String backgroundAsset;
 }

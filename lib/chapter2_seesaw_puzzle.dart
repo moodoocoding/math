@@ -775,11 +775,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
                 return Draggable<_CardDef>(
                   data: card,
-                  dragAnchorStrategy: (draggable, context, position) {
-                    final maxC = card.rotations[0].map((c) => c.$1).reduce(math.max) + 1;
-                    final maxR = card.rotations[0].map((c) => c.$2).reduce(math.max) + 1;
-                    return Offset(cellSz * maxC / 2, cellSz * maxR / 2);
-                  },
                   maxSimultaneousDrags: 1,
                   feedback: Material(
                     color: Colors.transparent,
@@ -1067,11 +1062,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (isOccupied) {
                   cellWidget = Draggable<_CardDef>(
                     data: _kCards[_leftIdx!],
-                    dragAnchorStrategy: (draggable, context, position) {
-                      final maxC = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$1).reduce(math.max) + 1;
-                      final maxR = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$2).reduce(math.max) + 1;
-                      return Offset(sz * maxC / 2, sz * maxR / 2);
-                    },
                     maxSimultaneousDrags: 1,
                     feedback: Material(
                       color: Colors.transparent,
@@ -1211,11 +1201,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (isOccupied) {
                   cellWidget = Draggable<_CardDef>(
                     data: _kCards[_rightIdx!],
-                    dragAnchorStrategy: (draggable, context, position) {
-                      final maxC = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$1).reduce(math.max) + 1;
-                      final maxR = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$2).reduce(math.max) + 1;
-                      return Offset(sz * maxC / 2, sz * maxR / 2);
-                    },
                     maxSimultaneousDrags: 1,
                     feedback: Material(
                       color: Colors.transparent,

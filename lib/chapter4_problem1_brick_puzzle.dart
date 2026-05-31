@@ -623,7 +623,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
               child: Text(
-                '문제1: 아래 보기 중 같은 블록 모양은 무엇일까요?',
+                '문제1: 알맞은 블록을 선택해 숫자 모양을 채워 주세요',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: isCompact ? 28 : 38,

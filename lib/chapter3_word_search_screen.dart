@@ -46,35 +46,25 @@ class WordData {
   }
 }
 
-class HiddenWordPuzzleScreen extends StatefulWidget {
-  const HiddenWordPuzzleScreen({super.key, this.completedRouteName});
+class Chapter3WordSearchScreen extends StatefulWidget {
+  const Chapter3WordSearchScreen({super.key, this.completedRouteName});
 
   final String? completedRouteName;
 
   @override
-  State<HiddenWordPuzzleScreen> createState() => _HiddenWordPuzzleScreenState();
+  State<Chapter3WordSearchScreen> createState() => _Chapter3WordSearchScreenState();
 }
 
-class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
-  late List<List<String>> board; // 10x10 글자판
-  late List<WordData> words; // 찾을 낱말들
-  late Set<String> foundWords; // 찾은 낱말 목록
-  late List<(int, int)> currentSelection; // 현재 선택 중인 칸들
-  late Map<String, List<(int, int)>> foundPositions; // 찾은 낱말들의 위치들
+class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
+  late List<List<String>> board;
+  late List<WordData> words;
+  late Set<String> foundWords;
+  late List<(int, int)> currentSelection;
+  late Map<String, List<(int, int)>> foundPositions;
   int lastHintIndex = -1;
 
-  static const List<String> layout = [
-    '알고리즘가머나루다라',
-    '마바사아조신자프페로',
-    '인공지능건러카타이봇',
-    '하거너더문닝파하스차',
-    '코딩블록디리미비로머',
-    '미비시이지치키티봇리',
-    '자율주행히제미있수학',
-    '놀이공원에서만나요로',
-    '센서감지작동명령실봇',
-    '즐거운코딩교실최고야',
-  ];
+  static const String koreanChars =
+      '가나다라마바사아자차카타파하거너더러머버서어저처커터퍼허고노도로모보소오조초코토포호';
 
   @override
   void initState() {
@@ -84,7 +74,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   }
 
   void _initializeGame() {
-    board = List.generate(10, (i) => List.filled(10, ''));
+    board = List.generate(8, (i) => List.filled(8, ''));
     words = [];
     foundWords = {};
     currentSelection = [];
@@ -94,23 +84,33 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   }
 
   void _generateBoard() {
-    // 10x10 고정 글자판 문자 파싱 및 할당
-    for (int i = 0; i < 10; i++) {
-      for (int j = 0; j < 10; j++) {
-        board[i][j] = layout[i][j];
+    final random = math.Random();
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        board[i][j] = koreanChars[random.nextInt(koreanChars.length)];
       }
     }
 
-    // 9개 AI & 코딩 낱말 설정 및 좌표 정의
-    words.add(WordData(word: '알고리즘', startRow: 0, startCol: 0, direction: 'horizontal'));
-    words.add(WordData(word: '인공지능', startRow: 2, startCol: 0, direction: 'horizontal'));
-    words.add(WordData(word: '코딩블록', startRow: 4, startCol: 0, direction: 'horizontal'));
-    words.add(WordData(word: '자율주행', startRow: 6, startCol: 0, direction: 'horizontal'));
-    words.add(WordData(word: '머신러닝', startRow: 0, startCol: 5, direction: 'vertical'));
-    words.add(WordData(word: '조건문', startRow: 1, startCol: 4, direction: 'vertical'));
-    words.add(WordData(word: '루프', startRow: 0, startCol: 7, direction: 'vertical'));
-    words.add(WordData(word: '페이스로봇', startRow: 1, startCol: 8, direction: 'vertical'));
-    words.add(WordData(word: '로봇', startRow: 1, startCol: 9, direction: 'vertical'));
+    words.add(WordData(word: '앨런튜링', startRow: 0, startCol: 2, direction: 'horizontal'));
+    words.add(WordData(word: '최석정', startRow: 1, startCol: 5, direction: 'vertical'));
+    words.add(WordData(word: '피보나치', startRow: 2, startCol: 0, direction: 'horizontal'));
+    words.add(WordData(word: '가우스', startRow: 4, startCol: 0, direction: 'vertical'));
+    words.add(WordData(word: '이상설', startRow: 5, startCol: 4, direction: 'horizontal'));
+    words.add(WordData(word: '이임학', startRow: 7, startCol: 0, direction: 'horizontal'));
+
+    for (final word in words) {
+      _placeWord(word);
+    }
+  }
+
+  void _placeWord(WordData wordData) {
+    for (int i = 0; i < wordData.word.length; i++) {
+      if (wordData.direction == 'horizontal') {
+        board[wordData.startRow][wordData.startCol + i] = wordData.word[i];
+      } else {
+        board[wordData.startRow + i][wordData.startCol] = wordData.word[i];
+      }
+    }
   }
 
   bool _isValidSelection(List<(int, int)> selected) {
@@ -221,7 +221,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                'AI & 코딩 낱말을 모두 찾았어요!\n정말 훌륭해요!',
+                '수학자 이름을 모두 찾았어요!\n대단한 실력인걸요?',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 30,
@@ -368,7 +368,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '남은 낱말 수: ${words.length - foundWords.length}개',
+                  '남은 수학자 수: ${words.length - foundWords.length}명',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
@@ -414,7 +414,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 30),
           onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
         ),
-        title: const Text('2단계: AI & 코딩 낱말 찾기', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('2단계: 위대한 수학자 이름 찾기', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           const BgmToggleButton(iconSize: 32),
           IconButton(
@@ -435,7 +435,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
               child: Text(
-                '문제2: 글자판에서 앞서 풀었던 9개의 AI & 코딩 낱말을 모두 찾으세요!',
+                '문제2: 앞서 발견한 6명의 수학자 이름을 글자판에서 모두 찾으세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: isCompact ? 22 : 28,
@@ -599,7 +599,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final boardSize = math.min(constraints.maxWidth, constraints.maxHeight) * 0.95;
-        final cellSize = boardSize / 10;
+        final cellSize = boardSize / 8;
 
         return GestureDetector(
           onPanStart: (details) {
@@ -632,12 +632,12 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
             child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 10,
+                crossAxisCount: 8,
               ),
-              itemCount: 100,
+              itemCount: 64,
               itemBuilder: (context, index) {
-                int row = index ~/ 10;
-                int col = index % 10;
+                int row = index ~/ 8;
+                int col = index % 8;
                 bool isSelected = currentSelection.contains((row, col));
                 bool isFoundCell = _isCellInFoundWord(row, col);
 
@@ -673,7 +673,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   (int, int)? _getGridPosition(Offset localPosition, double cellSize) {
     int col = (localPosition.dx / cellSize).floor();
     int row = (localPosition.dy / cellSize).floor();
-    if (row >= 0 && row < 10 && col >= 0 && col < 10) return (row, col);
+    if (row >= 0 && row < 8 && col >= 0 && col < 8) return (row, col);
     return null;
   }
 
