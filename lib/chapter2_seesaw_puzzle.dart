@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'bgm_toggle_button.dart';
+import 'bgm_controller.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // Types
@@ -52,20 +53,6 @@ class _CardDef {
 
 // ─────────────────────────────────────────────────────────────
 // 5개 카드 데이터
-//
-// 토크 = Σ(각 추의 거리)
-// 공식: 각 회전별 Σ(col_offset) 를 C 라 하면  torque = 4d + C
-//
-// I  가로: C=6  → d=1:10, d=2:14
-// I  세로: C=0  → d=2:8,  d=3:12
-// L  0°  : C=1  → d=1:5,  d=2:9
-// L  90° : C=3  → d=2:11, d=1:7
-// S  가로: C=4  → d=1:8,  d=2:12
-// S  세로: C=2  → d=2:10, d=3:14
-// 2×2    : C=2  → d=2:10, d=3:14
-// T  0°  : C=4  → d=1:8,  d=2:12
-// T  90° : C=1  → d=1:5,  d=2:9
-// T  270°: C=3  → d=1:7,  d=2:11
 // ─────────────────────────────────────────────────────────────
 const _kCards = <_CardDef>[
   // ① I자
@@ -73,58 +60,58 @@ const _kCards = <_CardDef>[
     name: 'I자',
     color: Color(0xFF1E88E5),
     rotations: [
-      [(0, 0), (1, 0), (2, 0), (3, 0)], // 가로: torque=4d+6
-      [(0, 0), (0, 1), (0, 2), (0, 3)], // 세로: torque=4d
+      [(0, 0), (1, 0), (2, 0), (3, 0)], // 가로
+      [(0, 0), (0, 1), (0, 2), (0, 3)], // 세로
     ],
     rotationLabels: ['가로', '세로'],
-    leftPresets: [(0, 1), (1, 3)], // 가로@d=1→10, 세로@d=3→12
+    leftPresets: [(0, 1), (1, 3)],
   ),
   // ② L자
   _CardDef(
     name: 'L자',
     color: Color(0xFFFB8C00),
     rotations: [
-      [(0, 0), (0, 1), (0, 2), (1, 2)], // 0°:   torque=4d+1
-      [(0, 0), (1, 0), (2, 0), (0, 1)], // 90°:  torque=4d+3
-      [(0, 0), (1, 0), (1, 1), (1, 2)], // 180°: torque=4d+3
-      [(2, 0), (0, 1), (1, 1), (2, 1)], // 270°: torque=4d+5
+      [(0, 0), (0, 1), (0, 2), (1, 2)], // 0°
+      [(0, 0), (1, 0), (2, 0), (0, 1)], // 90°
+      [(0, 0), (1, 0), (1, 1), (1, 2)], // 180°
+      [(2, 0), (0, 1), (1, 1), (2, 1)], // 270°
     ],
     rotationLabels: ['0°', '90°', '180°', '270°'],
-    leftPresets: [(0, 1), (1, 2)], // 0°@d=1→5, 90°@d=2→11
+    leftPresets: [(0, 1), (1, 2)],
   ),
   // ③ S자
   _CardDef(
     name: 'S자',
     color: Color(0xFF43A047),
     rotations: [
-      [(1, 0), (2, 0), (0, 1), (1, 1)], // 가로: torque=4d+4
-      [(0, 0), (0, 1), (1, 1), (1, 2)], // 세로: torque=4d+2
+      [(1, 0), (2, 0), (0, 1), (1, 1)], // 가로
+      [(0, 0), (0, 1), (1, 1), (1, 2)], // 세로
     ],
     rotationLabels: ['가로', '세로'],
-    leftPresets: [(0, 1), (1, 2)], // 가로@d=1→8, 세로@d=2→10
+    leftPresets: [(0, 1), (1, 2)],
   ),
   // ④ 2×2 사각형
   _CardDef(
     name: '2×2',
     color: Color(0xFFD81B60),
     rotations: [
-      [(0, 0), (1, 0), (0, 1), (1, 1)], // torque=4d+2
+      [(0, 0), (1, 0), (0, 1), (1, 1)],
     ],
     rotationLabels: ['기본'],
-    leftPresets: [(0, 2), (0, 3)], // d=2→10, d=3→14
+    leftPresets: [(0, 2), (0, 3)],
   ),
   // ⑤ T자
   _CardDef(
     name: 'T자',
     color: Color(0xFF8E24AA),
     rotations: [
-      [(0, 0), (1, 0), (2, 0), (1, 1)], // 0°:   torque=4d+4
-      [(0, 0), (0, 1), (1, 1), (0, 2)], // 90°:  torque=4d+1
-      [(1, 0), (0, 1), (1, 1), (2, 1)], // 180°: torque=4d+4
-      [(1, 0), (0, 1), (1, 1), (1, 2)], // 270°: torque=4d+3
+      [(0, 0), (1, 0), (2, 0), (1, 1)], // 0°
+      [(0, 0), (0, 1), (1, 1), (0, 2)], // 90°
+      [(1, 0), (0, 1), (1, 1), (2, 1)], // 180°
+      [(1, 0), (0, 1), (1, 1), (1, 2)], // 270°
     ],
     rotationLabels: ['0°', '90°', '180°', '270°'],
-    leftPresets: [(0, 1), (1, 2)], // 0°@d=1→8, 90°@d=2→9
+    leftPresets: [(0, 1), (1, 2)],
   ),
 ];
 
@@ -146,7 +133,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   int? _leftIdx;     // 왼쪽 카드 인덱스
   int _leftPreset = 0; // 2개 프리셋 중 랜덤 선택
 
-  int? _rightIdx;    // 오른쪽 (학생) 카드 인덱스
+  int? _rightIdx;    // 오른쪽 카드 인덱스
   int _rightRot = 0; // 오른쪽 회전 인덱스
   int _rightDist = 1; // 오른쪽 고스트 시작 거리
   bool _ghostPlaced = false; // 추를 놓은 상태
@@ -164,6 +151,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     _seesawCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
     _seesawAnim = const AlwaysStoppedAnimation(0);
+    AppBgmController.playProblem();
   }
 
   @override
@@ -202,6 +190,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   // ── 액션 ──────────────────────────────────────────
   void _selectLeft(int idx) {
     HapticFeedback.selectionClick();
+    AppSfxController.playClick();
     setState(() {
       _leftIdx = idx;
       _leftPreset = math.Random().nextInt(2);
@@ -217,6 +206,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   void _selectRight(int idx) {
     if (_leftIdx == null || idx == _leftIdx) return;
     HapticFeedback.selectionClick();
+    AppSfxController.playClick();
     setState(() {
       _rightIdx = idx;
       _rightRot = 0;
@@ -233,6 +223,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     int dist = _rightDist;
     if (!card.isValidAt(nextRot, dist)) dist = 1;
     HapticFeedback.lightImpact();
+    AppSfxController.playClick();
     setState(() {
       _rightRot = nextRot;
       _rightDist = dist;
@@ -244,6 +235,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     final next = _rightDist + delta;
     if (_kCards[_rightIdx!].isValidAt(_rightRot, next)) {
       HapticFeedback.selectionClick();
+      AppSfxController.playClick();
       setState(() => _rightDist = next);
     }
   }
@@ -251,12 +243,14 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   void _placeGhost() {
     if (_rightIdx == null || _ghostPlaced) return;
     HapticFeedback.mediumImpact();
+    AppSfxController.playClick();
     setState(() => _ghostPlaced = true);
     _animateSeesaw();
   }
 
   void _undoGhost() {
     HapticFeedback.lightImpact();
+    AppSfxController.playClick();
     setState(() {
       _ghostPlaced = false;
       _result = null;
@@ -267,10 +261,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   void _check() {
     if (!_ghostPlaced || _leftIdx == null) return;
     HapticFeedback.heavyImpact();
-    setState(() => _result = _leftTorque == _rightTorque);
+
+    final correct = _leftTorque == _rightTorque;
+    setState(() => _result = correct);
+
+    if (correct) {
+      AppSfxController.playCorrect();
+      _showSuccessDialog();
+    } else {
+      AppSfxController.playWrong();
+      _showTryAgainDialog();
+    }
   }
 
   void _reset() {
+    AppSfxController.playClick();
     setState(() {
       _leftIdx = null;
       _rightIdx = null;
@@ -283,25 +288,275 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     _animateSeesaw();
   }
 
+  // ── 정답/오답 팝업 대화상자 ────────────────────────────────
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              Center(
+                child: Image.asset(
+                  'assets/images/chr_play_correct.png',
+                  height: 180,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '🎉 정답입니다! 🎉',
+                style: TextStyle(
+                  fontSize: 38,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF13968F),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '양쪽 시소의 균형이 아주 잘 맞아요!\n정말 훌륭해요!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 26),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, widget.completedRouteName);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF133E97),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    '확인',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showTryAgainDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              Center(
+                child: Image.asset(
+                  'assets/images/chr_how_fail.png',
+                  height: 180,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '아직 균형이 맞지 않아요!',
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFFD64A45),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '다시 한번 올려볼까요?\n위치와 방향을 잘 어림해 보세요!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B5563),
+                  height: 1.3,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 26),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD64A45),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    '다시 해보기',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showHint() {
+    AppSfxController.playClick();
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '💡 힌트',
+                style: TextStyle(
+                  fontSize: 38,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF6F63D1),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 20),
+              Image.asset(
+                'assets/images/chr_play_idea.png',
+                height: 160,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '도형을 이루는 블록 칸들의 위치에 따라\n중심에서 멀어질수록 힘(토크)이 더 커져요!\n양쪽 토크 값의 합이 같아지게 맞춰봐요.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF091F59),
+                  height: 1.4,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 26),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  '확인',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF6F63D1),
+                    fontFamily: 'GangwonEduAll',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // ── 빌드 ───────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
     final isMobile = mq.size.width < 600;
 
+    // 화면 너비 기준으로 셀 크기와 간격을 계산 (중앙 정렬 정렬의 일관성 유지)
+    final double availWidth = mq.size.width - 24 - (isMobile ? 16 : 32);
+    final double cellSz = (availWidth / 11.8).clamp(22.0, 38.0);
+    final double gap = cellSz * 0.13;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FF),
+      backgroundColor: const Color(0xFFF0F8FF),
       appBar: _appBar(),
       body: SafeArea(
         child: Column(
           children: [
+            // 상단 주황색 테두리 데코 바
+            Container(
+              width: double.infinity,
+              height: 14,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF6B51E),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
+              ),
+            ),
+            // 문제 안내 영역 (기존 게임들과 디자인 일치)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.fromLTRB(8, 12, 8, 10),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+              ),
+              child: Text(
+                '도형을 양쪽 시소에 올려 균형을 맞춰 보세요!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isMobile ? 20 : 28,
+                  fontWeight: FontWeight.w900,
+                  color: const Color(0xFF091F59),
+                ),
+              ),
+            ),
             _cardRow(isMobile),
             _hintBar(),
             Expanded(
               child: Column(
                 children: [
-                  _seesawWidget(mq.size.width),
-                  Expanded(child: _grid()),
+                  const SizedBox(height: 10),
+                  _seesawWidget(mq.size.width, cellSz, gap),
+                  Expanded(child: _grid(cellSz, gap)),
                   if (_rightIdx != null && !_ghostPlaced) _ghostControls(),
                   _bottomBar(mq),
                 ],
@@ -316,16 +571,28 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   // ─────────────────────────────── AppBar
 
   PreferredSizeWidget _appBar() => AppBar(
-        backgroundColor: const Color(0xFF1A237E),
-        foregroundColor: Colors.white,
-        title: const Text('시소 균형 맞추기',
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20)),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF163988),
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 38),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        ),
         actions: [
-          const BgmToggleButton(),
+          const BgmToggleButton(iconSize: 40),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: '처음부터',
-            onPressed: _reset,
+            icon: const Icon(Icons.home_rounded, size: 44),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
         ],
       );
@@ -336,17 +603,18 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     final h = isMobile ? 100.0 : 118.0;
     return Container(
       height: h,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1A237E), Color(0xFF283593)],
-        ),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFF4C430), width: 2),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         itemCount: _kCards.length,
         separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (_, i) => _cardTile(i, h - 20),
+        itemBuilder: (_, i) => _cardTile(i, h - 24),
       ),
     );
   }
@@ -461,20 +729,20 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       return ('❌ 균형이 맞지 않아요. 다른 카드나 위치를 찾아봐요!', const Color(0xFFB71C1C));
     }
     if (_leftIdx == null) {
-      return ('카드를 선택해서 왼쪽 시소에 올려보세요!', const Color(0xFF283593));
+      return ('카드를 선택해서 왼쪽 시소에 올려보세요!', const Color(0xFF163988));
     }
     if (_rightIdx == null) {
-      return ('균형 맞출 카드를 선택하세요 (🔒 카드는 선택 불가)', const Color(0xFF1565C0));
+      return ('균형 맞출 카드를 선택하세요 (🔒 카드는 선택 불가)', const Color(0xFF1E88E5));
     }
     if (!_ghostPlaced) {
-      return ('도형을 이동·회전하여 위치를 정하고 "추 놓기"를 누르세요', const Color(0xFF2E7D32));
+      return ('그리드를 탭하거나 화살표를 눌러 위치를 정하고 "추 놓기"를 누르세요', const Color(0xFF2E7D32));
     }
     return ('"정답 확인" 버튼을 눌러보세요!', const Color(0xFF00695C));
   }
 
   // ─────────────────────────────── 시소 애니메이션
 
-  Widget _seesawWidget(double screenW) {
+  Widget _seesawWidget(double screenW, double cellSz, double gap) {
     return SizedBox(
       height: 74,
       width: screenW,
@@ -486,6 +754,8 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             leftLabel: _leftIdx != null ? '$_leftTorque' : '',
             rightLabel: _ghostPlaced ? '$_rightTorque' : '',
             balanced: _result == true,
+            cellSz: cellSz,
+            gap: gap,
           ),
         ),
       ),
@@ -494,29 +764,23 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   // ─────────────────────────────── 그리드
 
-  Widget _grid() {
-    return LayoutBuilder(builder: (context, box) {
-      final avail = box.maxWidth - 24;
-      final cellSz = (avail / 11.8).clamp(22.0, 38.0);
-      final gap = cellSz * 0.13;
-
-      return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Column(
-          children: [
-            _distRow(cellSz, gap),
-            const SizedBox(height: 6),
-            for (int r = 1; r <= 4; r++)
-              Padding(
-                padding: EdgeInsets.only(bottom: gap),
-                child: _gridRow(r, cellSz, gap),
-              ),
-            const SizedBox(height: 6),
-            _distRow(cellSz, gap),
-          ],
-        ),
-      );
-    });
+  Widget _grid(double cellSz, double gap) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Column(
+        children: [
+          _distRow(cellSz, gap),
+          const SizedBox(height: 6),
+          for (int r = 1; r <= 4; r++)
+            Padding(
+              padding: EdgeInsets.only(bottom: gap),
+              child: _gridRow(r, cellSz, gap),
+            ),
+          const SizedBox(height: 6),
+          _distRow(cellSz, gap),
+        ],
+      ),
+    );
   }
 
   Widget _distRow(double sz, double gap) => Row(
@@ -591,15 +855,26 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             ),
           ),
         ),
-        // 오른쪽: 거리 1→5
+        // 오른쪽: 거리 1→5 (터치 시 해당 위치로 즉시 이동하는 기능 구현)
         for (int d = 1; d <= 5; d++)
           Padding(
             padding: EdgeInsets.only(right: d < 5 ? gap : 0),
-            child: _Cell(
-              size: sz,
-              hasWeight: _ghostPlaced && ghostDists.contains(d),
-              isGhost: !_ghostPlaced && ghostDists.contains(d),
-              color: rightColor,
+            child: GestureDetector(
+              onTap: () {
+                if (_rightIdx == null || _ghostPlaced) return;
+                // 해당 위치로의 배치 유효성 체크 후 이동
+                if (_kCards[_rightIdx!].isValidAt(_rightRot, d)) {
+                  HapticFeedback.selectionClick();
+                  AppSfxController.playClick();
+                  setState(() => _rightDist = d);
+                }
+              },
+              child: _Cell(
+                size: sz,
+                hasWeight: _ghostPlaced && ghostDists.contains(d),
+                isGhost: !_ghostPlaced && ghostDists.contains(d),
+                color: rightColor,
+              ),
             ),
           ),
       ],
@@ -660,11 +935,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   Widget _bottomBar(MediaQueryData mq) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-            colors: [Color(0xFF1A237E), Color(0xFF0D47A1)]),
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFE1E1E4), width: 1)),
       ),
-      padding:
-          EdgeInsets.fromLTRB(16, 12, 16, 12 + mq.padding.bottom),
+      padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + mq.padding.bottom),
       child: Row(
         children: [
           // 토크 표시
@@ -672,34 +946,101 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _torqueText('왼쪽', _leftTorque, const Color(0xFF90CAF9)),
+              _torqueText('왼쪽 토크', _leftTorque, const Color(0xFF1E88E5)),
               const SizedBox(height: 2),
-              _torqueText('오른쪽', _rightTorque, const Color(0xFFA5D6A7)),
+              _torqueText('오른쪽 토크', _rightTorque, const Color(0xFF43A047)),
             ],
           ),
           const Spacer(),
-          // 버튼
+          // 버튼 정렬
+          OutlinedButton.icon(
+            onPressed: _showHint,
+            icon: const Icon(Icons.lightbulb_outline, size: 20),
+            label: const Text(
+              '힌트',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF6F63D1),
+              side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton.icon(
+            onPressed: _reset,
+            icon: const Icon(Icons.refresh, size: 20),
+            label: const Text(
+              '다시하기',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8A8A8A),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           if (_result == true)
-            _ActionBtn(
-              label: '다음으로 →',
-              color: const Color(0xFF2E7D32),
-              onTap: () => Navigator.pushReplacementNamed(
+            ElevatedButton.icon(
+              icon: const Icon(Icons.check_circle, size: 20),
+              label: const Text(
+                '다음으로',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+              ),
+              onPressed: () => Navigator.pushReplacementNamed(
                   context, widget.completedRouteName),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF123E97),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             )
           else ...[
             if (_ghostPlaced) ...[
-              _ActionBtn(
-                label: '취소',
-                color: Colors.grey.shade600,
-                onTap: _undoGhost,
+              ElevatedButton.icon(
+                icon: const Icon(Icons.undo, size: 20),
+                label: const Text(
+                  '취소',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                ),
+                onPressed: _undoGhost,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8A8A8A),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
               const SizedBox(width: 8),
             ],
             if (_ghostPlaced)
-              _ActionBtn(
-                label: '정답 확인',
-                color: const Color(0xFF43A047),
-                onTap: _check,
+              ElevatedButton.icon(
+                icon: const Icon(Icons.check_circle, size: 20),
+                label: const Text(
+                  '정답 확인',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                ),
+                onPressed: _check,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF123E97),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
           ],
         ],
@@ -856,41 +1197,6 @@ class _PillBtn extends StatelessWidget {
   }
 }
 
-class _ActionBtn extends StatelessWidget {
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionBtn(
-      {required this.label, required this.color, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-                color: color.withAlpha(115),
-                blurRadius: 6,
-                offset: const Offset(0, 3))
-          ],
-        ),
-        child: Text(label,
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 14)),
-      ),
-    );
-  }
-}
-
 // ═══════════════════════════════════════════════════════════════
 // CustomPainters
 // ═══════════════════════════════════════════════════════════════
@@ -933,12 +1239,16 @@ class _SeesawPainter extends CustomPainter {
   final String leftLabel;
   final String rightLabel;
   final bool balanced;
+  final double cellSz;
+  final double gap;
 
   const _SeesawPainter({
     required this.tilt,
     required this.leftLabel,
     required this.rightLabel,
     required this.balanced,
+    required this.cellSz,
+    required this.gap,
   });
 
   @override
@@ -971,7 +1281,9 @@ class _SeesawPainter extends CustomPainter {
     canvas.translate(cx, cy);
     canvas.rotate(tilt);
 
-    final beamLen = size.width * 0.82;
+    // 아래 숫자판 5번 셀 중심의 정확한 X좌표 계산 (중앙 0 기준)
+    final endCircleX = 4.825 * cellSz + 5 * gap;
+    final beamLen = endCircleX * 2 + 20; // 양옆에 10씩 마진 확보
 
     // 빔 몸체
     canvas.drawRRect(
@@ -998,12 +1310,12 @@ class _SeesawPainter extends CustomPainter {
         balanced ? const Color(0xFF2E7D32) : const Color(0xFF3949AB);
     for (final sign in [-1.0, 1.0]) {
       canvas.drawCircle(
-        Offset(sign * (beamLen / 2 - 12), 0),
+        Offset(sign * endCircleX, 0),
         13,
         Paint()..color = endColor,
       );
       canvas.drawCircle(
-        Offset(sign * (beamLen / 2 - 12), -3),
+        Offset(sign * endCircleX, -3),
         5,
         Paint()..color = Colors.white.withAlpha(80),
       );
@@ -1012,10 +1324,10 @@ class _SeesawPainter extends CustomPainter {
 
     // 토크 레이블
     if (leftLabel.isNotEmpty) {
-      _drawLabel(canvas, leftLabel, Offset(cx * 0.25, cy - 24));
+      _drawLabel(canvas, leftLabel, Offset(cx - endCircleX, cy - 24));
     }
     if (rightLabel.isNotEmpty) {
-      _drawLabel(canvas, rightLabel, Offset(cx * 1.75, cy - 24));
+      _drawLabel(canvas, rightLabel, Offset(cx + endCircleX, cy - 24));
     }
   }
 
@@ -1039,5 +1351,7 @@ class _SeesawPainter extends CustomPainter {
       o.tilt != tilt ||
       o.leftLabel != leftLabel ||
       o.rightLabel != rightLabel ||
-      o.balanced != balanced;
+      o.balanced != balanced ||
+      o.cellSz != cellSz ||
+      o.gap != gap;
 }

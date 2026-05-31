@@ -877,146 +877,276 @@ class _QuizScreenState extends State<QuizScreen> {
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    questionText,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: questionFontSize,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF091F59),
-                      height: 1.2,
-                    ),
-                  ),
-                ),
-                if (hasSimulationImages)
-                  _buildSimulationArea(
-                    (step['simulation_images'] as List<dynamic>).cast<String>(),
-                  ),
-                if (showHanoiVisual) ...[
-                  const SizedBox(height: 14),
-                  _InteractiveHanoiVisualPanel(
-                    height: hanoiHeight,
-                    pegs: _hanoiPegs,
-                    selectedPeg: _selectedHanoiPeg,
-                    moveCount: _hanoiMoveCount,
-                    onPegTap: _handleHanoiPegTap,
-                    onReset: () {
-                      setState(_resetHanoi);
-                    },
-                  ),
-                ],
-                if (visualType == 'rod_numeral') ...[
-                  const SizedBox(height: 12),
-                  _RodNumeralVisualPanel(
-                    height: rodVisualHeight,
-                    tens: (step['rod_tens'] as int?) ?? 2,
-                    ones: (step['rod_ones'] as int?) ?? 3,
-                  ),
-                ],
-                if (visualType == 'magic_square') ...[
-                  const SizedBox(height: 12),
-                  _MagicSquareVisualPanel(
-                    height: magicSquareVisualHeight,
-                    blankIndexes: _magicSquareBlankIndexes,
-                    values: _magicSquareInputs,
-                    onBlankTap: _showMagicSquareKeypad,
-                    activeBlankIndex: _activeMagicSquareCell,
-                  ),
-                ],
-                if (renderChoicesAsShapes) ...[
-                  const SizedBox(height: 12),
-                  _TessellationFloorPreview(height: floorPreviewHeight),
-                ],
-                SizedBox(height: choicesTopGap),
-                if (quizType == 'mcq' && !isMagicSquare)
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 4,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: useFourAcrossChoices ? 4 : 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: useFourAcrossChoices
-                          ? (isMobile ? 3.0 : (isCompact ? 5.8 : 7.0))
-                          : (isMobile ? 3.5 : (isCompact ? 5.5 : 7.5)),
-                    ),
-                    itemBuilder: (context, index) {
-                      final selected = selectedChoiceIndex == index;
-                      final color = _optionColors[index % _optionColors.length];
-                      final isEnabled = index < choices.length;
-                      final choiceText = isEnabled
-                          ? choices[index].toString()
-                          : '준비 중';
-                      final shapeType = _parseShapeChoiceType(choiceText);
-                      final textColor = color.computeLuminance() > 0.55
-                          ? const Color(0xFF163988)
-                          : Colors.white;
-
-                      return AnimatedScale(
-                        scale: selected ? 1.0 : 0.98,
-                        duration: const Duration(milliseconds: 120),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 140),
-                          curve: Curves.easeOut,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: selected
-                                ? Border.all(color: const Color(0xFF0B1F61), width: 5)
-                                : null,
-                            boxShadow: selected
-                                ? const [
-                                    BoxShadow(
-                                      color: Color(0x33133E97),
-                                      blurRadius: 8,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: isEnabled
-                                  ? () => setState(() => selectedChoiceIndex = index)
-                                  : null,
-                              borderRadius: BorderRadius.circular(10),
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  color: isEnabled ? color : const Color(0xFFB8B8BE),
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x22000000),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
+            child: renderChoicesAsShapes
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── 왼쪽 영역: 질문 및 바닥 프리뷰 ──
+                      Expanded(
+                        flex: 5,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 8),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                questionText,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: questionFontSize,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF091F59),
+                                  height: 1.2,
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 18),
-                                child: Stack(
-                                  children: [
-                                    Center(
-                                      child: renderChoicesAsShapes
-                                          ? _ShapeOptionSymbol(
-                                              type: shapeType,
-                                              color: textColor,
-                                              size: useFourAcrossChoices
-                                                  ? (isCompact ? 36.0 : 44.0)
-                                                  : optionShapeSize,
-                                              selected: selected,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _TessellationFloorPreview(
+                              height: floorPreviewHeight * 0.76, // 가로 배치에 어울리게 콤팩트하게 비율 조정
+                              selectedShape: selectedChoiceIndex != null
+                                  ? _parseShapeChoiceType(
+                                      choices[selectedChoiceIndex!].toString())
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      // ── 오른쪽 영역: 2x2 큰 카드 도형 선택지 ──
+                      Expanded(
+                        flex: 4,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 8),
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: 4,
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: isMobile ? 1.05 : 1.25,
+                              ),
+                              itemBuilder: (context, index) {
+                                final selected = selectedChoiceIndex == index;
+                                final color = _optionColors[index % _optionColors.length];
+                                final isEnabled = index < choices.length;
+                                final choiceText = isEnabled
+                                    ? choices[index].toString()
+                                    : '준비 중';
+                                final shapeType = _parseShapeChoiceType(choiceText);
+                                final textColor = color.computeLuminance() > 0.55
+                                    ? const Color(0xFF163988)
+                                    : Colors.white;
+
+                                return AnimatedScale(
+                                  scale: selected ? 1.03 : 1.0,
+                                  duration: const Duration(milliseconds: 180),
+                                  curve: Curves.easeOutBack,
+                                  child: GestureDetector(
+                                    onTap: isEnabled
+                                        ? () => setState(() => selectedChoiceIndex = index)
+                                        : null,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 180),
+                                      curve: Curves.easeOut,
+                                      decoration: BoxDecoration(
+                                        color: selected ? color : Colors.white,
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: selected
+                                              ? const Color(0xFF0B1F61)
+                                              : const Color(0xFFDDE3F0),
+                                          width: selected ? 4 : 2,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: selected
+                                                ? color.withValues(alpha: 0.4)
+                                                : const Color(0x14000000),
+                                            blurRadius: selected ? 18 : 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Spacer(),
+                                          _ShapeOptionSymbol(
+                                            type: shapeType,
+                                            color: selected ? textColor : color,
+                                            size: optionShapeSize,
+                                            selected: selected,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            choiceText,
+                                            style: TextStyle(
+                                              fontSize: isMobile ? 18 : 22,
+                                              fontWeight: FontWeight.w900,
+                                              color: selected
+                                                  ? textColor
+                                                  : const Color(0xFF2D3A5C),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          if (selected)
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom: 8),
+                                              child: Icon(
+                                                Icons.check_circle_rounded,
+                                                color: textColor,
+                                                size: 26,
+                                              ),
                                             )
-                                          : Text(
+                                          else
+                                            const SizedBox(height: 34),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          questionText,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: questionFontSize,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF091F59),
+                            height: 1.2,
+                          ),
+                        ),
+                      ),
+                      if (hasSimulationImages)
+                        _buildSimulationArea(
+                          (step['simulation_images'] as List<dynamic>).cast<String>(),
+                        ),
+                      if (showHanoiVisual) ...[
+                        const SizedBox(height: 14),
+                        _InteractiveHanoiVisualPanel(
+                          height: hanoiHeight,
+                          pegs: _hanoiPegs,
+                          selectedPeg: _selectedHanoiPeg,
+                          moveCount: _hanoiMoveCount,
+                          onPegTap: _handleHanoiPegTap,
+                          onReset: () {
+                            setState(_resetHanoi);
+                          },
+                        ),
+                      ],
+                      if (visualType == 'rod_numeral') ...[
+                        const SizedBox(height: 12),
+                        _RodNumeralVisualPanel(
+                          height: rodVisualHeight,
+                          tens: (step['rod_tens'] as int?) ?? 2,
+                          ones: (step['rod_ones'] as int?) ?? 3,
+                        ),
+                      ],
+                      if (visualType == 'magic_square') ...[
+                        const SizedBox(height: 12),
+                        _MagicSquareVisualPanel(
+                          height: magicSquareVisualHeight,
+                          blankIndexes: _magicSquareBlankIndexes,
+                          values: _magicSquareInputs,
+                          onBlankTap: _showMagicSquareKeypad,
+                          activeBlankIndex: _activeMagicSquareCell,
+                        ),
+                      ],
+                      SizedBox(height: choicesTopGap),
+                      if (quizType == 'mcq' && !isMagicSquare)
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 4,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: useFourAcrossChoices ? 4 : 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: useFourAcrossChoices
+                                ? (isMobile ? 3.0 : (isCompact ? 5.8 : 7.0))
+                                : (isMobile ? 3.5 : (isCompact ? 5.5 : 7.5)),
+                          ),
+                          itemBuilder: (context, index) {
+                            final selected = selectedChoiceIndex == index;
+                            final color = _optionColors[index % _optionColors.length];
+                            final isEnabled = index < choices.length;
+                            final choiceText = isEnabled
+                                ? choices[index].toString()
+                                : '준비 중';
+                            final textColor = color.computeLuminance() > 0.55
+                                ? const Color(0xFF163988)
+                                : Colors.white;
+
+                            // ── 기존 텍스트 선택지 디자인 ──
+                            return AnimatedScale(
+                              scale: selected ? 1.0 : 0.98,
+                              duration: const Duration(milliseconds: 120),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 140),
+                                curve: Curves.easeOut,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: selected
+                                      ? Border.all(color: const Color(0xFF0B1F61), width: 5)
+                                      : null,
+                                  boxShadow: selected
+                                      ? const [
+                                          BoxShadow(
+                                            color: Color(0x33133E97),
+                                            blurRadius: 8,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: isEnabled
+                                        ? () => setState(() => selectedChoiceIndex = index)
+                                        : null,
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                        color: isEnabled ? color : const Color(0xFFB8B8BE),
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0x22000000),
+                                            blurRadius: 6,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                                      child: Stack(
+                                        children: [
+                                          Center(
+                                            child: Text(
                                               choiceText,
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
@@ -1035,57 +1165,57 @@ class _QuizScreenState extends State<QuizScreen> {
                                                     : null,
                                               ),
                                             ),
-                                    ),
-                                    if (selected)
-                                      Positioned(
-                                        right: 10,
-                                        top: 10,
-                                        child: Icon(
-                                          Icons.check_circle_rounded,
-                                          color: textColor,
-                                          size: 30,
-                                        ),
+                                          ),
+                                          if (selected)
+                                            Positioned(
+                                              right: 10,
+                                              top: 10,
+                                              child: Icon(
+                                                Icons.check_circle_rounded,
+                                                color: textColor,
+                                                size: 30,
+                                              ),
+                                            ),
+                                        ],
                                       ),
-                                  ],
+                                    ),
+                                  ),
                                 ),
+                              ),
+                            );
+                          },
+                        )
+                      else if (!isMagicSquare)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFF243B78), width: 2),
+                          ),
+                          child: TextField(
+                            controller: _inputController,
+                            onChanged: (value) => inputAnswer = value,
+                            style: TextStyle(
+                              fontSize: isCompact ? 22 : 26,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF091F59),
+                            ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: quizType == 'qr' ? 'QR 결과를 입력하세요' : '답을 입력하세요',
+                              hintStyle: TextStyle(
+                                fontSize: isCompact ? 20 : 24,
+                                color: const Color(0xFF8A93AE),
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
                         ),
-                      );
-                    },
-                  )
-                else if (!isMagicSquare)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF243B78), width: 2),
-                    ),
-                    child: TextField(
-                      controller: _inputController,
-                      onChanged: (value) => inputAnswer = value,
-                      style: TextStyle(
-                        fontSize: isCompact ? 22 : 26,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF091F59),
-                      ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: quizType == 'qr' ? 'QR 결과를 입력하세요' : '답을 입력하세요',
-                        hintStyle: TextStyle(
-                          fontSize: isCompact ? 20 : 24,
-                          color: const Color(0xFF8A93AE),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                      const SizedBox(height: 4),
+                    ],
                   ),
-                const SizedBox(height: 4),
-              ],
-            ),
           ),
         ),
         // ── 항상 하단에 고정되는 버튼 영역 ──
@@ -1228,97 +1358,323 @@ class _ShapeOptionSymbol extends StatelessWidget {
 }
 
 class _TessellationFloorPreview extends StatelessWidget {
-  const _TessellationFloorPreview({required this.height});
+  const _TessellationFloorPreview({
+    required this.height,
+    this.selectedShape,
+  });
 
   final double height;
+  final _ShapeChoiceType? selectedShape;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: height,
-      child: CustomPaint(painter: _TessellationFloorPainter()),
+    // 선택된 도형에 따라 레이블 및 힌트 결정
+    String hint;
+    bool canTile;
+    switch (selectedShape) {
+      case _ShapeChoiceType.square:
+        hint = '사각형은 빈틈 없이 꽉 채울 수 있어요! ✅';
+        canTile = true;
+      case _ShapeChoiceType.circle:
+        hint = '원은 사이사이에 빈틈이 생겨요 ❌';
+        canTile = false;
+      case _ShapeChoiceType.star:
+        hint = '별은 모양이 복잡해서 빈틈이 생겨요 ❌';
+        canTile = false;
+      case _ShapeChoiceType.heart:
+        hint = '하트는 곡선이 있어서 빈틈이 생겨요 ❌';
+        canTile = false;
+      default:
+        hint = '도형을 골라서 바닥에 깔아봐!';
+        canTile = false;
+    }
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      child: Column(
+        key: ValueKey(selectedShape),
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: height,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: CustomPaint(
+                painter: _TessellationFloorPainter(
+                  selectedShape: selectedShape,
+                  canTile: canTile,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: selectedShape == null
+                  ? const Color(0xFFEFF3FF)
+                  : canTile
+                      ? const Color(0xFFDFF7EC)
+                      : const Color(0xFFFFEEEE),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: selectedShape == null
+                    ? const Color(0xFFC3CEF0)
+                    : canTile
+                        ? const Color(0xFF4CAF50)
+                        : const Color(0xFFE57373),
+                width: 1.5,
+              ),
+            ),
+            child: Text(
+              hint,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: selectedShape == null
+                    ? const Color(0xFF4A5E9A)
+                    : canTile
+                        ? const Color(0xFF2E7D32)
+                        : const Color(0xFFC62828),
+                fontFamily: 'GangwonEduAll',
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _TessellationFloorPainter extends CustomPainter {
+  const _TessellationFloorPainter({
+    this.selectedShape,
+    this.canTile = false,
+  });
+
+  final _ShapeChoiceType? selectedShape;
+  final bool canTile;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final wallPaint = Paint()..color = const Color(0xFFEAF1FF);
+    // 배경 (바닥 기본 색상)
     final floorPaint = Paint()..color = const Color(0xFFFFF7D8);
-    final tilePaintA = Paint()..color = const Color(0xFFFFD65A);
-    final tilePaintB = Paint()..color = const Color(0xFFFFE78F);
+    // 벽면/테두리 영역 (깔끔한 테투리를 위해 배경 둥근 사각형 처리)
+    final bgPaint = Paint()..color = const Color(0xFFEAF1FF);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
+      bgPaint,
+    );
+
+    // 바닥 영역을 꽉 채우도록 사각형 그림
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
+      floorPaint,
+    );
+
+    // 도형 선택 여부에 따라 타일 색상 결정
+    final Color tileColorA;
+    final Color tileColorB;
+    if (selectedShape == null) {
+      tileColorA = const Color(0xFFE8E8E8);
+      tileColorB = const Color(0xFFD0D0D0);
+    } else if (canTile) {
+      tileColorA = const Color(0xFF81C784);
+      tileColorB = const Color(0xFFA5D6A7);
+    } else {
+      tileColorA = const Color(0xFFEF9A9A);
+      tileColorB = const Color(0xFFFFCDD2);
+    }
+
+    final tilePaintA = Paint()..color = tileColorA;
+    final tilePaintB = Paint()..color = tileColorB;
     final gridPaint = Paint()
-      ..color = const Color(0xFF9D7A20)
+      ..color = canTile
+          ? const Color(0xFF388E3C)
+          : (selectedShape == null
+              ? const Color(0xFF9E9E9E)
+              : const Color(0xFFE53935))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4;
+      ..strokeWidth = 1.5;
     final borderPaint = Paint()
       ..color = const Color(0xFF163988)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(10)),
-      wallPaint,
-    );
+    const rows = 4;
+    const columns = 10;
+    final cellWidth = size.width / columns;
+    final cellHeight = size.height / rows;
 
-    final horizon = size.height * 0.18;
-    final floor = Path()
-      ..moveTo(size.width * 0.06, horizon)
-      ..lineTo(size.width * 0.94, horizon)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(floor, floorPaint);
+    // 1. 사각형 (테셀레이션 가능)
+    if (selectedShape == _ShapeChoiceType.square || selectedShape == null) {
+      for (var row = 0; row < rows; row++) {
+        final topY = row * cellHeight;
+        final bottomY = (row + 1) * cellHeight;
 
-    final rows = 4;
-    final columns = 14;
-    for (var row = 0; row < rows; row++) {
-      final topT = row / rows;
-      final bottomT = (row + 1) / rows;
-      final topY = _floorY(horizon, size.height, topT);
-      final bottomY = _floorY(horizon, size.height, bottomT);
-      final topLeft = _floorLeft(size.width, topT);
-      final topRight = _floorRight(size.width, topT);
-      final bottomLeft = _floorLeft(size.width, bottomT);
-      final bottomRight = _floorRight(size.width, bottomT);
+        for (var col = 0; col < columns; col++) {
+          final leftX = col * cellWidth;
+          final rightX = (col + 1) * cellWidth;
 
-      for (var col = 0; col < columns; col++) {
-        final leftT = col / columns;
-        final rightT = (col + 1) / columns;
-        final tile = Path()
-          ..moveTo(_lerp(topLeft, topRight, leftT), topY)
-          ..lineTo(_lerp(topLeft, topRight, rightT), topY)
-          ..lineTo(_lerp(bottomLeft, bottomRight, rightT), bottomY)
-          ..lineTo(_lerp(bottomLeft, bottomRight, leftT), bottomY)
-          ..close();
-        canvas.drawPath(tile, (row + col).isEven ? tilePaintA : tilePaintB);
-        canvas.drawPath(tile, gridPaint);
+          final tile = Rect.fromLTRB(leftX, topY, rightX, bottomY);
+          canvas.drawRect(tile, (row + col).isEven ? tilePaintA : tilePaintB);
+          canvas.drawRect(tile, gridPaint);
+        }
+      }
+    } 
+    // 2. 테셀레이션 불가능한 도형들 (원, 별, 하트) -> 빈틈 렌더링
+    else {
+      // 바둑판처럼 깔되, 크기를 세로 기준 85%로 제한하여 도형 간 간격 및 빈틈이 확연하게 보이게 함
+      final shapeSize = cellHeight * 0.85;
+
+      for (var row = 0; row < rows; row++) {
+        final centerY = row * cellHeight + cellHeight / 2;
+        for (var col = 0; col < columns; col++) {
+          final centerX = col * cellWidth + cellWidth / 2;
+          final center = Offset(centerX, centerY);
+
+          // 번갈아가며 색상 지정
+          final currentPaint = (row + col).isEven ? tilePaintA : tilePaintB;
+          
+          _drawShapeSymbol(canvas, center, shapeSize, currentPaint.color);
+          
+          // 테두리선 그리기
+          final strokePaint = Paint()
+            ..color = gridPaint.color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5;
+          _drawShapeSymbolBorder(canvas, center, shapeSize, strokePaint);
+        }
       }
     }
 
-    canvas.drawPath(floor, borderPaint);
+    // 외곽 테두리 둥글게 감싸기
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
+      borderPaint,
+    );
+
+    // 선택 안 됐을 때 중앙 안내 텍스트
+    if (selectedShape == null) {
+      final textPainter = TextPainter(
+        text: const TextSpan(
+          text: '↓  도형을 골라봐!  ↓',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF8899CC),
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(
+          (size.width - textPainter.width) / 2,
+          (size.height - textPainter.height) / 2,
+        ),
+      );
+    }
   }
 
-  double _floorY(double horizon, double bottom, double t) {
-    return horizon + (bottom - horizon) * t;
+  void _drawShapeSymbolBorder(
+      Canvas canvas, Offset center, double size, Paint paint) {
+    switch (selectedShape) {
+      case _ShapeChoiceType.square:
+        canvas.drawRect(
+          Rect.fromCenter(center: center, width: size * 1.3, height: size),
+          paint,
+        );
+        break;
+      case _ShapeChoiceType.circle:
+        canvas.drawCircle(center, size * 0.6, paint);
+        break;
+      case _ShapeChoiceType.star:
+        _drawStar(canvas, center, size * 0.7, paint);
+        break;
+      case _ShapeChoiceType.heart:
+        _drawHeart(canvas, center, size * 0.7, paint);
+        break;
+      default:
+        break;
+    }
   }
 
-  double _floorLeft(double width, double t) {
-    return _lerp(width * 0.06, 0, t);
+  void _drawShapeSymbol(
+      Canvas canvas, Offset center, double size, Color color) {
+    final paint = Paint()..color = color;
+    switch (selectedShape) {
+      case _ShapeChoiceType.square:
+        canvas.drawRect(
+          Rect.fromCenter(center: center, width: size * 1.3, height: size),
+          paint,
+        );
+      case _ShapeChoiceType.circle:
+        canvas.drawCircle(center, size * 0.6, paint);
+      case _ShapeChoiceType.star:
+        _drawStar(canvas, center, size * 0.7, paint);
+      case _ShapeChoiceType.heart:
+        _drawHeart(canvas, center, size * 0.7, paint);
+      default:
+        break;
+    }
   }
 
-  double _floorRight(double width, double t) {
-    return _lerp(width * 0.94, width, t);
+  void _drawStar(Canvas canvas, Offset center, double r, Paint paint) {
+    final path = Path();
+    const n = 5;
+    for (var i = 0; i < n * 2; i++) {
+      final angle = (i * 3.14159 / n) - 3.14159 / 2;
+      final radius = i.isEven ? r : r * 0.45;
+      final x = center.dx + radius * _cos(angle);
+      final y = center.dy + radius * _sin(angle);
+      if (i == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
   }
 
-  double _lerp(double a, double b, double t) {
-    return a + (b - a) * t;
+  void _drawHeart(Canvas canvas, Offset center, double r, Paint paint) {
+    final path = Path();
+    final x = center.dx;
+    final y = center.dy;
+    path.moveTo(x, y + r * 0.3);
+    path.cubicTo(
+        x - r * 1.2, y - r * 0.8, x - r * 2, y + r * 0.6, x, y + r * 1.5);
+    path.cubicTo(
+        x + r * 2, y + r * 0.6, x + r * 1.2, y - r * 0.8, x, y + r * 0.3);
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  double _cos(double angle) {
+    // Simple cos approximation using dart:math indirectly
+    return _sin(angle + 3.14159 / 2);
+  }
+
+  double _sin(double angle) {
+    // Use series expansion for small angles — use dart:math instead
+    // We'll rely on the import at the top of the file
+    return _sinVal(angle);
+  }
+
+  double _sinVal(double x) {
+    // Reduce to [-pi, pi]
+    // ignore: no_leading_underscores_for_local_identifiers
+    double _x = x % (2 * 3.14159265358979);
+    if (_x > 3.14159265358979) _x -= 2 * 3.14159265358979;
+    // Taylor series: sin(x) ≈ x - x^3/6 + x^5/120 - x^7/5040
+    final x2 = _x * _x;
+    return _x * (1 - x2 / 6 * (1 - x2 / 20 * (1 - x2 / 42)));
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _TessellationFloorPainter old) =>
+      old.selectedShape != selectedShape || old.canTile != canTile;
 }
 
 class _RodNumeralVisualPanel extends StatelessWidget {
