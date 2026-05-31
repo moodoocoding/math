@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -52,7 +53,7 @@ class _CardDef {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 5개 카드 데이터
+// 6개 카드 데이터
 // ─────────────────────────────────────────────────────────────
 const _kCards = <_CardDef>[
   // ① I자
@@ -100,6 +101,30 @@ const _kCards = <_CardDef>[
     rotationLabels: ['기본'],
     leftPresets: [(0, 2), (0, 3)],
   ),
+  // ⑤ T자
+  _CardDef(
+    name: 'T자',
+    color: Color(0xFF9C27B0),
+    rotations: [
+      [(0, 0), (1, 0), (2, 0), (1, 1)], // 0°
+      [(1, 0), (0, 1), (1, 1), (1, 2)], // 90°
+      [(1, 0), (0, 1), (1, 1), (2, 1)], // 180°
+      [(0, 0), (0, 1), (1, 1), (0, 2)], // 270°
+    ],
+    rotationLabels: ['0°', '90°', '180°', '270°'],
+    leftPresets: [],
+  ),
+  // ⑥ Z자
+  _CardDef(
+    name: 'Z자',
+    color: Color(0xFF00ACC1),
+    rotations: [
+      [(0, 0), (1, 0), (1, 1), (2, 1)], // 가로
+      [(1, 0), (0, 1), (1, 1), (0, 2)], // 세로
+    ],
+    rotationLabels: ['가로', '세로'],
+    leftPresets: [],
+  ),
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -117,13 +142,24 @@ class SeesawPuzzleScreen extends StatefulWidget {
 class _SeesawState extends State<SeesawPuzzleScreen>
     with SingleTickerProviderStateMixin {
   // ── 상태 ──────────────────────────────────────────
-  int? _leftIdx;     // 왼쪽 카드 인덱스
-  int _leftPreset = 0; // 2개 프리셋 중 랜덤 선택
+  int? _leftIdx;
+  int _leftRot = 0;
+  int _leftDist = 1;
+  bool _leftPlaced = false;
+  int _leftVisibleCells = 0;
+  Timer? _leftTimer;
 
-  int? _rightIdx;    // 오른쪽 카드 인덱스
-  int _rightRot = 0; // 오른쪽 회전 인덱스
-  int _rightDist = 1; // 오른쪽 고스트 시작 거리
-  bool _ghostPlaced = false; // 추를 놓은 상태
+  int? _rightIdx;
+  int _rightRot = 0;
+  int _rightDist = 1;
+  bool _rightPlaced = false;
+  int _rightVisibleCells = 0;
+  Timer? _rightTimer;
+
+  int? _hoverLeftIdx;
+  int? _hoverLeftDist;
+  int? _hoverRightIdx;
+  int? _hoverRightDist;
 
   bool? _result; // null=미확인, true=정답, false=오답
 
@@ -140,18 +176,23 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     _seesawAnim = const AlwaysStoppedAnimation(0);
     AppBgmController.playProblem();
 
-    // 첫 진입 시 자동으로 0번 인덱스 도형(I자)을 세팅하여 왼쪽 시소 채움
-    _leftIdx = 0;
-    _leftPreset = math.Random().nextInt(2);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _animateSeesaw();
-      }
-    });
+    _leftIdx = null;
+    _leftPlaced = false;
+    _leftRot = 0;
+    _leftDist = 1;
+    _leftVisibleCells = 0;
+
+    _rightIdx = null;
+    _rightPlaced = false;
+    _rightRot = 0;
+    _rightDist = 1;
+    _rightVisibleCells = 0;
   }
 
   @override
   void dispose() {
+    _leftTimer?.cancel();
+    _rightTimer?.cancel();
     _seesawCtrl.dispose();
     super.dispose();
   }
@@ -159,19 +200,31 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   // ── 계산값 ─────────────────────────────────────────
   List<_Abs> get _leftCells {
     if (_leftIdx == null) return const [];
-    final p = _kCards[_leftIdx!].leftPresets[_leftPreset];
-    return _kCards[_leftIdx!].cells(p.$1, p.$2);
+    return _kCards[_leftIdx!].cells(_leftRot, _leftDist);
   }
 
-  int get _leftTorque => _leftCells.fold(0, (s, c) => s + c.$1);
+  int get _leftTorque {
+    if (_leftIdx == null || !_leftPlaced) return 0;
+    int torque = 0;
+    for (int i = 0; i < math.min(_leftVisibleCells, _leftCells.length); i++) {
+      torque += _leftCells[i].$1;
+    }
+    return torque;
+  }
 
-  List<_Abs> get _ghostCells {
+  List<_Abs> get _rightCells {
     if (_rightIdx == null) return const [];
     return _kCards[_rightIdx!].cells(_rightRot, _rightDist);
   }
 
-  int get _rightTorque =>
-      _ghostPlaced ? _ghostCells.fold(0, (s, c) => s + c.$1) : 0;
+  int get _rightTorque {
+    if (_rightIdx == null || !_rightPlaced) return 0;
+    int torque = 0;
+    for (int i = 0; i < math.min(_rightVisibleCells, _rightCells.length); i++) {
+      torque += _rightCells[i].$1;
+    }
+    return torque;
+  }
 
   void _animateSeesaw() {
     final diff = (_leftTorque - _rightTorque).toDouble();
@@ -184,23 +237,66 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   }
 
   // ── 액션 ──────────────────────────────────────────
-  void _selectLeft(int idx) {
-    HapticFeedback.selectionClick();
+  void _startLeftPlacementAnimation() {
+    _leftTimer?.cancel();
+    setState(() {
+      _leftVisibleCells = 0;
+    });
+    int total = _leftCells.length;
+    _leftTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _leftVisibleCells++;
+        if (_leftVisibleCells >= total) {
+          timer.cancel();
+        }
+      });
+      _animateSeesaw();
+    });
+  }
+
+  void _startRightPlacementAnimation() {
+    _rightTimer?.cancel();
+    setState(() {
+      _rightVisibleCells = 0;
+    });
+    int total = _rightCells.length;
+    _rightTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _rightVisibleCells++;
+        if (_rightVisibleCells >= total) {
+          timer.cancel();
+        }
+      });
+      _animateSeesaw();
+    });
+  }
+
+  void _rotateLeft() {
+    if (_leftIdx == null || !_leftPlaced) return;
+    final card = _kCards[_leftIdx!];
+    int nextRot = (_leftRot + 1) % card.rotCount;
+    int dist = _leftDist;
+    if (!card.isValidAt(nextRot, dist)) dist = 1;
+    HapticFeedback.lightImpact();
     AppSfxController.playClick();
     setState(() {
-      _leftIdx = idx;
-      _leftPreset = math.Random().nextInt(2);
-      _rightIdx = null;
-      _rightRot = 0;
-      _rightDist = 1;
-      _ghostPlaced = false;
-      _result = null;
+      _leftRot = nextRot;
+      _leftDist = dist;
+      _leftVisibleCells = card.rotations[nextRot].length;
     });
     _animateSeesaw();
   }
 
-  void _rotate() {
-    if (_rightIdx == null) return;
+  void _rotateRight() {
+    if (_rightIdx == null || !_rightPlaced) return;
     final card = _kCards[_rightIdx!];
     int nextRot = (_rightRot + 1) % card.rotCount;
     int dist = _rightDist;
@@ -210,8 +306,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     setState(() {
       _rightRot = nextRot;
       _rightDist = dist;
+      _rightVisibleCells = card.rotations[nextRot].length;
     });
-    _animateSeesaw(); // 회전 시 즉시 물리 반응 업데이트
+    _animateSeesaw();
   }
 
   void _undoGhost() {
@@ -219,14 +316,14 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     AppSfxController.playClick();
     setState(() {
       _rightIdx = null;
-      _ghostPlaced = false;
+      _rightPlaced = false;
       _result = null;
     });
     _animateSeesaw();
   }
 
   void _check() {
-    if (!_ghostPlaced || _leftIdx == null) return;
+    if (!_leftPlaced || !_rightPlaced) return;
     HapticFeedback.heavyImpact();
 
     final correct = _leftTorque == _rightTorque;
@@ -245,13 +342,25 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     AppSfxController.playClick();
     setState(() {
       _leftIdx = null;
+      _leftPlaced = false;
+      _leftRot = 0;
+      _leftDist = 1;
+      _leftVisibleCells = 0;
+
       _rightIdx = null;
-      _leftPreset = 0;
+      _rightPlaced = false;
       _rightRot = 0;
       _rightDist = 1;
-      _ghostPlaced = false;
+      _rightVisibleCells = 0;
+
       _result = null;
+      _hoverLeftIdx = null;
+      _hoverLeftDist = null;
+      _hoverRightIdx = null;
+      _hoverRightDist = null;
     });
+    _leftTimer?.cancel();
+    _rightTimer?.cancel();
     _animateSeesaw();
   }
 
@@ -441,7 +550,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               const SizedBox(height: 20),
               const Text(
-                '도형을 이루는 블록 칸들의 위치에 따라\n중심에서 멀어질수록 힘(토크)이 더 커져요!\n양쪽 토크 값의 합이 같아지게 맞춰봐요.',
+                '도형이 차지하고 있는 칸이 나타내는 숫자는 모두 얼마인지 생각해보세요',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
@@ -505,7 +614,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               child: Column(
                 children: [
                   Text(
-                    '문제: 왼쪽 시소에 놓인 도형을 보고, 오른쪽 시소의 알맞은 위치에 도형을 드래그해 올려놓아 시소의 균형을 맞춰 보세요!',
+                    '문제: 시소가 균형을 이루도록 도형을 움직여 보세요',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: isMobile ? 18 : 25,
@@ -516,7 +625,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '(가이드: 보관함에서 도형을 오른쪽 시소로 드래그하여 올려놓은 후, 도형을 탭하면 알맞은 방향으로 회전시킬 수 있습니다.)',
+                    '(가이드: 도형을 드래그하여 시소 위에 올려놓은 후, 올려진 도형을 탭하면 90도씩 회전시킬 수 있습니다.)',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: isMobile ? 12.0 : 14.0,
@@ -640,23 +749,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               itemCount: _kCards.length,
               itemBuilder: (context, i) {
                 final card = _kCards[i];
-                final isLeft = _leftIdx == i;
-                final isRight = _rightIdx == i;
+                final isUsed = (_leftPlaced && _leftIdx == i) || (_rightPlaced && _rightIdx == i);
 
                 // 2열 격자에서의 각 타일 대략적인 너비
                 final double tileSize = (width - 28) / 2;
 
                 // 드래그 대상 빌드
-                Widget cardTile = _storageCardTile(i, tileSize, isLeft, isRight);
+                Widget cardTile = _storageCardTile(i, tileSize, isUsed);
 
-                // 왼쪽에 자물쇠 잠겨있거나 이미 배치된 도형인 경우 드래그 제한
-                if (isLeft) {
-                  return cardTile; // 드래그 불가능
+                if (isUsed) {
+                  return cardTile; // 드래그 불가능 (잠금 상태)
                 }
 
                 return Draggable<_CardDef>(
                   data: card,
-                  maxSimultaneousDrags: isRight ? 0 : 1, // 우측에 이미 배치되어 있으면 드래그 제한 (우측 그리드 내에서 드래그 가능하므로)
+                  maxSimultaneousDrags: 1,
                   feedback: Material(
                     color: Colors.transparent,
                     child: Opacity(
@@ -684,12 +791,13 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     opacity: 0.4,
                     child: cardTile,
                   ),
-                  onDragStarted: () {
-                    // 왼쪽 카드가 먼저 선택되어 잠겨있지 않다면,
-                    // 학생이 드래그를 시작할 때 자동으로 첫번째 카드로 탭하게 유도
-                    if (_leftIdx == null) {
-                      _selectLeft(i);
-                    }
+                  onDragEnd: (_) {
+                    setState(() {
+                      _hoverLeftIdx = null;
+                      _hoverLeftDist = null;
+                      _hoverRightIdx = null;
+                      _hoverRightDist = null;
+                    });
                   },
                   child: cardTile,
                 );
@@ -701,25 +809,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     );
   }
 
-  Widget _storageCardTile(int idx, double tileSize, bool isLeft, bool isRight) {
+  Widget _storageCardTile(int idx, double tileSize, bool isUsed) {
     final card = _kCards[idx];
 
     return Container(
       width: tileSize,
       height: tileSize * 0.9,
       decoration: BoxDecoration(
-        color: isLeft
-            ? Colors.black.withAlpha(140)
-            : isRight
-                ? card.color.withValues(alpha: 0.35) // 배치되어 있으면 희미하게 표시
-                : Colors.white,
+        color: isUsed
+            ? Colors.black.withAlpha(100)
+            : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isLeft
-              ? Colors.black54
-              : isRight
-                  ? card.color.withValues(alpha: 0.5)
-                  : card.color,
+          color: isUsed
+              ? Colors.black26
+              : card.color,
           width: 2,
         ),
       ),
@@ -732,19 +836,17 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 size: Size.square(tileSize * 0.55),
                 painter: _MiniShapePainter(
                   cells: card.rotations[0],
-                  color: isLeft
-                      ? Colors.white.withAlpha(80)
-                      : isRight
-                          ? card.color.withValues(alpha: 0.5)
-                          : card.color,
+                  color: isUsed
+                      ? card.color.withValues(alpha: 0.3)
+                      : card.color,
                 ),
               ),
             ),
           ),
-          if (isLeft)
+          if (isUsed)
             Center(
               child: Icon(Icons.lock_rounded,
-                  color: Colors.white.withAlpha(160), size: tileSize * 0.28)),
+                  color: Colors.white.withAlpha(180), size: tileSize * 0.28)),
           Positioned(
             bottom: 4,
             left: 0,
@@ -755,11 +857,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
-                color: isLeft
-                    ? Colors.white54
-                    : isRight
-                        ? card.color
-                        : card.color,
+                color: isUsed
+                    ? card.color.withValues(alpha: 0.4)
+                    : card.color,
               ),
             ),
           ),
@@ -833,7 +933,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 ),
               ),
               Text(
-                '오른쪽 기울기: ${_ghostPlaced ? _rightTorque : 0}',
+                '오른쪽 기울기: ${_rightPlaced ? _rightTorque : 0}',
                 style: TextStyle(
                   fontSize: isMobile ? 15 : 18,
                   fontWeight: FontWeight.w800,
@@ -879,16 +979,24 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       );
 
   Widget _gridRow(int row, double sz, double gap) {
-    final leftDists = {
-      for (final c in _leftCells.where((c) => c.$2 == row)) c.$1
-    };
-    final ghostDists = {
-      for (final c in _ghostCells.where((c) => c.$2 == row)) c.$1
-    };
-    final leftColor =
-        _leftIdx != null ? _kCards[_leftIdx!].color : Colors.grey;
-    final rightColor =
-        _rightIdx != null ? _kCards[_rightIdx!].color : Colors.grey;
+    final activeLeftCells = _leftIdx != null && _leftPlaced
+        ? _kCards[_leftIdx!].cells(_leftRot, _leftDist).take(_leftVisibleCells).toSet()
+        : <_Abs>{};
+
+    final activeRightCells = _rightIdx != null && _rightPlaced
+        ? _kCards[_rightIdx!].cells(_rightRot, _rightDist).take(_rightVisibleCells).toSet()
+        : <_Abs>{};
+
+    final hoverLeftCells = _hoverLeftIdx != null && _hoverLeftDist != null
+        ? _kCards[_hoverLeftIdx!].cells(_leftRot, _hoverLeftDist!).toSet()
+        : <_Abs>{};
+
+    final hoverRightCells = _hoverRightIdx != null && _hoverRightDist != null
+        ? _kCards[_hoverRightIdx!].cells(_rightRot, _hoverRightDist!).toSet()
+        : <_Abs>{};
+
+    final leftColor = _leftIdx != null ? _kCards[_leftIdx!].color : Colors.grey;
+    final rightColor = _rightIdx != null ? _kCards[_rightIdx!].color : Colors.grey;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -897,11 +1005,110 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         for (int d = 5; d >= 1; d--)
           Padding(
             padding: EdgeInsets.only(right: gap),
-            child: _Cell(
-              size: sz,
-              hasWeight: leftDists.contains(d),
-              isGhost: false,
-              color: leftColor,
+            child: DragTarget<_CardDef>(
+              onWillAcceptWithDetails: (details) {
+                final card = details.data;
+                final cardIndex = _kCards.indexOf(card);
+                if (cardIndex == _rightIdx && _rightPlaced) return false;
+                final isValid = card.isValidAt(_leftRot, d);
+                if (isValid) {
+                  setState(() {
+                    _hoverLeftIdx = cardIndex;
+                    _hoverLeftDist = d;
+                  });
+                }
+                return isValid;
+              },
+              onLeave: (data) {
+                setState(() {
+                  _hoverLeftIdx = null;
+                  _hoverLeftDist = null;
+                });
+              },
+              onAcceptWithDetails: (details) {
+                final card = details.data;
+                final cardIndex = _kCards.indexOf(card);
+                setState(() {
+                  _leftIdx = cardIndex;
+                  _leftDist = d;
+                  _leftPlaced = true;
+                  _result = null;
+                  _hoverLeftIdx = null;
+                  _hoverLeftDist = null;
+                });
+                _startLeftPlacementAnimation();
+                _animateSeesaw();
+              },
+              builder: (context, candidateData, rejectedData) {
+                final isHover = hoverLeftCells.any((c) => c.$1 == d && c.$2 == row);
+                final isPlaced = activeLeftCells.any((c) => c.$1 == d && c.$2 == row);
+                final isOccupied = _leftPlaced && _kCards[_leftIdx!].cells(_leftRot, _leftDist).any((c) => c.$1 == d && c.$2 == row);
+
+                Widget cellWidget = _Cell(
+                  size: sz,
+                  hasWeight: isPlaced,
+                  isGhost: false,
+                  color: isHover ? _kCards[_hoverLeftIdx!].color : leftColor,
+                  isHovering: isHover,
+                );
+
+                if (isOccupied) {
+                  cellWidget = Draggable<_CardDef>(
+                    data: _kCards[_leftIdx!],
+                    maxSimultaneousDrags: 1,
+                    feedback: Material(
+                      color: Colors.transparent,
+                      child: Opacity(
+                        opacity: 0.7,
+                        child: Builder(
+                          builder: (context) {
+                            final maxC = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$1).reduce(math.max) + 1;
+                            final maxR = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$2).reduce(math.max) + 1;
+                            return SizedBox(
+                              width: sz * maxC,
+                              height: sz * maxR,
+                              child: CustomPaint(
+                                painter: _MiniShapePainter(
+                                  cells: _kCards[_leftIdx!].rotations[_leftRot],
+                                  color: _kCards[_leftIdx!].color,
+                                  fixedCellSize: sz,
+                                ),
+                              ),
+                            );
+                          }
+                        ),
+                      ),
+                    ),
+                    childWhenDragging: _Cell(
+                      size: sz,
+                      hasWeight: false,
+                      isGhost: false,
+                      color: Colors.grey.shade300,
+                    ),
+                    onDragStarted: () {
+                      setState(() {
+                        _leftPlaced = false;
+                        _result = null;
+                      });
+                      _animateSeesaw();
+                    },
+                    onDragEnd: (_) {
+                      setState(() {
+                        _hoverLeftIdx = null;
+                        _hoverLeftDist = null;
+                        _hoverRightIdx = null;
+                        _hoverRightDist = null;
+                      });
+                    },
+                    child: GestureDetector(
+                      onTap: _rotateLeft,
+                      child: cellWidget,
+                    ),
+                  );
+                }
+
+                return cellWidget;
+              },
             ),
           ),
         // 중심 기둥
@@ -927,9 +1134,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               onWillAcceptWithDetails: (details) {
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
-                if (cardIndex == _leftIdx) return false;
-                // 드롭하려는 위치가 유효한지 확인
-                return card.isValidAt(_rightRot, d);
+                if (cardIndex == _leftIdx && _leftPlaced) return false;
+                final isValid = card.isValidAt(_rightRot, d);
+                if (isValid) {
+                  setState(() {
+                    _hoverRightIdx = cardIndex;
+                    _hoverRightDist = d;
+                  });
+                }
+                return isValid;
+              },
+              onLeave: (data) {
+                setState(() {
+                  _hoverRightIdx = null;
+                  _hoverRightDist = null;
+                });
               },
               onAcceptWithDetails: (details) {
                 final card = details.data;
@@ -937,24 +1156,27 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 setState(() {
                   _rightIdx = cardIndex;
                   _rightDist = d;
-                  _ghostPlaced = true;
+                  _rightPlaced = true;
                   _result = null;
+                  _hoverRightIdx = null;
+                  _hoverRightDist = null;
                 });
+                _startRightPlacementAnimation();
                 _animateSeesaw();
               },
               builder: (context, candidateData, rejectedData) {
-                final isHovering = candidateData.isNotEmpty;
-                final isOccupied = _ghostPlaced && ghostDists.contains(d);
+                final isHover = hoverRightCells.any((c) => c.$1 == d && c.$2 == row);
+                final isPlaced = activeRightCells.any((c) => c.$1 == d && c.$2 == row);
+                final isOccupied = _rightPlaced && _kCards[_rightIdx!].cells(_rightRot, _rightDist).any((c) => c.$1 == d && c.$2 == row);
 
                 Widget cellWidget = _Cell(
                   size: sz,
-                  hasWeight: isOccupied,
+                  hasWeight: isPlaced,
                   isGhost: false,
-                  color: isHovering ? rightColor.withValues(alpha: 0.4) : rightColor,
-                  isHovering: isHovering,
+                  color: isHover ? _kCards[_hoverRightIdx!].color : rightColor,
+                  isHovering: isHover,
                 );
 
-                // 이미 올려진 도형은 탭하면 회전하고 다시 드래그할 수 있게 지원
                 if (isOccupied) {
                   cellWidget = Draggable<_CardDef>(
                     data: _kCards[_rightIdx!],
@@ -989,15 +1211,22 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       color: Colors.grey.shade300,
                     ),
                     onDragStarted: () {
-                      // 드래그를 다시 집어 올리면 임시 배치 해제
                       setState(() {
-                        _ghostPlaced = false;
+                        _rightPlaced = false;
                         _result = null;
                       });
                       _animateSeesaw();
                     },
+                    onDragEnd: (_) {
+                      setState(() {
+                        _hoverLeftIdx = null;
+                        _hoverLeftDist = null;
+                        _hoverRightIdx = null;
+                        _hoverRightDist = null;
+                      });
+                    },
                     child: GestureDetector(
-                      onTap: _rotate, // 탭하면 회전
+                      onTap: _rotateRight,
                       child: cellWidget,
                     ),
                   );
@@ -1078,7 +1307,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
             )
           else ...[
-            if (_ghostPlaced) ...[
+            if (_rightPlaced) ...[
               ElevatedButton.icon(
                 icon: const Icon(Icons.undo, size: 20),
                 label: const Text(
@@ -1103,7 +1332,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 '정답 확인',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
               ),
-              onPressed: _ghostPlaced ? _check : null,
+              onPressed: (_leftPlaced && _rightPlaced) ? _check : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF123E97),
                 foregroundColor: Colors.white,
