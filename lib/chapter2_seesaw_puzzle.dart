@@ -168,6 +168,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   late Animation<double> _seesawAnim;
   double _prevTilt = 0;
 
+  int _getDragRotation(_CardDef card, bool isLeftSideTarget) {
+    final cardIndex = _kCards.indexOf(card);
+    if (isLeftSideTarget) {
+      if (_leftPlaced && _leftIdx == cardIndex) {
+        return _leftRot;
+      }
+      return 0;
+    } else {
+      if (_rightPlaced && _rightIdx == cardIndex) {
+        return _rightRot;
+      }
+      return 0;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -647,8 +662,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     final double storageWidth = availWidth * 0.28;
                     final double gameAreaWidth = availWidth * 0.70;
 
-                    // 우측 시소/그리드 영역을 위한 셀 크기 계산
-                    final double cellSz = (gameAreaWidth / 11.8).clamp(32.0, 56.0);
+                    // 우측 시소/그리드 영역을 위한 셀 크기 계산 (가로 세로 비율 모두 반영하여 화면 넘침 방지)
+                    final double cellSzWidth = gameAreaWidth / 11.8;
+                    final double cellSzHeight = (constraints.maxHeight - 190) / 4.6;
+                    final double cellSz = math.min(cellSzWidth, cellSzHeight).clamp(30.0, 56.0);
                     final double gap = cellSz * 0.13;
 
                     return Row(
@@ -739,7 +756,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 8,
@@ -896,20 +913,20 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     return Column(
       children: [
         _distRow(cellSz, gap),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         for (int r = 1; r <= 4; r++)
           Padding(
             padding: EdgeInsets.only(bottom: gap),
             child: _gridRow(r, cellSz, gap),
           ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         _distRow(cellSz, gap),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
           decoration: BoxDecoration(
             color: const Color(0xFFF0F4C3),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFCDDC39), width: 1.5),
           ),
           child: Row(
@@ -919,23 +936,23 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               Text(
                 '왼쪽 기울기: $_leftTorque',
                 style: TextStyle(
-                  fontSize: isMobile ? 15 : 18,
+                  fontSize: isMobile ? 13 : 15,
                   fontWeight: FontWeight.w800,
                   color: const Color(0xFF163988),
                 ),
               ),
               const SizedBox(
-                height: 18,
+                height: 14,
                 child: VerticalDivider(
                   color: Color(0xFFCDDC39),
-                  width: 20,
-                  thickness: 2,
+                  width: 16,
+                  thickness: 1.5,
                 ),
               ),
               Text(
                 '오른쪽 기울기: ${_rightPlaced ? _rightTorque : 0}',
                 style: TextStyle(
-                  fontSize: isMobile ? 15 : 18,
+                  fontSize: isMobile ? 13 : 15,
                   fontWeight: FontWeight.w800,
                   color: const Color(0xFF163988),
                 ),
@@ -987,12 +1004,14 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         ? _kCards[_rightIdx!].cells(_rightRot, _rightDist).take(_rightVisibleCells).toSet()
         : <_Abs>{};
 
+    final dragRotLeft = _hoverLeftIdx != null ? _getDragRotation(_kCards[_hoverLeftIdx!], true) : 0;
     final hoverLeftCells = _hoverLeftIdx != null && _hoverLeftDist != null
-        ? _kCards[_hoverLeftIdx!].cells(_leftRot, _hoverLeftDist!).toSet()
+        ? _kCards[_hoverLeftIdx!].cells(dragRotLeft, _hoverLeftDist!).toSet()
         : <_Abs>{};
 
+    final dragRotRight = _hoverRightIdx != null ? _getDragRotation(_kCards[_hoverRightIdx!], false) : 0;
     final hoverRightCells = _hoverRightIdx != null && _hoverRightDist != null
-        ? _kCards[_hoverRightIdx!].cells(_rightRot, _hoverRightDist!).toSet()
+        ? _kCards[_hoverRightIdx!].cells(dragRotRight, _hoverRightDist!).toSet()
         : <_Abs>{};
 
     final leftColor = _leftIdx != null ? _kCards[_leftIdx!].color : Colors.grey;
@@ -1010,7 +1029,8 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
                 if (cardIndex == _rightIdx && _rightPlaced) return false;
-                final isValid = card.isValidAt(_leftRot, d);
+                final dragRot = _getDragRotation(card, true);
+                final isValid = card.isValidAt(dragRot, d);
                 if (isValid) {
                   setState(() {
                     _hoverLeftIdx = cardIndex;
@@ -1028,9 +1048,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               onAcceptWithDetails: (details) {
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
+                final dragRot = _getDragRotation(card, true);
                 setState(() {
                   _leftIdx = cardIndex;
                   _leftDist = d;
+                  _leftRot = dragRot;
                   _leftPlaced = true;
                   _result = null;
                   _hoverLeftIdx = null;
@@ -1135,7 +1157,8 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
                 if (cardIndex == _leftIdx && _leftPlaced) return false;
-                final isValid = card.isValidAt(_rightRot, d);
+                final dragRot = _getDragRotation(card, false);
+                final isValid = card.isValidAt(dragRot, d);
                 if (isValid) {
                   setState(() {
                     _hoverRightIdx = cardIndex;
@@ -1153,9 +1176,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               onAcceptWithDetails: (details) {
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
+                final dragRot = _getDragRotation(card, false);
                 setState(() {
                   _rightIdx = cardIndex;
                   _rightDist = d;
+                  _rightRot = dragRot;
                   _rightPlaced = true;
                   _result = null;
                   _hoverRightIdx = null;
