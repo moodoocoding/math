@@ -23,7 +23,13 @@ import 'ending_story_screen.dart';
 import 'chapter2_seesaw_puzzle.dart';
 
 void main() {
-  runApp(const MissionTourApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]).then((_) {
+    runApp(const MissionTourApp());
+  });
 }
 
 class MissionTourApp extends StatelessWidget {
