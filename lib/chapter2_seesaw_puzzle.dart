@@ -177,12 +177,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   int _getDragRotation(_CardDef card, bool isLeftSideTarget) {
     final cardIndex = _kCards.indexOf(card);
     if (isLeftSideTarget) {
-      if (_leftPlaced && _leftIdx == cardIndex) {
+      if (_leftIdx == cardIndex) {
         return _leftRot;
       }
       return 0;
     } else {
-      if (_rightPlaced && _rightIdx == cardIndex) {
+      if (_rightIdx == cardIndex) {
         return _rightRot;
       }
       return 0;
@@ -1095,13 +1095,18 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       });
                       _animateSeesaw();
                     },
-                    onDragEnd: (_) {
+                    onDragEnd: (details) {
                       setState(() {
+                        if (!details.wasAccepted) {
+                          _leftIdx = null;
+                          _leftPlaced = false;
+                        }
                         _hoverLeftIdx = null;
                         _hoverLeftDist = null;
                         _hoverRightIdx = null;
                         _hoverRightDist = null;
                       });
+                      _animateSeesaw();
                     },
                     child: GestureDetector(
                       onTap: _rotateLeft,
@@ -1224,13 +1229,18 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       });
                       _animateSeesaw();
                     },
-                    onDragEnd: (_) {
+                    onDragEnd: (details) {
                       setState(() {
+                        if (!details.wasAccepted) {
+                          _rightIdx = null;
+                          _rightPlaced = false;
+                        }
                         _hoverLeftIdx = null;
                         _hoverLeftDist = null;
                         _hoverRightIdx = null;
                         _hoverRightDist = null;
                       });
+                      _animateSeesaw();
                     },
                     child: GestureDetector(
                       onTap: _rotateRight,
