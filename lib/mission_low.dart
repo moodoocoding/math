@@ -852,8 +852,8 @@ class _QuizScreenState extends State<QuizScreen> {
     final hanoiHeight = (screenHeight * (isMobile ? 0.42 : (isCompact ? 0.48 : 0.52)))
         .clamp(isMobile ? 280.0 : 360.0, 680.0)
         .toDouble();
-    final floorPreviewHeight = (screenHeight * (isMobile ? 0.44 : (isCompact ? 0.50 : 0.54)))
-        .clamp(isMobile ? 300.0 : 360.0, 660.0)
+    final floorPreviewHeight = (screenHeight * (isMobile ? 0.30 : (isCompact ? 0.38 : 0.42)))
+        .clamp(isMobile ? 200.0 : 260.0, 500.0)
         .toDouble();
     final rodVisualHeight = (screenHeight * (isMobile ? 0.46 : (isCompact ? 0.52 : 0.56)))
         .clamp(isMobile ? 320.0 : 390.0, 680.0)
@@ -1474,83 +1474,98 @@ class _TessellationFloorPainter extends CustomPainter {
       floorPaint,
     );
 
-    // 도형 선택 여부에 따라 타일 색상 결정
-    final Color tileColorA;
-    final Color tileColorB;
-    if (selectedShape == null) {
-      tileColorA = const Color(0xFFE8E8E8);
-      tileColorB = const Color(0xFFD0D0D0);
-    } else if (canTile) {
-      tileColorA = const Color(0xFF81C784);
-      tileColorB = const Color(0xFFA5D6A7);
-    } else {
-      tileColorA = const Color(0xFFEF9A9A);
-      tileColorB = const Color(0xFFFFCDD2);
-    }
-
-    final tilePaintA = Paint()..color = tileColorA;
-    final tilePaintB = Paint()..color = tileColorB;
-    final gridPaint = Paint()
-      ..color = canTile
-          ? const Color(0xFF388E3C)
-          : (selectedShape == null
-              ? const Color(0xFF9E9E9E)
-              : const Color(0xFFE53935))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    final borderPaint = Paint()
-      ..color = const Color(0xFF163988)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
     const rows = 5;
     const columns = 5;
     final cellWidth = size.width / columns;
     final cellHeight = size.height / rows;
 
-    // 1. 사각형 (테셀레이션 가능)
-    if (selectedShape == _ShapeChoiceType.square || selectedShape == null) {
-      for (var row = 0; row < rows; row++) {
-        final topY = row * cellHeight;
-        final bottomY = (row + 1) * cellHeight;
+    // ── 기본 모눈 격자선 상시 렌더링 (도형 아래에 보임) ──
+    final baseGridPaint = Paint()
+      ..color = const Color(0xFFC3CEF0) // 모눈종이 격자선 연청색
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
 
-        for (var col = 0; col < columns; col++) {
-          final leftX = col * cellWidth;
-          final rightX = (col + 1) * cellWidth;
-
-          final tile = Rect.fromLTRB(leftX, topY, rightX, bottomY);
-          canvas.drawRect(tile, (row + col).isEven ? tilePaintA : tilePaintB);
-          canvas.drawRect(tile, gridPaint);
-        }
+    for (var row = 0; row < rows; row++) {
+      final topY = row * cellHeight;
+      final bottomY = (row + 1) * cellHeight;
+      for (var col = 0; col < columns; col++) {
+        final leftX = col * cellWidth;
+        final rightX = (col + 1) * cellWidth;
+        final tileRect = Rect.fromLTRB(leftX, topY, rightX, bottomY);
+        canvas.drawRect(tileRect, baseGridPaint);
       }
-    } 
-    // 2. 테셀레이션 불가능한 도형들 (원, 별, 하트) -> 빈틈 렌더링
-    else {
-      // 각 셀의 Bounding Box를 100% 준수
-      final shapeSize = cellHeight;
+    }
 
-      for (var row = 0; row < rows; row++) {
-        final centerY = row * cellHeight + cellHeight / 2;
-        for (var col = 0; col < columns; col++) {
-          final centerX = col * cellWidth + cellWidth / 2;
-          final center = Offset(centerX, centerY);
+    // ── 사용자가 선택한 도형 오버레이 (반투명 렌더링) ──
+    if (selectedShape != null) {
+      // 도형 선택 여부에 따라 타일 색상 결정 (반투명 적용)
+      final Color tileColorA;
+      final Color tileColorB;
+      if (canTile) {
+        tileColorA = const Color(0xFF81C784).withValues(alpha: 0.68);
+        tileColorB = const Color(0xFFA5D6A7).withValues(alpha: 0.68);
+      } else {
+        tileColorA = const Color(0xFFEF9A9A).withValues(alpha: 0.68);
+        tileColorB = const Color(0xFFFFCDD2).withValues(alpha: 0.68);
+      }
 
-          // 번갈아가며 색상 지정
-          final currentPaint = (row + col).isEven ? tilePaintA : tilePaintB;
-          
-          _drawShapeSymbol(canvas, center, shapeSize, currentPaint.color);
-          
-          // 테두리선 그리기
-          final strokePaint = Paint()
-            ..color = gridPaint.color
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5;
-          _drawShapeSymbolBorder(canvas, center, shapeSize, strokePaint);
+      final tilePaintA = Paint()..color = tileColorA;
+      final tilePaintB = Paint()..color = tileColorB;
+      final gridPaint = Paint()
+        ..color = canTile
+            ? const Color(0xFF2E7D32).withValues(alpha: 0.8)
+            : const Color(0xFFC62828).withValues(alpha: 0.8)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
+
+      // 1. 사각형 (테셀레이션 가능) - 격자 100% 꽉 채움
+      if (selectedShape == _ShapeChoiceType.square) {
+        for (var row = 0; row < rows; row++) {
+          final topY = row * cellHeight;
+          final bottomY = (row + 1) * cellHeight;
+
+          for (var col = 0; col < columns; col++) {
+            final leftX = col * cellWidth;
+            final rightX = (col + 1) * cellWidth;
+
+            final tile = Rect.fromLTRB(leftX, topY, rightX, bottomY);
+            canvas.drawRect(tile, (row + col).isEven ? tilePaintA : tilePaintB);
+            canvas.drawRect(tile, gridPaint);
+          }
+        }
+      } 
+      // 2. 테셀레이션 불가능한 도형들 (원, 별, 하트) -> 빈틈 렌더링
+      else {
+        // 각 셀의 Bounding Box를 100% 준수
+        final shapeSize = cellHeight;
+
+        for (var row = 0; row < rows; row++) {
+          final centerY = row * cellHeight + cellHeight / 2;
+          for (var col = 0; col < columns; col++) {
+            final centerX = col * cellWidth + cellWidth / 2;
+            final center = Offset(centerX, centerY);
+
+            // 번갈아가며 색상 지정
+            final currentPaint = (row + col).isEven ? tilePaintA : tilePaintB;
+            
+            _drawShapeSymbol(canvas, center, shapeSize, currentPaint.color);
+            
+            // 테두리선 그리기
+            final strokePaint = Paint()
+              ..color = gridPaint.color
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.5;
+            _drawShapeSymbolBorder(canvas, center, shapeSize, strokePaint);
+          }
         }
       }
     }
 
     // 외곽 테두리 둥글게 감싸기
+    final borderPaint = Paint()
+      ..color = const Color(0xFF163988)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
     canvas.drawRRect(
       RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
       borderPaint,

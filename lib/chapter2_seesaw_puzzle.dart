@@ -529,7 +529,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     final double gameAreaWidth = availWidth * 0.70;
 
                     // 우측 시소/그리드 영역을 위한 셀 크기 계산
-                    final double cellSz = (gameAreaWidth / 11.8).clamp(20.0, 36.0);
+                    final double cellSz = (gameAreaWidth / 11.8).clamp(18.0, 30.0);
                     final double gap = cellSz * 0.13;
 
                     return Row(
@@ -618,16 +618,26 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             ),
           ),
           Expanded(
-            child: ListView.separated(
+            child: GridView.builder(
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 1.05,
+              ),
               itemCount: _kCards.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, i) {
                 final card = _kCards[i];
                 final isLeft = _leftIdx == i;
                 final isRight = _rightIdx == i;
 
+                // 2열 격자에서의 각 타일 대략적인 너비
+                final double tileSize = (width - 28) / 2;
+
                 // 드래그 대상 빌드
-                Widget cardTile = _storageCardTile(i, width - 24, isLeft, isRight);
+                Widget cardTile = _storageCardTile(i, tileSize, isLeft, isRight);
 
                 // 왼쪽에 자물쇠 잠겨있거나 이미 배치된 도형인 경우 드래그 제한
                 if (isLeft) {
@@ -642,8 +652,8 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     child: Opacity(
                       opacity: 0.75,
                       child: SizedBox(
-                        width: (width - 24) * 0.9,
-                        height: (width - 24) * 0.9,
+                        width: tileSize * 0.9,
+                        height: tileSize * 0.9,
                         child: CustomPaint(
                           painter: _MiniShapePainter(
                             cells: card.rotations[0],
