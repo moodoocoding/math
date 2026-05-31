@@ -853,9 +853,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final hanoiHeight = (screenHeight * (isMobile ? 0.42 : (isCompact ? 0.48 : 0.52)))
         .clamp(isMobile ? 280.0 : 360.0, 680.0)
         .toDouble();
-    final floorPreviewHeight = (screenHeight * (isMobile ? 0.30 : (isCompact ? 0.38 : 0.42)))
-        .clamp(isMobile ? 200.0 : 260.0, 500.0)
-        .toDouble();
+
     final rodVisualHeight = (screenHeight * (isMobile ? 0.46 : (isCompact ? 0.52 : 0.56)))
         .clamp(isMobile ? 320.0 : 390.0, 680.0)
         .toDouble();
@@ -917,128 +915,146 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                       const SizedBox(height: 16),
                       Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // ── 왼쪽 영역: 오직 바닥 프리뷰만 ──
-                            Expanded(
-                              flex: 5,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _TessellationFloorPreview(
-                                    height: floorPreviewHeight * 0.70,
-                                    selectedShape: selectedChoiceIndex != null
-                                        ? _parseShapeChoiceType(
-                                            choices[selectedChoiceIndex!].toString())
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // ── 오른쪽 영역: 2x2 큰 카드 도형 선택지 ──
-                            Expanded(
-                              flex: 4,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  GridView.builder(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: 4,
-                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10,
-                                      childAspectRatio: isMobile ? 1.05 : 1.25,
-                                    ),
-                                    itemBuilder: (context, index) {
-                                      final selected = selectedChoiceIndex == index;
-                                      final color = _optionColors[index % _optionColors.length];
-                                      final isEnabled = index < choices.length;
-                                      final choiceText = isEnabled
-                                          ? choices[index].toString()
-                                          : '준비 중';
-                                      final shapeType = _parseShapeChoiceType(choiceText);
-                                      final textColor = color.computeLuminance() > 0.55
-                                          ? const Color(0xFF163988)
-                                          : Colors.white;
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final availableHeight = constraints.maxHeight;
+                            final availableWidth = constraints.maxWidth;
 
-                                      return AnimatedScale(
-                                        scale: selected ? 1.03 : 1.0,
-                                        duration: const Duration(milliseconds: 180),
-                                        curve: Curves.easeOutBack,
-                                        child: GestureDetector(
-                                          onTap: isEnabled
-                                              ? () => setState(() => selectedChoiceIndex = index)
-                                              : null,
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 180),
-                                            curve: Curves.easeOut,
-                                            decoration: BoxDecoration(
-                                              color: selected ? color : Colors.white,
-                                              borderRadius: BorderRadius.circular(18),
-                                              border: Border.all(
-                                                color: selected
-                                                    ? const Color(0xFF0B1F61)
-                                                    : const Color(0xFFDDE3F0),
-                                                width: selected ? 4 : 2,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: selected
-                                                      ? color.withValues(alpha: 0.4)
-                                                      : const Color(0x14000000),
-                                                  blurRadius: selected ? 18 : 8,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                const Spacer(),
-                                                _ShapeOptionSymbol(
-                                                  type: shapeType,
-                                                  color: selected ? textColor : color,
-                                                  size: optionShapeSize,
-                                                  selected: selected,
-                                                ),
-                                                const SizedBox(height: 10),
-                                                Text(
-                                                  choiceText,
-                                                  style: TextStyle(
-                                                    fontSize: isMobile ? 18 : 22,
-                                                    fontWeight: FontWeight.w900,
-                                                    color: selected
-                                                        ? textColor
-                                                        : const Color(0xFF2D3A5C),
-                                                  ),
-                                                ),
-                                                const Spacer(),
-                                                if (selected)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(bottom: 8),
-                                                    child: Icon(
-                                                      Icons.check_circle_rounded,
-                                                      color: textColor,
-                                                      size: 26,
-                                                    ),
-                                                  )
-                                                else
-                                                  const SizedBox(height: 34),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                            // Calculate grid size to prevent overflow (leave space for the hint box)
+                            final gridSize = (math.min(availableWidth * 5 / 9 - 16, availableHeight - 90))
+                                .clamp(180.0, 420.0);
+
+                            // Calculate childAspectRatio dynamically for right column 2x2 grid
+                            final rightColW = availableWidth * 4 / 9 - 16;
+                            final rightColH = availableHeight - 40;
+                            final tileW = (rightColW - 10) / 2;
+                            final tileH = (rightColH - 10) / 2;
+                            final dynamicAspectRatio = (tileW / tileH).clamp(1.05, 1.65);
+
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // ── 왼쪽 영역: 오직 바닥 프리뷰만 ──
+                                Expanded(
+                                  flex: 5,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _TessellationFloorPreview(
+                                        height: gridSize,
+                                        selectedShape: selectedChoiceIndex != null
+                                            ? _parseShapeChoiceType(
+                                                choices[selectedChoiceIndex!].toString())
+                                            : null,
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
+                                ),
+                                const SizedBox(width: 16),
+                                // ── 오른쪽 영역: 2x2 큰 카드 도형 선택지 ──
+                                Expanded(
+                                  flex: 4,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GridView.builder(
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: 4,
+                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          crossAxisSpacing: 10,
+                                          mainAxisSpacing: 10,
+                                          childAspectRatio: isMobile ? 1.05 : dynamicAspectRatio,
+                                        ),
+                                        itemBuilder: (context, index) {
+                                          final selected = selectedChoiceIndex == index;
+                                          final color = _optionColors[index % _optionColors.length];
+                                          final isEnabled = index < choices.length;
+                                          final choiceText = isEnabled
+                                              ? choices[index].toString()
+                                              : '준비 중';
+                                          final shapeType = _parseShapeChoiceType(choiceText);
+                                          final textColor = color.computeLuminance() > 0.55
+                                              ? const Color(0xFF163988)
+                                              : Colors.white;
+
+                                          return AnimatedScale(
+                                            scale: selected ? 1.03 : 1.0,
+                                            duration: const Duration(milliseconds: 180),
+                                            curve: Curves.easeOutBack,
+                                            child: GestureDetector(
+                                              onTap: isEnabled
+                                                  ? () => setState(() => selectedChoiceIndex = index)
+                                                  : null,
+                                              child: AnimatedContainer(
+                                                duration: const Duration(milliseconds: 180),
+                                                curve: Curves.easeOut,
+                                                decoration: BoxDecoration(
+                                                  color: selected ? color : Colors.white,
+                                                  borderRadius: BorderRadius.circular(18),
+                                                  border: Border.all(
+                                                    color: selected
+                                                        ? const Color(0xFF0B1F61)
+                                                        : const Color(0xFFDDE3F0),
+                                                    width: selected ? 4 : 2,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: selected
+                                                          ? color.withValues(alpha: 0.4)
+                                                          : const Color(0x14000000),
+                                                      blurRadius: selected ? 18 : 8,
+                                                      offset: const Offset(0, 4),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    const Spacer(),
+                                                    _ShapeOptionSymbol(
+                                                      type: shapeType,
+                                                      color: selected ? textColor : color,
+                                                      size: optionShapeSize,
+                                                      selected: selected,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Text(
+                                                      choiceText,
+                                                      style: TextStyle(
+                                                        fontSize: isMobile ? 18 : 22,
+                                                        fontWeight: FontWeight.w900,
+                                                        color: selected
+                                                            ? textColor
+                                                            : const Color(0xFF2D3A5C),
+                                                      ),
+                                                    ),
+                                                    const Spacer(),
+                                                    if (selected)
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(bottom: 8),
+                                                        child: Icon(
+                                                          Icons.check_circle_rounded,
+                                                          color: textColor,
+                                                          size: 26,
+                                                        ),
+                                                      )
+                                                    else
+                                                      const SizedBox(height: 34),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -1492,8 +1508,9 @@ class _TessellationFloorPreview extends StatelessWidget {
       child: Column(
         key: ValueKey(selectedShape),
         children: [
-          AspectRatio(
-            aspectRatio: 1.0,
+          SizedBox(
+            width: height,
+            height: height,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: CustomPaint(
@@ -1703,13 +1720,13 @@ class _TessellationFloorPainter extends CustomPainter {
         );
         break;
       case _ShapeChoiceType.circle:
-        canvas.drawCircle(center, size * 0.38, paint);
+        canvas.drawCircle(center, size * 0.5, paint);
         break;
       case _ShapeChoiceType.star:
-        _drawStar(canvas, center, size * 0.35, paint);
+        _drawStar(canvas, center, size * 0.5, paint);
         break;
       case _ShapeChoiceType.pentagon:
-        _drawPentagon(canvas, center, size * 0.35, paint);
+        _drawPentagon(canvas, center, size * 0.5, paint);
         break;
       default:
         break;
@@ -1727,13 +1744,13 @@ class _TessellationFloorPainter extends CustomPainter {
         );
         break;
       case _ShapeChoiceType.circle:
-        canvas.drawCircle(center, size * 0.38, paint);
+        canvas.drawCircle(center, size * 0.5, paint);
         break;
       case _ShapeChoiceType.star:
-        _drawStar(canvas, center, size * 0.35, paint);
+        _drawStar(canvas, center, size * 0.5, paint);
         break;
       case _ShapeChoiceType.pentagon:
-        _drawPentagon(canvas, center, size * 0.35, paint);
+        _drawPentagon(canvas, center, size * 0.5, paint);
         break;
       default:
         break;
