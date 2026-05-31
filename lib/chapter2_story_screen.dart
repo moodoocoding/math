@@ -35,12 +35,12 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '와! 여기가 수학놀이실이구나! 저기 반짝이는 저울이 보여!',
+      line: '와! 여기가 수학놀이실이구나! 저기 반짝이는 시소가 보여!',
       characterAsset: 'assets/images/chr_how_laughing.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '더 무거운 쪽을 맞히면 다음 장치가 열릴 거야!',
+      line: '시소 양쪽의 균형을 맞히면 다음 장치가 열릴 거야!',
       characterAsset: 'assets/images/chr_play_lefthand.png',
     ),
   ];

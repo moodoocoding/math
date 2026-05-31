@@ -20,6 +20,7 @@ import 'chapter4_story_screen.dart';
 import 'chapter4_problem1_brick_puzzle.dart';
 import 'chapter4_problem2_hidden_word.dart';
 import 'ending_story_screen.dart';
+import 'chapter2_seesaw_puzzle.dart';
 
 void main() {
   runApp(const MissionTourApp());
@@ -62,8 +63,7 @@ class MissionTourApp extends StatelessWidget {
           missionDataPath: 'assets/data/mission_chapter1_q2.json',
           completedRouteName: '/chapter2_story',
         ),
-        '/mission_chapter2_q1': (context) => const MissionLowScreen(
-          missionDataPath: 'assets/data/mission_chapter2_q1.json',
+        '/mission_chapter2_q1': (context) => const SeesawPuzzleScreen(
           completedRouteName: '/chapter2_story2',
         ),
         '/mission_chapter2_q2': (context) => const Chapter2PuzzleQ2Screen(),

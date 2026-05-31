@@ -15,7 +15,7 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
       speaker: '하우',
-      line: '열렸어! 저울 아래에서 반짝이는 무늬판이 나타났어!',
+      line: '열렸어! 시소 아래에서 반짝이는 무늬판이 나타났어!',
       characterAsset: 'assets/images/chr_how_clapping.png',
     ),
     _Chapter2Scene(
