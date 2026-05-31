@@ -194,6 +194,24 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     }
   }
 
+  (int, int)? _findValidAnchor(_CardDef card, int dragRot, int d, int row, bool isLeft) {
+    final cells = card.rotations[dragRot];
+    final mc = card._maxCol(dragRot);
+    for (final c in cells) {
+      int startDist;
+      if (isLeft) {
+        startDist = d - mc + c.$1;
+      } else {
+        startDist = d - c.$1;
+      }
+      final startRow = row - c.$2;
+      if (card.isValidAt(dragRot, startDist, r: startRow)) {
+        return (startDist, startRow);
+      }
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1042,21 +1060,16 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final cardIndex = _kCards.indexOf(card);
                 if (cardIndex == _rightIdx && _rightPlaced) return false;
                 final dragRot = _getDragRotation(card, true);
-                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
-                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
-                int startDist = d - (mc ~/ 2);
-                startDist = startDist.clamp(1, 5 - mc);
-                int startRow = row - (mr ~/ 2);
-                startRow = startRow.clamp(1, 4 - mr);
-                final isValid = card.isValidAt(dragRot, startDist, r: startRow);
-                if (isValid) {
+                final anchor = _findValidAnchor(card, dragRot, d, row, true);
+                if (anchor != null) {
                   setState(() {
                     _hoverLeftIdx = cardIndex;
-                    _hoverLeftDist = startDist;
-                    _hoverLeftStartRow = startRow;
+                    _hoverLeftDist = anchor.$1;
+                    _hoverLeftStartRow = anchor.$2;
                   });
+                  return true;
                 }
-                return isValid;
+                return false;
               },
               onLeave: (data) {
                 setState(() {
@@ -1069,25 +1082,22 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
                 final dragRot = _getDragRotation(card, true);
-                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
-                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
-                int startDist = d - (mc ~/ 2);
-                startDist = startDist.clamp(1, 5 - mc);
-                int startRow = row - (mr ~/ 2);
-                startRow = startRow.clamp(1, 4 - mr);
-                setState(() {
-                  _leftIdx = cardIndex;
-                  _leftDist = startDist;
-                  _leftStartRow = startRow;
-                  _leftRot = dragRot;
-                  _leftPlaced = true;
-                  _result = null;
-                  _hoverLeftIdx = null;
-                  _hoverLeftDist = null;
-                  _hoverLeftStartRow = null;
-                });
-                _startLeftPlacementAnimation();
-                _animateSeesaw();
+                final anchor = _findValidAnchor(card, dragRot, d, row, true);
+                if (anchor != null) {
+                  setState(() {
+                    _leftIdx = cardIndex;
+                    _leftDist = anchor.$1;
+                    _leftStartRow = anchor.$2;
+                    _leftRot = dragRot;
+                    _leftPlaced = true;
+                    _result = null;
+                    _hoverLeftIdx = null;
+                    _hoverLeftDist = null;
+                    _hoverLeftStartRow = null;
+                  });
+                  _startLeftPlacementAnimation();
+                  _animateSeesaw();
+                }
               },
               builder: (context, candidateData, rejectedData) {
                 final isHover = hoverLeftCells.any((c) => c.$1 == d && c.$2 == row);
@@ -1193,21 +1203,16 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final cardIndex = _kCards.indexOf(card);
                 if (cardIndex == _leftIdx && _leftPlaced) return false;
                 final dragRot = _getDragRotation(card, false);
-                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
-                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
-                int startDist = d - (mc ~/ 2);
-                startDist = startDist.clamp(1, 5 - mc);
-                int startRow = row - (mr ~/ 2);
-                startRow = startRow.clamp(1, 4 - mr);
-                final isValid = card.isValidAt(dragRot, startDist, r: startRow);
-                if (isValid) {
+                final anchor = _findValidAnchor(card, dragRot, d, row, false);
+                if (anchor != null) {
                   setState(() {
                     _hoverRightIdx = cardIndex;
-                    _hoverRightDist = startDist;
-                    _hoverRightStartRow = startRow;
+                    _hoverRightDist = anchor.$1;
+                    _hoverRightStartRow = anchor.$2;
                   });
+                  return true;
                 }
-                return isValid;
+                return false;
               },
               onLeave: (data) {
                 setState(() {
@@ -1220,25 +1225,22 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
                 final dragRot = _getDragRotation(card, false);
-                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
-                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
-                int startDist = d - (mc ~/ 2);
-                startDist = startDist.clamp(1, 5 - mc);
-                int startRow = row - (mr ~/ 2);
-                startRow = startRow.clamp(1, 4 - mr);
-                setState(() {
-                  _rightIdx = cardIndex;
-                  _rightDist = startDist;
-                  _rightStartRow = startRow;
-                  _rightRot = dragRot;
-                  _rightPlaced = true;
-                  _result = null;
-                  _hoverRightIdx = null;
-                  _hoverRightDist = null;
-                  _hoverRightStartRow = null;
-                });
-                _startRightPlacementAnimation();
-                _animateSeesaw();
+                final anchor = _findValidAnchor(card, dragRot, d, row, false);
+                if (anchor != null) {
+                  setState(() {
+                    _rightIdx = cardIndex;
+                    _rightDist = anchor.$1;
+                    _rightStartRow = anchor.$2;
+                    _rightRot = dragRot;
+                    _rightPlaced = true;
+                    _result = null;
+                    _hoverRightIdx = null;
+                    _hoverRightDist = null;
+                    _hoverRightStartRow = null;
+                  });
+                  _startRightPlacementAnimation();
+                  _animateSeesaw();
+                }
               },
               builder: (context, candidateData, rejectedData) {
                 final isHover = hoverRightCells.any((c) => c.$1 == d && c.$2 == row);
