@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
-enum _ShapeChoiceType { square, circle, star, heart, unknown }
+enum _ShapeChoiceType { square, circle, star, triangle, unknown }
 
 _ShapeChoiceType _parseShapeChoiceType(dynamic raw) {
   final value = raw?.toString().trim().toLowerCase() ?? '';
@@ -20,9 +20,10 @@ _ShapeChoiceType _parseShapeChoiceType(dynamic raw) {
     case '별':
     case 'star':
       return _ShapeChoiceType.star;
-    case '하트':
-    case 'heart':
-      return _ShapeChoiceType.heart;
+    case '세모':
+    case '삼각형':
+    case 'triangle':
+      return _ShapeChoiceType.triangle;
     default:
       return _ShapeChoiceType.unknown;
   }
@@ -1306,6 +1307,27 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 }
 
+class _TriangleSymbolPainter extends CustomPainter {
+  final Color color;
+  _TriangleSymbolPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    final path = Path()
+      ..moveTo(size.width / 2, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 class _ShapeOptionSymbol extends StatelessWidget {
   const _ShapeOptionSymbol({
     required this.type,
@@ -1339,8 +1361,14 @@ class _ShapeOptionSymbol extends StatelessWidget {
         );
       case _ShapeChoiceType.star:
         return Icon(Icons.star_rounded, size: size + 6, color: color);
-      case _ShapeChoiceType.heart:
-        return Icon(Icons.favorite_rounded, size: size + 6, color: color);
+      case _ShapeChoiceType.triangle:
+        return SizedBox(
+          width: size,
+          height: size,
+          child: CustomPaint(
+            painter: _TriangleSymbolPainter(color: color),
+          ),
+        );
       case _ShapeChoiceType.unknown:
         return Text(
           '?',
@@ -1381,8 +1409,8 @@ class _TessellationFloorPreview extends StatelessWidget {
       case _ShapeChoiceType.star:
         hint = '별은 모양이 복잡해서 빈틈이 생겨요 ❌';
         canTile = false;
-      case _ShapeChoiceType.heart:
-        hint = '하트는 곡선이 있어서 빈틈이 생겨요 ❌';
+      case _ShapeChoiceType.triangle:
+        hint = '정삼각형은 정사각형 모눈에 맞지 않아 빈틈이 생겨요 ❌';
         canTile = false;
       default:
         hint = '도형을 골라서 바닥에 깔아봐!';
@@ -1610,8 +1638,8 @@ class _TessellationFloorPainter extends CustomPainter {
       case _ShapeChoiceType.star:
         _drawStar(canvas, center, size * 0.5, paint);
         break;
-      case _ShapeChoiceType.heart:
-        _drawHeart(canvas, center, size * 0.25, paint);
+      case _ShapeChoiceType.triangle:
+        _drawTriangle(canvas, center, size * 0.5, paint);
         break;
       default:
         break;
@@ -1634,8 +1662,8 @@ class _TessellationFloorPainter extends CustomPainter {
       case _ShapeChoiceType.star:
         _drawStar(canvas, center, size * 0.5, paint);
         break;
-      case _ShapeChoiceType.heart:
-        _drawHeart(canvas, center, size * 0.25, paint);
+      case _ShapeChoiceType.triangle:
+        _drawTriangle(canvas, center, size * 0.5, paint);
         break;
       default:
         break;
@@ -1656,18 +1684,18 @@ class _TessellationFloorPainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-  void _drawHeart(Canvas canvas, Offset center, double r, Paint paint) {
+  void _drawTriangle(Canvas canvas, Offset center, double r, Paint paint) {
     final path = Path();
     final x = center.dx;
     final y = center.dy;
-    path.moveTo(x, y + r * 0.3);
-    path.cubicTo(
-        x - r * 1.2, y - r * 0.8, x - r * 2, y + r * 0.6, x, y + r * 1.5);
-    path.cubicTo(
-        x + r * 2, y + r * 0.6, x + r * 1.2, y - r * 0.8, x, y + r * 0.3);
+    path.moveTo(x, y - r);
+    path.lineTo(x + r * 0.866025, y + r * 0.5);
+    path.lineTo(x - r * 0.866025, y + r * 0.5);
     path.close();
     canvas.drawPath(path, paint);
   }
+
+
 
   double _cos(double angle) {
     // Simple cos approximation using dart:math indirectly
