@@ -1324,7 +1324,7 @@ class _ShapeOptionSymbol extends StatelessWidget {
     switch (type) {
       case _ShapeChoiceType.square:
         return Container(
-          width: size * 1.3,
+          width: size,
           height: size,
           decoration: BoxDecoration(
             color: color,
@@ -1394,9 +1394,8 @@ class _TessellationFloorPreview extends StatelessWidget {
       child: Column(
         key: ValueKey(selectedShape),
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: height,
+          AspectRatio(
+            aspectRatio: 1.0,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: CustomPaint(
@@ -1504,8 +1503,8 @@ class _TessellationFloorPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    const rows = 4;
-    const columns = 10;
+    const rows = 5;
+    const columns = 5;
     final cellWidth = size.width / columns;
     final cellHeight = size.height / rows;
 
@@ -1527,8 +1526,8 @@ class _TessellationFloorPainter extends CustomPainter {
     } 
     // 2. 테셀레이션 불가능한 도형들 (원, 별, 하트) -> 빈틈 렌더링
     else {
-      // 바둑판처럼 깔되, 크기를 세로 기준 85%로 제한하여 도형 간 간격 및 빈틈이 확연하게 보이게 함
-      final shapeSize = cellHeight * 0.85;
+      // 각 셀의 Bounding Box를 100% 준수
+      final shapeSize = cellHeight;
 
       for (var row = 0; row < rows; row++) {
         final centerY = row * cellHeight + cellHeight / 2;
@@ -1586,18 +1585,18 @@ class _TessellationFloorPainter extends CustomPainter {
     switch (selectedShape) {
       case _ShapeChoiceType.square:
         canvas.drawRect(
-          Rect.fromCenter(center: center, width: size * 1.3, height: size),
+          Rect.fromCenter(center: center, width: size, height: size),
           paint,
         );
         break;
       case _ShapeChoiceType.circle:
-        canvas.drawCircle(center, size * 0.6, paint);
+        canvas.drawCircle(center, size * 0.5, paint);
         break;
       case _ShapeChoiceType.star:
-        _drawStar(canvas, center, size * 0.7, paint);
+        _drawStar(canvas, center, size * 0.5, paint);
         break;
       case _ShapeChoiceType.heart:
-        _drawHeart(canvas, center, size * 0.7, paint);
+        _drawHeart(canvas, center, size * 0.25, paint);
         break;
       default:
         break;
@@ -1610,15 +1609,19 @@ class _TessellationFloorPainter extends CustomPainter {
     switch (selectedShape) {
       case _ShapeChoiceType.square:
         canvas.drawRect(
-          Rect.fromCenter(center: center, width: size * 1.3, height: size),
+          Rect.fromCenter(center: center, width: size, height: size),
           paint,
         );
+        break;
       case _ShapeChoiceType.circle:
-        canvas.drawCircle(center, size * 0.6, paint);
+        canvas.drawCircle(center, size * 0.5, paint);
+        break;
       case _ShapeChoiceType.star:
-        _drawStar(canvas, center, size * 0.7, paint);
+        _drawStar(canvas, center, size * 0.5, paint);
+        break;
       case _ShapeChoiceType.heart:
-        _drawHeart(canvas, center, size * 0.7, paint);
+        _drawHeart(canvas, center, size * 0.25, paint);
+        break;
       default:
         break;
     }
