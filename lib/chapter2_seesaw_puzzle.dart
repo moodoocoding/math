@@ -41,16 +41,17 @@ class _CardDef {
   int get rotCount => rotations.length;
 
   int _maxCol(int ri) => rotations[ri].map((c) => c.$1).reduce(math.max);
+  int _maxRow(int ri) => rotations[ri].map((c) => c.$2).reduce(math.max);
 
-  bool isValidAt(int ri, int d) =>
-      d >= 1 && d + _maxCol(ri) <= 5;
+  bool isValidAt(int ri, int d, {int r = 1}) =>
+      d >= 1 && d + _maxCol(ri) <= 5 && r >= 1 && r + _maxRow(ri) <= 4;
 
-  List<_Abs> cells(int ri, int d, {bool isLeft = false}) {
+  List<_Abs> cells(int ri, int d, {int r = 1, bool isLeft = false}) {
     if (isLeft) {
       final mc = _maxCol(ri);
-      return rotations[ri].map((c) => (d + mc - c.$1, c.$2 + 1)).toList();
+      return rotations[ri].map((c) => (d + mc - c.$1, r + c.$2)).toList();
     } else {
-      return rotations[ri].map((c) => (d + c.$1, c.$2 + 1)).toList();
+      return rotations[ri].map((c) => (d + c.$1, r + c.$2)).toList();
     }
   }
 
@@ -151,6 +152,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   int? _leftIdx;
   int _leftRot = 0;
   int _leftDist = 1;
+  int _leftStartRow = 1;
   bool _leftPlaced = false;
   int _leftVisibleCells = 0;
   Timer? _leftTimer;
@@ -158,14 +160,17 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   int? _rightIdx;
   int _rightRot = 0;
   int _rightDist = 1;
+  int _rightStartRow = 1;
   bool _rightPlaced = false;
   int _rightVisibleCells = 0;
   Timer? _rightTimer;
 
   int? _hoverLeftIdx;
   int? _hoverLeftDist;
+  int? _hoverLeftStartRow;
   int? _hoverRightIdx;
   int? _hoverRightDist;
+  int? _hoverRightStartRow;
 
   bool? _result; // null=미확인, true=정답, false=오답
 
@@ -201,12 +206,14 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     _leftPlaced = false;
     _leftRot = 0;
     _leftDist = 1;
+    _leftStartRow = 1;
     _leftVisibleCells = 0;
 
     _rightIdx = null;
     _rightPlaced = false;
     _rightRot = 0;
     _rightDist = 1;
+    _rightStartRow = 1;
     _rightVisibleCells = 0;
   }
 
@@ -221,7 +228,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   // ── 계산값 ─────────────────────────────────────────
   List<_Abs> get _leftCells {
     if (_leftIdx == null) return const [];
-    return _kCards[_leftIdx!].cells(_leftRot, _leftDist, isLeft: true);
+    return _kCards[_leftIdx!].cells(_leftRot, _leftDist, r: _leftStartRow, isLeft: true);
   }
 
   int get _leftTorque {
@@ -235,7 +242,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   List<_Abs> get _rightCells {
     if (_rightIdx == null) return const [];
-    return _kCards[_rightIdx!].cells(_rightRot, _rightDist);
+    return _kCards[_rightIdx!].cells(_rightRot, _rightDist, r: _rightStartRow);
   }
 
   int get _rightTorque {
@@ -305,12 +312,23 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     final card = _kCards[_leftIdx!];
     int nextRot = (_leftRot + 1) % card.rotCount;
     int dist = _leftDist;
-    if (!card.isValidAt(nextRot, dist)) dist = 1;
+    int startRow = _leftStartRow;
+    if (!card.isValidAt(nextRot, dist, r: startRow)) {
+      final mc = card._maxCol(nextRot);
+      final mr = card._maxRow(nextRot);
+      dist = dist.clamp(1, 5 - mc);
+      startRow = startRow.clamp(1, 4 - mr);
+      if (!card.isValidAt(nextRot, dist, r: startRow)) {
+        dist = 1;
+        startRow = 1;
+      }
+    }
     HapticFeedback.lightImpact();
     AppSfxController.playClick();
     setState(() {
       _leftRot = nextRot;
       _leftDist = dist;
+      _leftStartRow = startRow;
       _leftVisibleCells = card.rotations[nextRot].length;
     });
     _animateSeesaw();
@@ -321,12 +339,23 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     final card = _kCards[_rightIdx!];
     int nextRot = (_rightRot + 1) % card.rotCount;
     int dist = _rightDist;
-    if (!card.isValidAt(nextRot, dist)) dist = 1;
+    int startRow = _rightStartRow;
+    if (!card.isValidAt(nextRot, dist, r: startRow)) {
+      final mc = card._maxCol(nextRot);
+      final mr = card._maxRow(nextRot);
+      dist = dist.clamp(1, 5 - mc);
+      startRow = startRow.clamp(1, 4 - mr);
+      if (!card.isValidAt(nextRot, dist, r: startRow)) {
+        dist = 1;
+        startRow = 1;
+      }
+    }
     HapticFeedback.lightImpact();
     AppSfxController.playClick();
     setState(() {
       _rightRot = nextRot;
       _rightDist = dist;
+      _rightStartRow = startRow;
       _rightVisibleCells = card.rotations[nextRot].length;
     });
     _animateSeesaw();
@@ -366,19 +395,23 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       _leftPlaced = false;
       _leftRot = 0;
       _leftDist = 1;
+      _leftStartRow = 1;
       _leftVisibleCells = 0;
 
       _rightIdx = null;
       _rightPlaced = false;
       _rightRot = 0;
       _rightDist = 1;
+      _rightStartRow = 1;
       _rightVisibleCells = 0;
 
       _result = null;
       _hoverLeftIdx = null;
       _hoverLeftDist = null;
+      _hoverLeftStartRow = null;
       _hoverRightIdx = null;
       _hoverRightDist = null;
+      _hoverRightStartRow = null;
     });
     _leftTimer?.cancel();
     _rightTimer?.cancel();
@@ -976,21 +1009,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   Widget _gridRow(int row, double sz, double gap) {
     final activeLeftCells = _leftIdx != null && _leftPlaced
-        ? _kCards[_leftIdx!].cells(_leftRot, _leftDist, isLeft: true).take(_leftVisibleCells).toSet()
+        ? _kCards[_leftIdx!].cells(_leftRot, _leftDist, r: _leftStartRow, isLeft: true).take(_leftVisibleCells).toSet()
         : <_Abs>{};
 
     final activeRightCells = _rightIdx != null && _rightPlaced
-        ? _kCards[_rightIdx!].cells(_rightRot, _rightDist).take(_rightVisibleCells).toSet()
+        ? _kCards[_rightIdx!].cells(_rightRot, _rightDist, r: _rightStartRow).take(_rightVisibleCells).toSet()
         : <_Abs>{};
 
     final dragRotLeft = _hoverLeftIdx != null ? _getDragRotation(_kCards[_hoverLeftIdx!], true) : 0;
-    final hoverLeftCells = _hoverLeftIdx != null && _hoverLeftDist != null
-        ? _kCards[_hoverLeftIdx!].cells(dragRotLeft, _hoverLeftDist!, isLeft: true).toSet()
+    final hoverLeftCells = _hoverLeftIdx != null && _hoverLeftDist != null && _hoverLeftStartRow != null
+        ? _kCards[_hoverLeftIdx!].cells(dragRotLeft, _hoverLeftDist!, r: _hoverLeftStartRow!, isLeft: true).toSet()
         : <_Abs>{};
 
     final dragRotRight = _hoverRightIdx != null ? _getDragRotation(_kCards[_hoverRightIdx!], false) : 0;
-    final hoverRightCells = _hoverRightIdx != null && _hoverRightDist != null
-        ? _kCards[_hoverRightIdx!].cells(dragRotRight, _hoverRightDist!).toSet()
+    final hoverRightCells = _hoverRightIdx != null && _hoverRightDist != null && _hoverRightStartRow != null
+        ? _kCards[_hoverRightIdx!].cells(dragRotRight, _hoverRightDist!, r: _hoverRightStartRow!).toSet()
         : <_Abs>{};
 
     final leftColor = _leftIdx != null ? _kCards[_leftIdx!].color : Colors.grey;
@@ -1010,13 +1043,17 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (cardIndex == _rightIdx && _rightPlaced) return false;
                 final dragRot = _getDragRotation(card, true);
                 final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
                 int startDist = d - (mc ~/ 2);
                 startDist = startDist.clamp(1, 5 - mc);
-                final isValid = card.isValidAt(dragRot, startDist);
+                int startRow = row - (mr ~/ 2);
+                startRow = startRow.clamp(1, 4 - mr);
+                final isValid = card.isValidAt(dragRot, startDist, r: startRow);
                 if (isValid) {
                   setState(() {
                     _hoverLeftIdx = cardIndex;
                     _hoverLeftDist = startDist;
+                    _hoverLeftStartRow = startRow;
                   });
                 }
                 return isValid;
@@ -1025,6 +1062,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 setState(() {
                   _hoverLeftIdx = null;
                   _hoverLeftDist = null;
+                  _hoverLeftStartRow = null;
                 });
               },
               onAcceptWithDetails: (details) {
@@ -1032,16 +1070,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final cardIndex = _kCards.indexOf(card);
                 final dragRot = _getDragRotation(card, true);
                 final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
                 int startDist = d - (mc ~/ 2);
                 startDist = startDist.clamp(1, 5 - mc);
+                int startRow = row - (mr ~/ 2);
+                startRow = startRow.clamp(1, 4 - mr);
                 setState(() {
                   _leftIdx = cardIndex;
                   _leftDist = startDist;
+                  _leftStartRow = startRow;
                   _leftRot = dragRot;
                   _leftPlaced = true;
                   _result = null;
                   _hoverLeftIdx = null;
                   _hoverLeftDist = null;
+                  _hoverLeftStartRow = null;
                 });
                 _startLeftPlacementAnimation();
                 _animateSeesaw();
@@ -1049,7 +1092,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               builder: (context, candidateData, rejectedData) {
                 final isHover = hoverLeftCells.any((c) => c.$1 == d && c.$2 == row);
                 final isPlaced = activeLeftCells.any((c) => c.$1 == d && c.$2 == row);
-                final isOccupied = _leftPlaced && _kCards[_leftIdx!].cells(_leftRot, _leftDist, isLeft: true).any((c) => c.$1 == d && c.$2 == row);
+                final isOccupied = _leftPlaced && _kCards[_leftIdx!].cells(_leftRot, _leftDist, r: _leftStartRow, isLeft: true).any((c) => c.$1 == d && c.$2 == row);
 
                 Widget cellWidget = _Cell(
                   size: sz,
@@ -1107,8 +1150,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                         }
                         _hoverLeftIdx = null;
                         _hoverLeftDist = null;
+                        _hoverLeftStartRow = null;
                         _hoverRightIdx = null;
                         _hoverRightDist = null;
+                        _hoverRightStartRow = null;
                       });
                       _animateSeesaw();
                     },
@@ -1149,13 +1194,17 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (cardIndex == _leftIdx && _leftPlaced) return false;
                 final dragRot = _getDragRotation(card, false);
                 final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
                 int startDist = d - (mc ~/ 2);
                 startDist = startDist.clamp(1, 5 - mc);
-                final isValid = card.isValidAt(dragRot, startDist);
+                int startRow = row - (mr ~/ 2);
+                startRow = startRow.clamp(1, 4 - mr);
+                final isValid = card.isValidAt(dragRot, startDist, r: startRow);
                 if (isValid) {
                   setState(() {
                     _hoverRightIdx = cardIndex;
                     _hoverRightDist = startDist;
+                    _hoverRightStartRow = startRow;
                   });
                 }
                 return isValid;
@@ -1164,6 +1213,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 setState(() {
                   _hoverRightIdx = null;
                   _hoverRightDist = null;
+                  _hoverRightStartRow = null;
                 });
               },
               onAcceptWithDetails: (details) {
@@ -1171,16 +1221,21 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final cardIndex = _kCards.indexOf(card);
                 final dragRot = _getDragRotation(card, false);
                 final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                final mr = card.rotations[dragRot].map((c) => c.$2).reduce(math.max);
                 int startDist = d - (mc ~/ 2);
                 startDist = startDist.clamp(1, 5 - mc);
+                int startRow = row - (mr ~/ 2);
+                startRow = startRow.clamp(1, 4 - mr);
                 setState(() {
                   _rightIdx = cardIndex;
                   _rightDist = startDist;
+                  _rightStartRow = startRow;
                   _rightRot = dragRot;
                   _rightPlaced = true;
                   _result = null;
                   _hoverRightIdx = null;
                   _hoverRightDist = null;
+                  _hoverRightStartRow = null;
                 });
                 _startRightPlacementAnimation();
                 _animateSeesaw();
@@ -1188,7 +1243,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               builder: (context, candidateData, rejectedData) {
                 final isHover = hoverRightCells.any((c) => c.$1 == d && c.$2 == row);
                 final isPlaced = activeRightCells.any((c) => c.$1 == d && c.$2 == row);
-                final isOccupied = _rightPlaced && _kCards[_rightIdx!].cells(_rightRot, _rightDist).any((c) => c.$1 == d && c.$2 == row);
+                final isOccupied = _rightPlaced && _kCards[_rightIdx!].cells(_rightRot, _rightDist, r: _rightStartRow).any((c) => c.$1 == d && c.$2 == row);
 
                 Widget cellWidget = _Cell(
                   size: sz,
@@ -1246,8 +1301,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                         }
                         _hoverLeftIdx = null;
                         _hoverLeftDist = null;
+                        _hoverLeftStartRow = null;
                         _hoverRightIdx = null;
                         _hoverRightDist = null;
+                        _hoverRightStartRow = null;
                       });
                       _animateSeesaw();
                     },
