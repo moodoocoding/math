@@ -335,10 +335,10 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   static const List<Color> _optionColors = [
-    Color(0xFF123E97),
-    Color(0xFFF4C430),
-    Color(0xFF204FAE),
-    Color(0xFFE8B91C),
+    Color(0xFF1E40AF), // Royal Blue for Square
+    Color(0xFFEA580C), // Coral/Orange for Circle
+    Color(0xFFD97706), // Gold/Amber for Star
+    Color(0xFF0F766E), // Deep Teal for Pentagon
   ];
 
   int? selectedChoiceIndex;
@@ -1515,7 +1515,7 @@ class _TessellationFloorPreview extends StatelessWidget {
             width: height,
             height: height,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.zero, // Perfect rectangular boundary matching mathematical tessellation
               child: CustomPaint(
                 painter: _TessellationFloorPainter(
                   selectedShape: selectedShape,
@@ -1530,14 +1530,14 @@ class _TessellationFloorPreview extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: selectedShape == null
-                  ? const Color(0xFFEFF3FF)
+                  ? Colors.transparent // Soft natural caption styling without button confusion
                   : canTile
                       ? const Color(0xFFDFF7EC)
                       : const Color(0xFFFFEEEE),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: selectedShape == null
-                    ? const Color(0xFFC3CEF0)
+                    ? Colors.transparent
                     : canTile
                         ? const Color(0xFF4CAF50)
                         : const Color(0xFFE57373),
@@ -1551,7 +1551,7 @@ class _TessellationFloorPreview extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: selectedShape == null
-                    ? const Color(0xFF4A5E9A)
+                    ? const Color(0xFF6B7280) // Clean placeholder neutral text
                     : canTile
                         ? const Color(0xFF2E7D32)
                         : const Color(0xFFC62828),
@@ -1578,17 +1578,17 @@ class _TessellationFloorPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // 배경 (바닥 기본 색상)
     final floorPaint = Paint()..color = const Color(0xFFFFF7D8);
-    // 벽면/테두리 영역 (깔끔한 테투리를 위해 배경 둥근 사각형 처리)
+    // 벽면/테두리 영역 (수학적 테셀레이션 영역을 위한 직각형 바닥 처리)
     final bgPaint = Paint()..color = const Color(0xFFEAF1FF);
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
+    canvas.drawRect(
+      Offset.zero & size,
       bgPaint,
     );
 
     // 바닥 영역을 꽉 채우도록 사각형 그림
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
+    canvas.drawRect(
+      Offset.zero & size,
       floorPaint,
     );
 
@@ -1652,10 +1652,15 @@ class _TessellationFloorPainter extends CustomPainter {
           }
         }
       } 
-      // 2. 테셀레이션 불가능한 도형들 (원, 별, 하트) -> 빈틈 렌더링
+      // 2. 테셀레이션 불가능한 도형들 -> 빈틈 및 겹침 렌더링
       else {
-        // 각 셀의 Bounding Box를 100% 준수
-        final shapeSize = cellHeight;
+        // 정오각형은 겹침(overlap) 및 틈새 오류를 시각화하기 위해 의도적으로 cellHeight의 1.15배로 확대 렌더링
+        final double shapeSize;
+        if (selectedShape == _ShapeChoiceType.pentagon) {
+          shapeSize = cellHeight * 1.15;
+        } else {
+          shapeSize = cellHeight;
+        }
 
         for (var row = 0; row < rows; row++) {
           final centerY = row * cellHeight + cellHeight / 2;
@@ -1679,13 +1684,13 @@ class _TessellationFloorPainter extends CustomPainter {
       }
     }
 
-    // 외곽 테두리 둥글게 감싸기
+    // 외곽 테두리 직각으로 감싸기
     final borderPaint = Paint()
       ..color = const Color(0xFF163988)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
+      ..strokeWidth = 3.0;
+    canvas.drawRect(
+      Offset.zero & size,
       borderPaint,
     );
 
@@ -1693,7 +1698,7 @@ class _TessellationFloorPainter extends CustomPainter {
     if (selectedShape == null) {
       final textPainter = TextPainter(
         text: const TextSpan(
-          text: '↓  도형을 골라봐!  ↓',
+          text: '오른쪽에서 도형을 골라봐! →',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -1764,10 +1769,10 @@ class _TessellationFloorPainter extends CustomPainter {
     final path = Path();
     const n = 5;
     for (var i = 0; i < n * 2; i++) {
-      final angle = (i * 3.14159 / n) - 3.14159 / 2;
+      final angle = (i * math.pi / n) - math.pi / 2;
       final radius = i.isEven ? r : r * 0.45;
-      final x = center.dx + radius * _cos(angle);
-      final y = center.dy + radius * _sin(angle);
+      final x = center.dx + radius * math.cos(angle);
+      final y = center.dy + radius * math.sin(angle);
       if (i == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
     }
     path.close();
@@ -1779,9 +1784,9 @@ class _TessellationFloorPainter extends CustomPainter {
     final x = center.dx;
     final y = center.dy;
     for (int i = 0; i < 5; i++) {
-      final double angle = -3.14159265 / 2 + (i * 2 * 3.14159265 / 5);
-      final double px = x + r * _cos(angle);
-      final double py = y + r * _sin(angle);
+      final double angle = -math.pi / 2 + (i * 2 * math.pi / 5);
+      final double px = x + r * math.cos(angle);
+      final double py = y + r * math.sin(angle);
       if (i == 0) {
         path.moveTo(px, py);
       } else {
@@ -1790,29 +1795,6 @@ class _TessellationFloorPainter extends CustomPainter {
     }
     path.close();
     canvas.drawPath(path, paint);
-  }
-
-
-
-  double _cos(double angle) {
-    // Simple cos approximation using dart:math indirectly
-    return _sin(angle + 3.14159 / 2);
-  }
-
-  double _sin(double angle) {
-    // Use series expansion for small angles — use dart:math instead
-    // We'll rely on the import at the top of the file
-    return _sinVal(angle);
-  }
-
-  double _sinVal(double x) {
-    // Reduce to [-pi, pi]
-    // ignore: no_leading_underscores_for_local_identifiers
-    double _x = x % (2 * 3.14159265358979);
-    if (_x > 3.14159265358979) _x -= 2 * 3.14159265358979;
-    // Taylor series: sin(x) ≈ x - x^3/6 + x^5/120 - x^7/5040
-    final x2 = _x * _x;
-    return _x * (1 - x2 / 6 * (1 - x2 / 20 * (1 - x2 / 42)));
   }
 
   @override
