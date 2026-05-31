@@ -28,6 +28,7 @@ class _QuizQuestion {
 
 class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
   int _currentQuestionIndex = 0;
+  final Set<String> _correctlyAnswered = {};
 
   static const List<_QuizQuestion> _questions = [
     _QuizQuestion(
@@ -180,6 +181,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
   }
 
   void _proceedToNext() {
+    _correctlyAnswered.add(_questions[_currentQuestionIndex].correctAnswer);
     if (_currentQuestionIndex < _questions.length - 1) {
       setState(() {
         _currentQuestionIndex++;
@@ -264,6 +266,9 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
     final screenWidth = screenSize.width;
     final isMobile = screenWidth < 600;
     final currentQuestion = _questions[_currentQuestionIndex];
+    final filteredChoices = currentQuestion.choices
+        .where((choice) => !_correctlyAnswered.contains(choice))
+        .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F6FF),
@@ -376,9 +381,9 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
                     mainAxisSpacing: 14,
                     childAspectRatio: 3.4,
                   ),
-                  itemCount: currentQuestion.choices.length,
+                  itemCount: filteredChoices.length,
                   itemBuilder: (context, index) {
-                    final choice = currentQuestion.choices[index];
+                    final choice = filteredChoices[index];
                     return Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
