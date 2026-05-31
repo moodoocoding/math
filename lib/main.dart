@@ -76,8 +76,9 @@ class MissionTourApp extends StatelessWidget {
               completedRouteName: '/mission_chapter4_q2',
             ),
         '/mission_chapter4_q2': (context) => const HiddenWordPuzzleScreen(
-              completedRouteName: '/mission_chapter4_rps_qr',
+              completedRouteName: '/chapter4_story_before_rps',
             ),
+        '/chapter4_story_before_rps': (context) => const Chapter4StoryBeforeRpsScreen(),
         '/mission_chapter4_rps_qr': (context) => const Chapter4RpsQrScreen(
               completedRouteName: '/chapter4_story3',
             ),

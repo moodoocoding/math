@@ -67,12 +67,12 @@ class Chapter4Story2Screen extends StatelessWidget {
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '이번엔 AI와 코딩 퀴즈, 낱말 찾기를 거쳐 인공지능 로봇과 가위바위보 대결 후 QR 인증을 마쳐야 하나 봐!',
+      line: '이번엔 AI와 코딩에 관한 퀴즈를 풀고, 낱말 찾기를 해야 하나 봐!',
       characterAsset: 'assets/images/chr_play_right.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '퀴즈와 낱말 찾기를 성공하고, 똑똑한 인공지능 로봇과의 대결도 이겨서 QR 인증을 획득하자!',
+      line: '퀴즈를 풀고 글자 속에 숨은 AI와 코딩 낱말을 찾아보자!',
       characterAsset: 'assets/images/chr_how_presenting.png',
     ),
   ];
@@ -86,10 +86,46 @@ class Chapter4Story2Screen extends StatelessWidget {
   }
 }
 
+class Chapter4StoryBeforeRpsScreen extends StatelessWidget {
+  const Chapter4StoryBeforeRpsScreen({super.key});
+
+  static const List<_Chapter4Scene> _scenes = [
+    _Chapter4Scene(
+      speaker: '하우',
+      line: '우와! 글자판 속 단어들을 다 찾아내니까 다음 방의 문이 열렸어!',
+      characterAsset: 'assets/images/chr_how_laughing.png',
+    ),
+    _Chapter4Scene(
+      speaker: '플레이',
+      line: '어? 그런데 저기 앞에 똑똑해 보이는 인공지능 로봇이 우리 길을 막고 서 있어!',
+      characterAsset: 'assets/images/chr_play_thinking.png',
+    ),
+    _Chapter4Scene(
+      speaker: '하우',
+      line: '하하! 이 로봇과 가위바위보 대결에서 이겨서 수학융합실 QR 인증을 통과하래! 마지막 미션 도전이야!',
+      characterAsset: 'assets/images/chr_how_running.png',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return const _Chapter4StoryFlow(
+      scenes: _scenes,
+      nextRouteName: '/mission_chapter4_rps_qr',
+      finalButtonText: '로봇과 대결하기',
+    );
+  }
+}
+
 class Chapter4Story3Screen extends StatelessWidget {
   const Chapter4Story3Screen({super.key});
 
   static const List<_Chapter4Scene> _scenes = [
+    _Chapter4Scene(
+      speaker: '하우',
+      line: '우와! 인공지능 로봇과의 대결에서 승리하고 QR 인증을 완료했어!',
+      characterAsset: 'assets/images/chr_how_thumbs_up.png',
+    ),
     _Chapter4Scene(
       speaker: '플레이',
       line: '드디어 마지막 별 조각을 찾았어, 반짝별을 다시 빛나게 하자!',
