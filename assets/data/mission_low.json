@@ -8,7 +8,7 @@
       "quiz_type": "mcq",
       "question_no": 1,
       "question": "빈칸 없이 바닥을 채울 수 있는 모양은 무엇일까요?",
-      "choices": ["네모", "동그라미", "별", "세모"],
+      "choices": ["네모", "동그라미", "별", "오각형"],
       "answer": 0,
       "hint": "타일처럼 서로 빈틈 없이 딱 맞게 반복되는 모양을 찾아보세요.",
       "choices_as_shapes": true

@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
-enum _ShapeChoiceType { square, circle, star, triangle, unknown }
+enum _ShapeChoiceType { square, circle, star, pentagon, unknown }
 
 _ShapeChoiceType _parseShapeChoiceType(dynamic raw) {
   final value = raw?.toString().trim().toLowerCase() ?? '';
@@ -20,10 +21,9 @@ _ShapeChoiceType _parseShapeChoiceType(dynamic raw) {
     case '별':
     case 'star':
       return _ShapeChoiceType.star;
-    case '세모':
-    case '삼각형':
-    case 'triangle':
-      return _ShapeChoiceType.triangle;
+    case '오각형':
+    case 'pentagon':
+      return _ShapeChoiceType.pentagon;
     default:
       return _ShapeChoiceType.unknown;
   }
@@ -879,142 +879,164 @@ class _QuizScreenState extends State<QuizScreen> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
             child: renderChoicesAsShapes
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                ? Column(
                     children: [
-                      // ── 왼쪽 영역: 질문 및 바닥 프리뷰 ──
-                      Expanded(
-                        flex: 5,
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFDDE3F0), width: 1.5),
+                        ),
                         child: Column(
                           children: [
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                questionText,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: questionFontSize,
-                                  fontWeight: FontWeight.w800,
-                                  color: const Color(0xFF091F59),
-                                  height: 1.2,
-                                ),
+                            Text(
+                              questionText,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: questionFontSize,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF091F59),
+                                height: 1.2,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            _TessellationFloorPreview(
-                              height: floorPreviewHeight * 0.76, // 가로 배치에 어울리게 콤팩트하게 비율 조정
-                              selectedShape: selectedChoiceIndex != null
-                                  ? _parseShapeChoiceType(
-                                      choices[selectedChoiceIndex!].toString())
-                                  : null,
+                            const SizedBox(height: 6),
+                            Text(
+                              "(가이드: 오른쪽 보기에서 도형을 선택하여 왼쪽 모눈 바닥에 빈틈없이 채워지는지 관찰해 보세요.)",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: isMobile ? 12.0 : 14.0,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      // ── 오른쪽 영역: 2x2 큰 카드 도형 선택지 ──
+                      const SizedBox(height: 16),
                       Expanded(
-                        flex: 4,
-                        child: Column(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 8),
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: 4,
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                childAspectRatio: isMobile ? 1.05 : 1.25,
-                              ),
-                              itemBuilder: (context, index) {
-                                final selected = selectedChoiceIndex == index;
-                                final color = _optionColors[index % _optionColors.length];
-                                final isEnabled = index < choices.length;
-                                final choiceText = isEnabled
-                                    ? choices[index].toString()
-                                    : '준비 중';
-                                final shapeType = _parseShapeChoiceType(choiceText);
-                                final textColor = color.computeLuminance() > 0.55
-                                    ? const Color(0xFF163988)
-                                    : Colors.white;
-
-                                return AnimatedScale(
-                                  scale: selected ? 1.03 : 1.0,
-                                  duration: const Duration(milliseconds: 180),
-                                  curve: Curves.easeOutBack,
-                                  child: GestureDetector(
-                                    onTap: isEnabled
-                                        ? () => setState(() => selectedChoiceIndex = index)
+                            // ── 왼쪽 영역: 오직 바닥 프리뷰만 ──
+                            Expanded(
+                              flex: 5,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _TessellationFloorPreview(
+                                    height: floorPreviewHeight * 0.70,
+                                    selectedShape: selectedChoiceIndex != null
+                                        ? _parseShapeChoiceType(
+                                            choices[selectedChoiceIndex!].toString())
                                         : null,
-                                    child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 180),
-                                      curve: Curves.easeOut,
-                                      decoration: BoxDecoration(
-                                        color: selected ? color : Colors.white,
-                                        borderRadius: BorderRadius.circular(18),
-                                        border: Border.all(
-                                          color: selected
-                                              ? const Color(0xFF0B1F61)
-                                              : const Color(0xFFDDE3F0),
-                                          width: selected ? 4 : 2,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: selected
-                                                ? color.withValues(alpha: 0.4)
-                                                : const Color(0x14000000),
-                                            blurRadius: selected ? 18 : 8,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Spacer(),
-                                          _ShapeOptionSymbol(
-                                            type: shapeType,
-                                            color: selected ? textColor : color,
-                                            size: optionShapeSize,
-                                            selected: selected,
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Text(
-                                            choiceText,
-                                            style: TextStyle(
-                                              fontSize: isMobile ? 18 : 22,
-                                              fontWeight: FontWeight.w900,
-                                              color: selected
-                                                  ? textColor
-                                                  : const Color(0xFF2D3A5C),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            // ── 오른쪽 영역: 2x2 큰 카드 도형 선택지 ──
+                            Expanded(
+                              flex: 4,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemCount: 4,
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                      childAspectRatio: isMobile ? 1.05 : 1.25,
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      final selected = selectedChoiceIndex == index;
+                                      final color = _optionColors[index % _optionColors.length];
+                                      final isEnabled = index < choices.length;
+                                      final choiceText = isEnabled
+                                          ? choices[index].toString()
+                                          : '준비 중';
+                                      final shapeType = _parseShapeChoiceType(choiceText);
+                                      final textColor = color.computeLuminance() > 0.55
+                                          ? const Color(0xFF163988)
+                                          : Colors.white;
+
+                                      return AnimatedScale(
+                                        scale: selected ? 1.03 : 1.0,
+                                        duration: const Duration(milliseconds: 180),
+                                        curve: Curves.easeOutBack,
+                                        child: GestureDetector(
+                                          onTap: isEnabled
+                                              ? () => setState(() => selectedChoiceIndex = index)
+                                              : null,
+                                          child: AnimatedContainer(
+                                            duration: const Duration(milliseconds: 180),
+                                            curve: Curves.easeOut,
+                                            decoration: BoxDecoration(
+                                              color: selected ? color : Colors.white,
+                                              borderRadius: BorderRadius.circular(18),
+                                              border: Border.all(
+                                                color: selected
+                                                    ? const Color(0xFF0B1F61)
+                                                    : const Color(0xFFDDE3F0),
+                                                width: selected ? 4 : 2,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: selected
+                                                      ? color.withValues(alpha: 0.4)
+                                                      : const Color(0x14000000),
+                                                  blurRadius: selected ? 18 : 8,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                const Spacer(),
+                                                _ShapeOptionSymbol(
+                                                  type: shapeType,
+                                                  color: selected ? textColor : color,
+                                                  size: optionShapeSize,
+                                                  selected: selected,
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  choiceText,
+                                                  style: TextStyle(
+                                                    fontSize: isMobile ? 18 : 22,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: selected
+                                                        ? textColor
+                                                        : const Color(0xFF2D3A5C),
+                                                  ),
+                                                ),
+                                                const Spacer(),
+                                                if (selected)
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(bottom: 8),
+                                                    child: Icon(
+                                                      Icons.check_circle_rounded,
+                                                      color: textColor,
+                                                      size: 26,
+                                                    ),
+                                                  )
+                                                else
+                                                  const SizedBox(height: 34),
+                                              ],
                                             ),
                                           ),
-                                          const Spacer(),
-                                          if (selected)
-                                            Padding(
-                                              padding: const EdgeInsets.only(bottom: 8),
-                                              child: Icon(
-                                                Icons.check_circle_rounded,
-                                                color: textColor,
-                                                size: 26,
-                                              ),
-                                            )
-                                          else
-                                            const SizedBox(height: 34),
-                                        ],
-                                      ),
-                                    ),
+                                        ),
+                                      );
+                                    },
                                   ),
-                                );
-                              },
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -1307,20 +1329,59 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 }
 
-class _TriangleSymbolPainter extends CustomPainter {
+class _PentagonSymbolPainter extends CustomPainter {
   final Color color;
-  _TriangleSymbolPainter({required this.color});
+  _PentagonSymbolPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
+    final path = Path();
+    final double cx = size.width / 2;
+    final double cy = size.height / 2;
+    final double r = size.width * 0.46;
+    for (int i = 0; i < 5; i++) {
+      final double angle = -3.14159265 / 2 + (i * 2 * 3.14159265 / 5);
+      final double x = cx + r * math.cos(angle);
+      final double y = cy + r * math.sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _StarSymbolPainter extends CustomPainter {
+  final Color color;
+  _StarSymbolPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    final path = Path();
+    final double cx = size.width / 2;
+    final double cy = size.height / 2;
+    final double r = size.width * 0.50;
+    const n = 5;
+    for (var i = 0; i < n * 2; i++) {
+      final angle = (i * 3.14159265 / n) - 3.14159265 / 2;
+      final radius = i.isEven ? r : r * 0.45;
+      final x = cx + radius * math.cos(angle);
+      final y = cy + radius * math.sin(angle);
+      if (i == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
+    }
+    path.close();
     canvas.drawPath(path, paint);
   }
 
@@ -1360,13 +1421,19 @@ class _ShapeOptionSymbol extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         );
       case _ShapeChoiceType.star:
-        return Icon(Icons.star_rounded, size: size + 6, color: color);
-      case _ShapeChoiceType.triangle:
         return SizedBox(
           width: size,
           height: size,
           child: CustomPaint(
-            painter: _TriangleSymbolPainter(color: color),
+            painter: _StarSymbolPainter(color: color),
+          ),
+        );
+      case _ShapeChoiceType.pentagon:
+        return SizedBox(
+          width: size,
+          height: size,
+          child: CustomPaint(
+            painter: _PentagonSymbolPainter(color: color),
           ),
         );
       case _ShapeChoiceType.unknown:
@@ -1409,8 +1476,8 @@ class _TessellationFloorPreview extends StatelessWidget {
       case _ShapeChoiceType.star:
         hint = '별은 모양이 복잡해서 빈틈이 생겨요 ❌';
         canTile = false;
-      case _ShapeChoiceType.triangle:
-        hint = '정삼각형은 정사각형 모눈에 맞지 않아 빈틈이 생겨요 ❌';
+      case _ShapeChoiceType.pentagon:
+        hint = '정오각형은 어떻게 이어 붙여도 각도가 맞지 않아 빈틈이 생겨요 ❌';
         canTile = false;
       default:
         hint = '도형을 골라서 바닥에 깔아봐!';
@@ -1633,13 +1700,13 @@ class _TessellationFloorPainter extends CustomPainter {
         );
         break;
       case _ShapeChoiceType.circle:
-        canvas.drawCircle(center, size * 0.5, paint);
+        canvas.drawCircle(center, size * 0.38, paint);
         break;
       case _ShapeChoiceType.star:
-        _drawStar(canvas, center, size * 0.5, paint);
+        _drawStar(canvas, center, size * 0.35, paint);
         break;
-      case _ShapeChoiceType.triangle:
-        _drawTriangle(canvas, center, size * 0.5, paint);
+      case _ShapeChoiceType.pentagon:
+        _drawPentagon(canvas, center, size * 0.35, paint);
         break;
       default:
         break;
@@ -1657,13 +1724,13 @@ class _TessellationFloorPainter extends CustomPainter {
         );
         break;
       case _ShapeChoiceType.circle:
-        canvas.drawCircle(center, size * 0.5, paint);
+        canvas.drawCircle(center, size * 0.38, paint);
         break;
       case _ShapeChoiceType.star:
-        _drawStar(canvas, center, size * 0.5, paint);
+        _drawStar(canvas, center, size * 0.35, paint);
         break;
-      case _ShapeChoiceType.triangle:
-        _drawTriangle(canvas, center, size * 0.5, paint);
+      case _ShapeChoiceType.pentagon:
+        _drawPentagon(canvas, center, size * 0.35, paint);
         break;
       default:
         break;
@@ -1684,13 +1751,20 @@ class _TessellationFloorPainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-  void _drawTriangle(Canvas canvas, Offset center, double r, Paint paint) {
+  void _drawPentagon(Canvas canvas, Offset center, double r, Paint paint) {
     final path = Path();
     final x = center.dx;
     final y = center.dy;
-    path.moveTo(x, y - r);
-    path.lineTo(x + r * 0.866025, y + r * 0.5);
-    path.lineTo(x - r * 0.866025, y + r * 0.5);
+    for (int i = 0; i < 5; i++) {
+      final double angle = -3.14159265 / 2 + (i * 2 * 3.14159265 / 5);
+      final double px = x + r * _cos(angle);
+      final double py = y + r * _sin(angle);
+      if (i == 0) {
+        path.moveTo(px, py);
+      } else {
+        path.lineTo(px, py);
+      }
+    }
     path.close();
     canvas.drawPath(path, paint);
   }

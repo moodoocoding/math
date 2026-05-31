@@ -139,6 +139,15 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         vsync: this, duration: const Duration(milliseconds: 500));
     _seesawAnim = const AlwaysStoppedAnimation(0);
     AppBgmController.playProblem();
+
+    // 첫 진입 시 자동으로 0번 인덱스 도형(I자)을 세팅하여 왼쪽 시소 채움
+    _leftIdx = 0;
+    _leftPreset = math.Random().nextInt(2);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _animateSeesaw();
+      }
+    });
   }
 
   @override
@@ -483,27 +492,41 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
               ),
             ),
-            // 문제 안내 영역 (상세 지시문 보강)
+            // 문제 안내 영역 (상세 지시문 및 서브 가이드 보강)
             Container(
               width: double.infinity,
               margin: const EdgeInsets.fromLTRB(8, 12, 8, 8),
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(6)),
+                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                border: Border.all(color: const Color(0xFFDDE3F0), width: 1.5),
               ),
-              child: Text(
-                '문제: 왼쪽 시소에 놓인 도형을 보고, 오른쪽 시소의 알맞은 위치에 도형을 드래그해 올려놓아 시소의 균형을 맞춰 보세요!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: isMobile ? 18 : 25,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFF091F59),
-                  height: 1.25,
-                ),
+              child: Column(
+                children: [
+                  Text(
+                    '문제: 왼쪽 시소에 놓인 도형을 보고, 오른쪽 시소의 알맞은 위치에 도형을 드래그해 올려놓아 시소의 균형을 맞춰 보세요!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isMobile ? 18 : 25,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF091F59),
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '(가이드: 보관함에서 도형을 오른쪽 시소로 드래그하여 올려놓은 후, 도형을 탭하면 알맞은 방향으로 회전시킬 수 있습니다.)',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isMobile ? 12.0 : 14.0,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
               ),
             ),
-            _hintBar(),
             
             // 본문 영역: 가로 분할 구조 (기존 브릭 퍼즐 스타일 매칭)
             Expanded(
@@ -745,37 +768,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     );
   }
 
-  // ─────────────────────────────── 힌트 바
 
-  Widget _hintBar() {
-    final (msg, bg) = _hintInfo();
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      color: bg,
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Text(msg,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-              color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-    );
-  }
-
-  (String, Color) _hintInfo() {
-    if (_result == true) {
-      return ('🎉 정답! 왼쪽과 오른쪽의 토크가 같아요!', const Color(0xFF1B5E20));
-    }
-    if (_result == false) {
-      return ('❌ 균형이 맞지 않아요. 다른 카드나 위치를 찾아봐요!', const Color(0xFFB71C1C));
-    }
-    if (_leftIdx == null) {
-      return ('도형 조각을 드래그해서 왼쪽 시소에 먼저 채우거나, 원하는 조각을 끌어다 놓으세요.', const Color(0xFF163988));
-    }
-    if (_rightIdx == null) {
-      return ('도형 조각을 드래그해서 오른쪽 시소에 드롭하세요! (🔒 카드는 사용 불가)', const Color(0xFF1E88E5));
-    }
-    return ('시소의 도형을 탭하면 회전할 수 있어요! 다 마쳤다면 "정답 확인"을 누르세요.', const Color(0xFF2E7D32));
-  }
 
   // ─────────────────────────────── 시소 애니메이션
 
