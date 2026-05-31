@@ -1695,9 +1695,9 @@ class _Chapter2QrVerificationScreenState
     final value = rawValue.trim();
     if (value.isEmpty) return false;
 
-    // Convert to lowercase for English "luca" check
+    // Convert to lowercase for English "luca" and "cbnse.go.kr" checks
     final lower = value.toLowerCase();
-    if (lower.contains('luca')) return true;
+    if (lower.contains('luca') || lower.contains('cbnse.go.kr')) return true;
 
     // Check Korean "루카" in both NFC (루카) and NFD (ㄹㅜㅋㅏ) forms
     if (value.contains('루카') || value.contains('\u1105\u116E\u110F\u1161')) return true;
@@ -1705,7 +1705,7 @@ class _Chapter2QrVerificationScreenState
     try {
       final decoded = Uri.decodeFull(value);
       final decodedLower = decoded.toLowerCase();
-      if (decodedLower.contains('luca')) return true;
+      if (decodedLower.contains('luca') || decodedLower.contains('cbnse.go.kr')) return true;
       if (decoded.contains('루카') || decoded.contains('\u1105\u116E\u110F\u1161')) return true;
     } catch (_) {
       // Ignore decoding errors
