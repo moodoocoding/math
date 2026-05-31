@@ -203,21 +203,8 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     _animateSeesaw();
   }
 
-  void _selectRight(int idx) {
-    if (_leftIdx == null || idx == _leftIdx) return;
-    HapticFeedback.selectionClick();
-    AppSfxController.playClick();
-    setState(() {
-      _rightIdx = idx;
-      _rightRot = 0;
-      _rightDist = 1;
-      _ghostPlaced = false;
-      _result = null;
-    });
-  }
-
   void _rotate() {
-    if (_rightIdx == null || _ghostPlaced) return;
+    if (_rightIdx == null) return;
     final card = _kCards[_rightIdx!];
     int nextRot = (_rightRot + 1) % card.rotCount;
     int dist = _rightDist;
@@ -228,30 +215,14 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       _rightRot = nextRot;
       _rightDist = dist;
     });
-  }
-
-  void _shift(int delta) {
-    if (_rightIdx == null || _ghostPlaced) return;
-    final next = _rightDist + delta;
-    if (_kCards[_rightIdx!].isValidAt(_rightRot, next)) {
-      HapticFeedback.selectionClick();
-      AppSfxController.playClick();
-      setState(() => _rightDist = next);
-    }
-  }
-
-  void _placeGhost() {
-    if (_rightIdx == null || _ghostPlaced) return;
-    HapticFeedback.mediumImpact();
-    AppSfxController.playClick();
-    setState(() => _ghostPlaced = true);
-    _animateSeesaw();
+    _animateSeesaw(); // 회전 시 즉시 물리 반응 업데이트
   }
 
   void _undoGhost() {
     HapticFeedback.lightImpact();
     AppSfxController.playClick();
     setState(() {
+      _rightIdx = null;
       _ghostPlaced = false;
       _result = null;
     });
@@ -510,11 +481,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     final mq = MediaQuery.of(context);
     final isMobile = mq.size.width < 600;
 
-    // 화면 너비 기준으로 셀 크기와 간격을 계산 (중앙 정렬 정렬의 일관성 유지)
-    final double availWidth = mq.size.width - 24 - (isMobile ? 16 : 32);
-    final double cellSz = (availWidth / 11.8).clamp(22.0, 38.0);
-    final double gap = cellSz * 0.13;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF0F8FF),
       appBar: _appBar(),
@@ -530,38 +496,68 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
               ),
             ),
-            // 문제 안내 영역 (기존 게임들과 디자인 일치)
+            // 문제 안내 영역 (상세 지시문 보강)
             Container(
               width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(8, 12, 8, 10),
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              margin: const EdgeInsets.fromLTRB(8, 12, 8, 8),
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
               child: Text(
-                '도형을 양쪽 시소에 올려 균형을 맞춰 보세요!',
+                '문제: 왼쪽 시소에 놓인 도형을 보고, 오른쪽 시소의 알맞은 위치에 도형을 드래그해 올려놓아 시소의 균형을 맞춰 보세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isMobile ? 20 : 28,
+                  fontSize: isMobile ? 18 : 25,
                   fontWeight: FontWeight.w900,
                   color: const Color(0xFF091F59),
+                  height: 1.25,
                 ),
               ),
             ),
-            _cardRow(isMobile),
             _hintBar(),
+            
+            // 본문 영역: 가로 분할 구조 (기존 브릭 퍼즐 스타일 매칭)
             Expanded(
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  _seesawWidget(mq.size.width, cellSz, gap),
-                  Expanded(child: _grid(cellSz, gap)),
-                  if (_rightIdx != null && !_ghostPlaced) _ghostControls(),
-                  _bottomBar(mq),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final double availWidth = constraints.maxWidth;
+                    final double storageWidth = availWidth * 0.28;
+                    final double gameAreaWidth = availWidth * 0.70;
+
+                    // 우측 시소/그리드 영역을 위한 셀 크기 계산
+                    final double cellSz = (gameAreaWidth / 11.8).clamp(20.0, 36.0);
+                    final double gap = cellSz * 0.13;
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // [왼쪽] 도형 보관함 (28% 너비)
+                        SizedBox(
+                          width: storageWidth,
+                          child: _buildStorage(storageWidth, isMobile),
+                        ),
+                        SizedBox(width: availWidth * 0.02),
+                        // [오른쪽] 시소 및 5x5 그리드 보드 (70% 너비)
+                        Expanded(
+                          child: Column(
+                            children: [
+                              _seesawWidget(gameAreaWidth, cellSz, gap),
+                              const SizedBox(height: 6),
+                              Expanded(child: _grid(cellSz, gap)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
+            _bottomBar(mq),
           ],
         ),
       ),
@@ -597,110 +593,150 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         ],
       );
 
-  // ─────────────────────────────── 카드 선택 행
+  // ─────────────────────────────── 좌측 세로 도형 보관함
 
-  Widget _cardRow(bool isMobile) {
-    final h = isMobile ? 100.0 : 118.0;
+  Widget _buildStorage(double width, bool isMobile) {
     return Container(
-      height: h,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: const Color(0xFFF4C430), width: 2),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _kCards.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (_, i) => _cardTile(i, h - 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10, left: 2),
+            child: Text(
+              '도형 조각',
+              style: TextStyle(
+                fontSize: isMobile ? 15 : 18,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF163988),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
+              itemCount: _kCards.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              itemBuilder: (context, i) {
+                final card = _kCards[i];
+                final isLeft = _leftIdx == i;
+                final isRight = _rightIdx == i;
+
+                // 드래그 대상 빌드
+                Widget cardTile = _storageCardTile(i, width - 24, isLeft, isRight);
+
+                // 왼쪽에 자물쇠 잠겨있거나 이미 배치된 도형인 경우 드래그 제한
+                if (isLeft) {
+                  return cardTile; // 드래그 불가능
+                }
+
+                return Draggable<_CardDef>(
+                  data: card,
+                  maxSimultaneousDrags: isRight ? 0 : 1, // 우측에 이미 배치되어 있으면 드래그 제한 (우측 그리드 내에서 드래그 가능하므로)
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: Opacity(
+                      opacity: 0.75,
+                      child: SizedBox(
+                        width: (width - 24) * 0.9,
+                        height: (width - 24) * 0.9,
+                        child: CustomPaint(
+                          painter: _MiniShapePainter(
+                            cells: card.rotations[0],
+                            color: card.color,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  childWhenDragging: Opacity(
+                    opacity: 0.4,
+                    child: cardTile,
+                  ),
+                  onDragStarted: () {
+                    // 왼쪽 카드가 먼저 선택되어 잠겨있지 않다면,
+                    // 학생이 드래그를 시작할 때 자동으로 첫번째 카드로 탭하게 유도
+                    if (_leftIdx == null) {
+                      _selectLeft(i);
+                    }
+                  },
+                  child: cardTile,
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _cardTile(int idx, double size) {
+  Widget _storageCardTile(int idx, double tileSize, bool isLeft, bool isRight) {
     final card = _kCards[idx];
-    final isLeft = _leftIdx == idx;
-    final isRight = _rightIdx == idx;
 
-    return GestureDetector(
-      onTap: () {
-        if (_leftIdx == null) {
-          _selectLeft(idx);
-        } else if (!isLeft) {
-          _selectRight(idx);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
+    return Container(
+      width: tileSize,
+      height: tileSize * 0.9,
+      decoration: BoxDecoration(
+        color: isLeft
+            ? Colors.black.withAlpha(140)
+            : isRight
+                ? card.color.withValues(alpha: 0.35) // 배치되어 있으면 희미하게 표시
+                : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
           color: isLeft
-              ? Colors.black.withAlpha(140)
+              ? Colors.black54
               : isRight
-                  ? card.color
-                  : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isLeft
-                ? Colors.black54
-                : isRight
-                    ? Colors.white
-                    : card.color,
-            width: isRight ? 3 : 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: (isLeft ? Colors.black : card.color).withAlpha(80),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
+                  ? card.color.withValues(alpha: 0.5)
+                  : card.color,
+          width: 2,
         ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(6, 6, 6, 18),
-              child: Center(
-                child: CustomPaint(
-                  size: Size.square(size - 26),
-                  painter: _MiniShapePainter(
-                    cells: card.rotations[0],
-                    color: isLeft
-                        ? Colors.white.withAlpha(80)
-                        : isRight
-                            ? Colors.white
-                            : card.color,
-                  ),
-                ),
-              ),
-            ),
-            if (isLeft)
-              Center(
-                child: Icon(Icons.lock_rounded,
-                    color: Colors.white.withAlpha(160), size: size * 0.28)),
-            Positioned(
-              bottom: 4,
-              left: 0,
-              right: 0,
-              child: Text(
-                card.name,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(6, 6, 6, 18),
+            child: Center(
+              child: CustomPaint(
+                size: Size.square(tileSize * 0.55),
+                painter: _MiniShapePainter(
+                  cells: card.rotations[0],
                   color: isLeft
-                      ? Colors.white54
+                      ? Colors.white.withAlpha(80)
                       : isRight
-                          ? Colors.white
+                          ? card.color.withValues(alpha: 0.5)
                           : card.color,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          if (isLeft)
+            Center(
+              child: Icon(Icons.lock_rounded,
+                  color: Colors.white.withAlpha(160), size: tileSize * 0.28)),
+          Positioned(
+            bottom: 4,
+            left: 0,
+            right: 0,
+            child: Text(
+              card.name,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: isLeft
+                    ? Colors.white54
+                    : isRight
+                        ? card.color
+                        : card.color,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -729,15 +765,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       return ('❌ 균형이 맞지 않아요. 다른 카드나 위치를 찾아봐요!', const Color(0xFFB71C1C));
     }
     if (_leftIdx == null) {
-      return ('카드를 선택해서 왼쪽 시소에 올려보세요!', const Color(0xFF163988));
+      return ('도형 조각을 드래그해서 왼쪽 시소에 먼저 채우거나, 원하는 조각을 끌어다 놓으세요.', const Color(0xFF163988));
     }
     if (_rightIdx == null) {
-      return ('균형 맞출 카드를 선택하세요 (🔒 카드는 선택 불가)', const Color(0xFF1E88E5));
+      return ('도형 조각을 드래그해서 오른쪽 시소에 드롭하세요! (🔒 카드는 사용 불가)', const Color(0xFF1E88E5));
     }
-    if (!_ghostPlaced) {
-      return ('그리드를 탭하거나 화살표를 눌러 위치를 정하고 "추 놓기"를 누르세요', const Color(0xFF2E7D32));
-    }
-    return ('"정답 확인" 버튼을 눌러보세요!', const Color(0xFF00695C));
+    return ('시소의 도형을 탭하면 회전할 수 있어요! 다 마쳤다면 "정답 확인"을 누르세요.', const Color(0xFF2E7D32));
   }
 
   // ─────────────────────────────── 시소 애니메이션
@@ -765,21 +798,18 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   // ─────────────────────────────── 그리드
 
   Widget _grid(double cellSz, double gap) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Column(
-        children: [
-          _distRow(cellSz, gap),
-          const SizedBox(height: 6),
-          for (int r = 1; r <= 4; r++)
-            Padding(
-              padding: EdgeInsets.only(bottom: gap),
-              child: _gridRow(r, cellSz, gap),
-            ),
-          const SizedBox(height: 6),
-          _distRow(cellSz, gap),
-        ],
-      ),
+    return Column(
+      children: [
+        _distRow(cellSz, gap),
+        const SizedBox(height: 6),
+        for (int r = 1; r <= 4; r++)
+          Padding(
+            padding: EdgeInsets.only(bottom: gap),
+            child: _gridRow(r, cellSz, gap),
+          ),
+        const SizedBox(height: 6),
+        _distRow(cellSz, gap),
+      ],
     );
   }
 
@@ -855,82 +885,92 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             ),
           ),
         ),
-        // 오른쪽: 거리 1→5 (터치 시 해당 위치로 즉시 이동하는 기능 구현)
+        // 오른쪽: 거리 1→5 (드래그앤드롭 및 탭 회전 처리 영역)
         for (int d = 1; d <= 5; d++)
           Padding(
             padding: EdgeInsets.only(right: d < 5 ? gap : 0),
-            child: GestureDetector(
-              onTap: () {
-                if (_rightIdx == null || _ghostPlaced) return;
-                // 해당 위치로의 배치 유효성 체크 후 이동
-                if (_kCards[_rightIdx!].isValidAt(_rightRot, d)) {
-                  HapticFeedback.selectionClick();
-                  AppSfxController.playClick();
-                  setState(() => _rightDist = d);
-                }
+            child: DragTarget<_CardDef>(
+              onWillAcceptWithDetails: (details) {
+                final card = details.data;
+                final cardIndex = _kCards.indexOf(card);
+                if (cardIndex == _leftIdx) return false;
+                // 드롭하려는 위치가 유효한지 확인
+                return card.isValidAt(_rightRot, d);
               },
-              child: _Cell(
-                size: sz,
-                hasWeight: _ghostPlaced && ghostDists.contains(d),
-                isGhost: !_ghostPlaced && ghostDists.contains(d),
-                color: rightColor,
-              ),
+              onAcceptWithDetails: (details) {
+                final card = details.data;
+                final cardIndex = _kCards.indexOf(card);
+                setState(() {
+                  _rightIdx = cardIndex;
+                  _rightDist = d;
+                  _ghostPlaced = true;
+                  _result = null;
+                });
+                _animateSeesaw();
+              },
+              builder: (context, candidateData, rejectedData) {
+                final isHovering = candidateData.isNotEmpty;
+                final isOccupied = _ghostPlaced && ghostDists.contains(d);
+
+                Widget cellWidget = _Cell(
+                  size: sz,
+                  hasWeight: isOccupied,
+                  isGhost: false,
+                  color: isHovering ? rightColor.withValues(alpha: 0.4) : rightColor,
+                  isHovering: isHovering,
+                );
+
+                // 이미 올려진 도형은 탭하면 회전하고 다시 드래그할 수 있게 지원
+                if (isOccupied) {
+                  cellWidget = Draggable<_CardDef>(
+                    data: _kCards[_rightIdx!],
+                    maxSimultaneousDrags: 1,
+                    feedback: Material(
+                      color: Colors.transparent,
+                      child: Opacity(
+                        opacity: 0.7,
+                        child: SizedBox(
+                          width: sz * 3,
+                          height: sz * 3,
+                          child: CustomPaint(
+                            painter: _MiniShapePainter(
+                              cells: _kCards[_rightIdx!].rotations[_rightRot],
+                              color: _kCards[_rightIdx!].color,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    childWhenDragging: _Cell(
+                      size: sz,
+                      hasWeight: false,
+                      isGhost: false,
+                      color: Colors.grey.shade300,
+                    ),
+                    onDragStarted: () {
+                      // 드래그를 다시 집어 올리면 임시 배치 해제
+                      setState(() {
+                        _ghostPlaced = false;
+                        _result = null;
+                      });
+                      _animateSeesaw();
+                    },
+                    child: GestureDetector(
+                      onTap: _rotate, // 탭하면 회전
+                      child: cellWidget,
+                    ),
+                  );
+                }
+
+                return cellWidget;
+              },
             ),
           ),
       ],
     );
   }
 
-  // ─────────────────────────────── 고스트 컨트롤
-
-  Widget _ghostControls() {
-    if (_rightIdx == null) return const SizedBox.shrink();
-    final card = _kCards[_rightIdx!];
-    final canL = _rightDist > 1;
-    final canR = card.isValidAt(_rightRot, _rightDist + 1);
-
-    return Container(
-      color: const Color(0xFFE8EAF6),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // ← 이동
-          _CtrlBtn(
-            icon: Icons.chevron_left_rounded,
-            enabled: canL,
-            color: card.color,
-            onTap: () => _shift(-1),
-          ),
-          // 회전 + 추 놓기
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            if (card.rotCount > 1) ...[
-              _PillBtn(
-                label: '↻ ${card.rotationLabels[_rightRot]}',
-                color: card.color,
-                onTap: _rotate,
-              ),
-              const SizedBox(width: 8),
-            ],
-            _PillBtn(
-              label: '⬇ 추 놓기',
-              color: const Color(0xFF00897B),
-              onTap: _placeGhost,
-            ),
-          ]),
-          // → 이동
-          _CtrlBtn(
-            icon: Icons.chevron_right_rounded,
-            enabled: canR,
-            color: card.color,
-            onTap: () => _shift(1),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ─────────────────────────────── 하단 바
+  // ─────────────────────────────── 하단 바 (토크 텍스트 삭제 및 버튼 일치)
 
   Widget _bottomBar(MediaQueryData mq) {
     return Container(
@@ -941,18 +981,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + mq.padding.bottom),
       child: Row(
         children: [
-          // 토크 표시
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _torqueText('왼쪽 토크', _leftTorque, const Color(0xFF1E88E5)),
-              const SizedBox(height: 2),
-              _torqueText('오른쪽 토크', _rightTorque, const Color(0xFF43A047)),
-            ],
-          ),
+          // 기존 토크 표시(왼쪽 하단)는 요구에 따라 전면 삭제됨
           const Spacer(),
-          // 버튼 정렬
+          // 버튼 정렬 (기존 브릭 퍼즐 버튼 구성 매칭)
           OutlinedButton.icon(
             onPressed: _showHint,
             icon: const Icon(Icons.lightbulb_outline, size: 20),
@@ -1015,8 +1046,8 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 ),
                 onPressed: _undoGhost,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8A8A8A),
-                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFFE8EAF6),
+                  foregroundColor: const Color(0xFF1A237E),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1025,45 +1056,27 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               const SizedBox(width: 8),
             ],
-            if (_ghostPlaced)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.check_circle, size: 20),
-                label: const Text(
-                  '정답 확인',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-                ),
-                onPressed: _check,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF123E97),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.check_circle, size: 20),
+              label: const Text(
+                '정답 확인',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+              ),
+              onPressed: _ghostPlaced ? _check : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF123E97),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
+            ),
           ],
         ],
       ),
     );
   }
-
-  Widget _torqueText(String side, int t, Color c) => RichText(
-        text: TextSpan(
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-          children: [
-            TextSpan(
-                text: '$side: ',
-                style: TextStyle(color: c.withAlpha(200))),
-            TextSpan(
-                text: '$t',
-                style: TextStyle(
-                    color: c,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16)),
-          ],
-        ),
-      );
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1075,12 +1088,14 @@ class _Cell extends StatelessWidget {
   final bool hasWeight;
   final bool isGhost;
   final Color color;
+  final bool isHovering;
 
   const _Cell({
     required this.size,
     required this.hasWeight,
     required this.isGhost,
     required this.color,
+    this.isHovering = false,
   });
 
   @override
@@ -1093,21 +1108,21 @@ class _Cell extends StatelessWidget {
         shape: BoxShape.circle,
         color: hasWeight
             ? color
-            : isGhost
-                ? color.withAlpha(90)
+            : isHovering
+                ? color.withValues(alpha: 0.25)
                 : const Color(0xFFCFD8DC),
         border: Border.all(
           color: hasWeight
-              ? color.withAlpha(230)
-              : isGhost
-                  ? color.withAlpha(170)
+              ? color.withValues(alpha: 0.9)
+              : isHovering
+                  ? color.withValues(alpha: 0.8)
                   : const Color(0xFFB0BEC5),
-          width: hasWeight || isGhost ? 2.5 : 1.2,
+          width: hasWeight || isHovering ? 2.5 : 1.2,
         ),
         boxShadow: hasWeight
             ? [
                 BoxShadow(
-                    color: color.withAlpha(115),
+                    color: color.withValues(alpha: 0.45),
                     blurRadius: 5,
                     offset: const Offset(0, 2))
               ]
@@ -1120,79 +1135,11 @@ class _Cell extends StatelessWidget {
                 height: size * 0.4,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withAlpha(100),
+                  color: Colors.white.withValues(alpha: 0.38),
                 ),
               ),
             )
           : null,
-    );
-  }
-}
-
-class _CtrlBtn extends StatelessWidget {
-  final IconData icon;
-  final bool enabled;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _CtrlBtn(
-      {required this.icon,
-      required this.enabled,
-      required this.color,
-      required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: enabled ? onTap : null,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: enabled ? color.withAlpha(38) : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(12),
-          border:
-              Border.all(color: enabled ? color : Colors.grey.shade300),
-        ),
-        child:
-            Icon(icon, color: enabled ? color : Colors.grey.shade400),
-      ),
-    );
-  }
-}
-
-class _PillBtn extends StatelessWidget {
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _PillBtn(
-      {required this.label, required this.color, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-                color: color.withAlpha(100),
-                blurRadius: 6,
-                offset: const Offset(0, 2))
-          ],
-        ),
-        child: Text(label,
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 13)),
-      ),
     );
   }
 }
