@@ -721,9 +721,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     final double gameAreaWidth = availWidth * 0.70;
 
                     // 우측 시소/그리드 영역을 위한 셀 크기 계산 (가로 세로 비율 모두 반영하여 화면 넘침 방지)
-                    final double cellSzWidth = gameAreaWidth / 11.8;
-                    final double cellSzHeight = (constraints.maxHeight - 190) / 4.6;
-                    final double cellSz = math.min(cellSzWidth, cellSzHeight).clamp(30.0, 56.0);
+                    final double cellSzWidth = gameAreaWidth / 12.5;
+                    final double cellSzHeight = (constraints.maxHeight - 190) / 4.8;
+                    final double cellSz = math.min(cellSzWidth, cellSzHeight).clamp(28.0, 48.0);
                     final double gap = cellSz * 0.13;
 
                     return Row(
@@ -803,12 +803,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.zero,
-              physics: const ClampingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 1.05,
+                crossAxisSpacing: 6,
+                mainAxisSpacing: 6,
+                childAspectRatio: 1.25,
               ),
               itemCount: _kCards.length,
               itemBuilder: (context, i) {
@@ -878,7 +878,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
     return Container(
       width: tileSize,
-      height: tileSize * 0.9,
+      height: tileSize * 0.78,
       decoration: BoxDecoration(
         color: isUsed
             ? Colors.black.withAlpha(100)

@@ -1669,6 +1669,10 @@ class _Chapter2QrVerificationScreenState
   }
 
   Future<void> _startScanner() async {
+    if (kDebugMode) {
+      // In debug/test mode, we do NOT spin up the physical camera scanner.
+      return;
+    }
     if (!mounted || _isStartingScanner) return;
     if (_scannerController.value.isRunning) return;
 
@@ -1963,22 +1967,45 @@ class _Chapter2QrVerificationScreenState
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              RotatedBox(
-                                quarterTurns: _previewRotationTurns,
-                                child: MobileScanner(
-                                  controller: _scannerController,
-                                  errorBuilder: (context, error, child) {
-                                    return _buildScannerError(error);
-                                  },
-                                  onDetect: (capture) {
-                                    final rawValue = capture.barcodes
-                                        .map((barcode) => barcode.rawValue?.trim() ?? '')
-                                        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
-                                    if (rawValue.isEmpty) return;
-                                    _handleDetection(rawValue);
-                                  },
+                              if (kDebugMode)
+                                Container(
+                                  color: Colors.black.withValues(alpha: 0.8),
+                                  child: const Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.camera_alt_outlined, color: Colors.white60, size: 56),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          '테스트 모드\n카메라 비활성화됨',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              else
+                                RotatedBox(
+                                  quarterTurns: _previewRotationTurns,
+                                  child: MobileScanner(
+                                    controller: _scannerController,
+                                    errorBuilder: (context, error, child) {
+                                      return _buildScannerError(error);
+                                    },
+                                    onDetect: (capture) {
+                                      final rawValue = capture.barcodes
+                                          .map((barcode) => barcode.rawValue?.trim() ?? '')
+                                          .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                      if (rawValue.isEmpty) return;
+                                      _handleDetection(rawValue);
+                                    },
+                                  ),
                                 ),
-                              ),
                               IgnorePointer(
                                 child: Container(
                                   decoration: BoxDecoration(
