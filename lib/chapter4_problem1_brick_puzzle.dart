@@ -358,7 +358,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               ),
               const SizedBox(height: 20),
               const Text(
-                '🎉 정답입니다! 🎉',
+                '🎉 블록판의 빛이 켜졌어요! 🎉',
                 style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w900,
@@ -368,7 +368,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                '완벽하게 완성했네요!\n정말 잘했어요!',
+                '숫자 모양이 반짝이며 이어졌어요!\n다음 단서가 열리고 있어요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 30,
@@ -460,7 +460,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                '다시 한 번 시도해 보세요!\n좀 더 생각해서 맞춰봐요!',
+                '아직 빈 곳이 남아 있어요!\n블록의 자리를 다시 살펴봐요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 30,
@@ -623,7 +623,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
               child: Text(
-                '문제1: 알맞은 블록을 선택해 숫자 모양을 채워 주세요',
+                '빛나는 숫자판이 모두 이어지도록 알맞은 블록을 놓아 보세요',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: isCompact ? 28 : 38,
@@ -723,7 +723,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                           onPressed: _checkAnswer,
                           icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
                           label: Text(
-                            '정답 확인',
+                            '블록 확인',
                             style: TextStyle(
                               fontSize: isMobile ? 16 : 20,
                               fontWeight: FontWeight.w800,

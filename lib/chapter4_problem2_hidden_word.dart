@@ -214,7 +214,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 20),
               const Text(
-                '🎉 정답입니다! 🎉',
+                '🎉 숨은 단서를 모두 찾았어요! 🎉',
                 style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w900,
@@ -224,7 +224,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                'AI & 코딩 낱말을 모두 찾았어요!\n정말 훌륭해요!',
+                '코딩 단서들이 하나로 이어졌어요!\n파란 불빛이 다음 길을 비추고 있어요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 30,
@@ -320,7 +320,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                '찾아야 할 낱말: \'$hintWord\'',
+                '찾아야 할 단서 낱말: \'$hintWord\'',
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
@@ -329,7 +329,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                '위치 힌트: ${targetWord.startRow + 1}번째 줄, ${targetWord.startCol + 1}번째 칸에서 시작해서 ${targetWord.direction == 'horizontal' ? '가로(오른쪽)' : '세로(아래쪽)'} 방향으로 있습니다!\n글자판에 빨간색으로 표시된 글자들을 찾아보세요.',
+                '위치 힌트: ${targetWord.startRow + 1}번째 줄, ${targetWord.startCol + 1}번째 칸에서 ${targetWord.direction == 'horizontal' ? '가로(오른쪽)' : '세로(아래쪽)'} 방향으로 단서가 이어져요.\n빨간색으로 반짝이는 글자를 따라가 보세요.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 22,
@@ -435,7 +435,10 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 30),
           onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
         ),
-        title: const Text('2단계: AI & 코딩 낱말 찾기', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           const BgmToggleButton(iconSize: 32),
           IconButton(
@@ -456,7 +459,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
               child: Text(
-                '문제2: 글자판에서 앞서 풀었던 9개의 AI & 코딩 낱말을 모두 찾으세요!',
+                '글자판 속에 숨어든 AI와 코딩 단서 낱말을 모두 찾아보세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: isCompact ? 22 : 28,
@@ -546,7 +549,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                           onPressed: _checkAnswer,
                           icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
                           label: Text(
-                            '정답 확인',
+                            '단서 확인',
                             style: TextStyle(fontSize: isMobile ? 16 : 18),
                           ),
                           style: ElevatedButton.styleFrom(

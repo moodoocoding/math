@@ -194,7 +194,7 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
         ),
         centerTitle: true,
         title: const Text(
-          '미션 완료! 반짝별의 귀환',
+          '미션! 수학체험센터의 반짝별을 찾아서',
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         actions: [

@@ -35,37 +35,37 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
     _QuizQuestion(
       question: '컴퓨터과학의 선구자로, 알고리즘과 계산 개념을 튜링 기계로 형식화하고, 기계 지능을 평가하는 튜링 테스트를 제안한 수학자는 누구일까요?',
       correctAnswer: '앨런 튜링',
-      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      choices: ['앨런 튜링', '최석정', '피보나치', '가우스'],
       explanation: '제2차 세계대전 당시 독일군의 극비 암호인 \'에니그마\'를 해독하여 연합군의 승리를 견인하고 인류 수천만 명의 목숨을 구했습니다.',
     ),
     _QuizQuestion(
       question: '『구수략』을 저술하고, 오일러의 직교 라틴 마방진보다 61년 앞서 마방진을 연구한 수학자는 누구일까요?',
       correctAnswer: '최석정',
-      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      choices: ['최석정', '앨런 튜링', '이상설', '이임학'],
       explanation: '오일러보다 61년 앞서 직교라틴방진을 발견했고, 마방진의 구성 원리를 음양오행 및 주역의 원리와 접목하여 철학적으로 규명했습니다.',
     ),
     _QuizQuestion(
       question: '이탈리아의 수학자로, 『산반서』를 저술하고 인도-아라비아 수 체계를 유럽에 소개하여 피보나치 수열로도 널리 알려진 수학자는 누구일까요?',
       correctAnswer: '피보나치',
-      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      choices: ['피보나치', '가우스', '최석정', '앨런 튜링'],
       explanation: '그가 소개한 수열은 꽃잎 수, 파인애플 비늘, 달팽이 껍질 등 대자연의 황금비율 속에서 끊임없이 발견되는 신비한 성질을 가집니다.',
     ),
     _QuizQuestion(
       question: '1부터 100까지의 합을 순식간에 구한 일화로 유명하며, 정수론, 전자기학 등 수학과 과학의 다양한 분야에 큰 업적을 남겨 \'수학의 왕\'으로 불리는 수학자는 누구일까요?',
       correctAnswer: '가우스',
-      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      choices: ['가우스', '피보나치', '최석정', '이임학'],
       explanation: '그는 정17각형을 작도하는 방법을 눈금 없는 자와 컴퍼스만으로 발견하여 자신의 묘비에 정17각형을 새겨달라고 유언을 남겼습니다.',
     ),
     _QuizQuestion(
       question: '헤이그 특사 중 한 명이자 독립운동가로, 한국 최초의 근대 수학 교과서인 『산술신서』를 저술하여 한국 근대 수학교육의 아버지로 불리는 분은 누구일까요?',
       correctAnswer: '이상설',
-      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      choices: ['이상설', '이임학', '최석정', '가우스'],
       explanation: '그는 헤이그 특사 파견 외에도 최초의 신학문 학교인 서전서숙을 세워 수학을 직접 가르쳤으며 대한제국 최고의 수학 천재로 칭송받았습니다.',
     ),
     _QuizQuestion(
       question: '‘리 군(Ree group)’ 이론으로 세계 수학계에 이름을 알렸으며, 캐나다 수학회 등에서 활약하며 세계에 이름을 알린 최초의 한국인 수학자는 누구일까요?',
       correctAnswer: '이임학',
-      choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
+      choices: ['이임학', '이상설', '앨런 튜링', '피보나치'],
       explanation: '미국 수학회지에 실린 논문을 우연히 발견해 편지로 수학적 오류를 지적하면서 세계적인 천재로 인정받았고 이 메일은 리 군 이론의 시초가 되었습니다.',
     ),
   ];
@@ -75,10 +75,21 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
     super.initState();
     AppBgmController.playProblem();
     _shuffledChoices = _questions.map((q) {
-      final list = List<String>.from(q.choices);
+      final list = _ensureAnswerChoice(q.choices, q.correctAnswer);
       list.shuffle();
       return list;
     }).toList();
+  }
+
+  static List<String> _ensureAnswerChoice(
+    List<String> choices,
+    String correctAnswer,
+  ) {
+    final list = List<String>.from(choices);
+    if (list.contains(correctAnswer)) return list;
+    if (list.isEmpty) return [correctAnswer];
+    list[list.length - 1] = correctAnswer;
+    return list;
   }
 
   void _handleChoice(String selectedChoice) {
@@ -94,7 +105,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
           content: Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: const Text(
-              '❌ 오답입니다. 다시 한번 잘 생각해 보세요!',
+              '아직 알맞은 인물이 아니에요. 단서를 다시 살펴보세요!',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -134,7 +145,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
               ),
               const SizedBox(height: 18),
               const Text(
-                '정답입니다! 🎉',
+                '단서를 찾았어요! 🎉',
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w900,
@@ -175,7 +186,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: const Text(
-                    '다음 문제',
+                    '다음 초상화 보기',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
                   ),
                 ),
@@ -219,7 +230,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
               ),
               const SizedBox(height: 18),
               const Text(
-                '퀴즈 통과! 🌟',
+                '초상화의 문이 열렸어요! 🌟',
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w900,
@@ -229,7 +240,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                '수학자 인물 퀴즈를 모두 맞혔습니다!\n다음은 수학자들의 이름을 글자판에서 찾아보세요.',
+                '수학자들의 이름이 빛 글자로 떠올랐어요.\n이제 글자판 속 이름들을 찾아보세요.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
@@ -255,7 +266,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: const Text(
-                    '낱말 찾기 시작',
+                    '빛 글자 찾기',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
                   ),
                 ),
@@ -287,7 +298,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
           onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
         ),
         title: const Text(
-          '1단계: 역사 속 위대한 수학자 퀴즈',
+          '미션! 수학체험센터의 반짝별을 찾아서',
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
         ),
         actions: [

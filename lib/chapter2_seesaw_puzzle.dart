@@ -463,7 +463,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               const SizedBox(height: 20),
               const Text(
-                '🎉 정답입니다! 🎉',
+                '🎉 균형의 빛이 켜졌어요! 🎉',
                 style: TextStyle(
                   fontSize: 38,
                   fontWeight: FontWeight.w900,
@@ -473,7 +473,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               const SizedBox(height: 12),
               const Text(
-                '양쪽 시소의 균형이 아주 잘 맞아요!\n정말 훌륭해요!',
+                '양쪽 힘이 딱 맞았어요!\n시소 아래 장치가 열리고 있어요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
@@ -540,7 +540,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               const SizedBox(height: 20),
               const Text(
-                '아직 균형이 맞지 않아요!',
+                '아직 균형이 한쪽으로 기울었어요!',
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w900,
@@ -550,7 +550,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               const SizedBox(height: 12),
               const Text(
-                '다시 한번 올려볼까요?\n위치와 방향을 잘 어림해 보세요!',
+                '도형이 놓인 자리의 힘을 다시 살펴볼까요?\n위치와 방향을 조금 바꿔 보세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
@@ -575,7 +575,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     ),
                   ),
                   child: const Text(
-                    '다시 해보기',
+                    '다시 맞춰보기',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -687,7 +687,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               child: Column(
                 children: [
                   Text(
-                    '문제: 시소가 균형을 이루도록 도형을 움직여 보세요',
+                    '반짝이는 시소의 양쪽 힘이 같아지도록 도형을 움직여 보세요',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: isMobile ? 18 : 25,
@@ -1448,7 +1448,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             ElevatedButton.icon(
               icon: const Icon(Icons.check_circle, size: 20),
               label: const Text(
-                '정답 확인',
+                '균형 확인',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
               ),
               onPressed: (_leftPlaced && _rightPlaced) ? _check : null,

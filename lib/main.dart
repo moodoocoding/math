@@ -921,10 +921,10 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
     showPremiumFeedbackDialog(
       context: context,
       isCorrect: correct,
-      title: correct ? '성공!' : '다시 도전!',
+      title: correct ? '무늬의 빛이 맞춰졌어요!' : '아직 무늬가 깨어나지 않았어요',
       message: correct
-          ? '목표 모양을 정확히 만들었어요!'
-          : '아직 목표 모양과 달라요. 조각을 다시 옮겨 보세요.',
+          ? '조각들이 한 그림으로 이어지며 다음 길이 밝아졌어요!'
+          : '조각의 자리와 방향을 다시 살펴보세요.',
       onConfirm: correct ? _handlePuzzleSolved : () {},
     );
   }
@@ -1295,7 +1295,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                       ),
                     ),
                     child: const Text(
-                      '문제2: 조각 6개를 움직여 목표 무늬를 완성하세요.',
+                      '흩어진 조각 6개를 움직여 반짝이는 목표 무늬를 완성해 보세요.',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -2048,7 +2048,7 @@ class _Chapter2QrVerificationScreenState
                               onPressed: _submitManualQr,
                               icon: const Icon(Icons.verified_outlined),
                               label: const Text(
-                                '직접 입력으로 인증',
+                                'QR 도장 확인',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                               ),
                             ),

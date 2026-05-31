@@ -67,12 +67,12 @@ class Chapter4Story2Screen extends StatelessWidget {
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '이번엔 AI와 코딩에 관한 퀴즈를 풀고, 낱말 찾기를 해야 하나 봐!',
+      line: '어? 벽에 작은 빛 글자들이 떠올랐어. 마지막 별 조각이 우리에게 말을 거는 것 같아!',
       characterAsset: 'assets/images/chr_play_right.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '퀴즈를 풀고 글자 속에 숨은 AI와 코딩 낱말을 찾아보자!',
+      line: '빛 글자의 규칙을 풀고, 숨어 있는 낱말을 찾으면 별 조각이 있는 곳을 알려줄 거야!',
       characterAsset: 'assets/images/chr_how_presenting.png',
     ),
   ];
@@ -92,17 +92,17 @@ class Chapter4StoryBeforeRpsScreen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: '우와! 글자판 속 단어들을 다 찾아내니까 다음 방의 문이 열렸어!',
+      line: '찾았다! 낱말들이 이어지면서 길 위에 파란 불빛이 생겼어!',
       characterAsset: 'assets/images/chr_how_laughing.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '어? 그런데 저기 앞에 똑똑해 보이는 인공지능 로봇이 우리 길을 막고 서 있어!',
+      line: '저 불빛이 수학융합실의 인공지능 로봇 쪽으로 이어지고 있어!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '하하! 이 로봇과 가위바위보 대결에서 이겨서 수학융합실 QR 인증을 통과하래! 마지막 미션 도전이야!',
+      line: '로봇 체험을 마치면 QR 인증을 받자. 체험을 완료했다는 표시가 될 거야!',
       characterAsset: 'assets/images/chr_how_running.png',
     ),
   ];
@@ -112,7 +112,7 @@ class Chapter4StoryBeforeRpsScreen extends StatelessWidget {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
       nextRouteName: '/mission_chapter4_rps_qr',
-      finalButtonText: '로봇과 대결하기',
+      finalButtonText: 'QR 인증하기',
     );
   }
 }
@@ -123,12 +123,12 @@ class Chapter4Story3Screen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: '우와! 인공지능 로봇과의 대결에서 승리하고 QR 인증을 완료했어!',
+      line: 'QR 인증이 완료됐어! 마지막 별 조각은 어디에 있지?',
       characterAsset: 'assets/images/chr_how_thumbs_up.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '드디어 마지막 별 조각을 찾았어, 반짝별을 다시 빛나게 하자!',
+      line: '마지막 별 조각이 깨어났어. 이제 반짝별을 다시 하늘처럼 밝히자!',
       characterAsset: 'assets/images/chr_play_heart_hands.png',
     ),
   ];

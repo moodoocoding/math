@@ -203,7 +203,7 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '문제 풀러 가기' : '다음',
+                        isLast ? '산가지 장치 깨우기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

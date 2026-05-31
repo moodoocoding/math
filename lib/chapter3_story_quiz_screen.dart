@@ -178,7 +178,7 @@ class _Chapter3StoryQuizScreenState extends State<Chapter3StoryQuizScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '문제 풀러 가기' : '다음',
+                        isLast ? '초상화 비밀 풀기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

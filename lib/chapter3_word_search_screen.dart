@@ -214,7 +214,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
               ),
               const SizedBox(height: 20),
               const Text(
-                '🎉 정답입니다! 🎉',
+                '🎉 이름의 빛을 모두 찾았어요! 🎉',
                 style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w900,
@@ -320,7 +320,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                '찾아야 할 낱말: \'$hintWord\'',
+                '찾아야 할 빛 이름: \'$hintWord\'',
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
@@ -329,7 +329,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                '위치 힌트: ${targetWord.startRow + 1}번째 줄, ${targetWord.startCol + 1}번째 칸에서 시작해서 ${targetWord.direction == 'horizontal' ? '가로(오른쪽)' : '세로(아래쪽)'} 방향으로 있습니다!\n글자판에 빨간색으로 표시된 글자들을 찾아보세요.',
+                '위치 힌트: ${targetWord.startRow + 1}번째 줄, ${targetWord.startCol + 1}번째 칸에서 ${targetWord.direction == 'horizontal' ? '가로(오른쪽)' : '세로(아래쪽)'} 방향으로 빛이 이어져요.\n빨간색으로 반짝이는 글자를 따라가 보세요.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 22,
@@ -435,7 +435,10 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 30),
           onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
         ),
-        title: const Text('2단계: 위대한 수학자 이름 찾기', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           const BgmToggleButton(iconSize: 32),
           IconButton(
@@ -456,7 +459,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
               child: Text(
-                '문제2: 앞서 발견한 6명의 수학자 이름을 글자판에서 모두 찾으세요!',
+                '초상화에서 깨어난 6명의 수학자 이름을 글자판에서 모두 찾아보세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: isCompact ? 22 : 28,
@@ -546,7 +549,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                           onPressed: _checkAnswer,
                           icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
                           label: Text(
-                            '정답 확인',
+                            '이름 확인',
                             style: TextStyle(fontSize: isMobile ? 16 : 18),
                           ),
                           style: ElevatedButton.styleFrom(

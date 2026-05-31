@@ -188,7 +188,7 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
                         ),
                       ),
                       child: Text(
-                        isLast ? '문제 풀러 가기' : '다음',
+                        isLast ? '무늬 장치 깨우기' : '다음',
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,

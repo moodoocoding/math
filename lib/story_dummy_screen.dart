@@ -296,7 +296,7 @@ class _StoryDummyScreenState extends State<StoryDummyScreen> {
                               ),
                             ),
                             child: Text(
-                              isLast ? '문제 풀이 시작' : '다음',
+                              isLast ? '바닥 장치 깨우기' : '다음',
                               style: TextStyle(
                                 fontSize: buttonFontSize,
                                 fontWeight: FontWeight.w800,

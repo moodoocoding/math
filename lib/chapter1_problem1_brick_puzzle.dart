@@ -327,7 +327,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               ),
               const SizedBox(height: 20),
               const Text(
-                '🎉 정답입니다! 🎉',
+                '🎉 블록판의 빛이 켜졌어요! 🎉',
                 style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w900,
@@ -662,7 +662,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                           onPressed: _checkAnswer,
                           icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
                           label: Text(
-                            '정답 확인',
+                            '완성 확인',
                             style: TextStyle(
                               fontSize: isMobile ? 16 : 20,
                               fontWeight: FontWeight.w800,

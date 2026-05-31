@@ -270,7 +270,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 20),
               const Text(
-                '🎉 정답입니다! 🎉',
+                '🎉 숨은 낱말의 빛을 찾았어요! 🎉',
                 style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w900,
@@ -479,7 +479,10 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF163988),
         elevation: 0,
-        title: const Text('숨은 낱말 찾기', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          '미션! 수학체험센터의 반짝별을 찾아서',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           const BgmToggleButton(iconSize: 32),
           IconButton(
@@ -598,7 +601,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                           onPressed: _checkAnswer,
                           icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
                           label: Text(
-                            '정답 확인',
+                            '낱말 확인',
                             style: TextStyle(fontSize: isMobile ? 16 : 18),
                           ),
                           style: ElevatedButton.styleFrom(

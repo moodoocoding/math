@@ -390,6 +390,39 @@ class _QuizScreenState extends State<QuizScreen> {
     return inputAnswer.trim().isNotEmpty;
   }
 
+  List<String> _resultCopyForStep(Map<String, dynamic> step, bool correct) {
+    final visualType = (step['visual_type'] ?? '')
+        .toString()
+        .trim()
+        .toLowerCase();
+    final hasHanoiVisual = _asTrue(step['show_hanoi_visual']);
+    final hasShapeChoices = _asTrue(step['choices_as_shapes']);
+
+    if (hasShapeChoices) {
+      return correct
+          ? const ['딱 맞는 모양이야', '빈틈 없이 바닥을 채울 수 있어!']
+          : const ['아직 빈틈이 남아', '다른 모양도 바닥에 놓아 보자.'];
+    }
+    if (hasHanoiVisual) {
+      return correct
+          ? const ['최소 횟수를 찾았어', '원반 장치가 안정되었어!']
+          : const ['아직 최소 횟수가 아니야', '원반을 더 적게 옮기는 방법을 떠올려 보자.'];
+    }
+    if (visualType == 'magic_square') {
+      return correct
+          ? const ['숫자판이 맞춰졌어', '가로, 세로, 대각선의 합이 모두 같아!']
+          : const ['합이 아직 맞지 않아', '빈칸에 들어갈 숫자를 다시 계산해 보자.'];
+    }
+    if (visualType == 'rod_numeral') {
+      return correct
+          ? const ['산가지 수를 읽었어', '자릿값을 정확히 짚었어!']
+          : const ['자릿수를 다시 살펴보자', '백, 십, 일의 자리를 차례로 확인해 봐.'];
+    }
+    return correct
+        ? const ['정답이야', '다음 단서로 이어가 보자!']
+        : const ['아직 아니야', '문제의 조건을 한 번 더 살펴보자.'];
+  }
+
   void _showMagicSquareKeypad(int cellIndex) {
     setState(() {
       _activeMagicSquareCell = cellIndex;
@@ -628,8 +661,9 @@ class _QuizScreenState extends State<QuizScreen> {
       correct = inputAnswer.trim() == expected;
     }
 
-    final resultTitle = correct ? '정답이야' : '정답이 아니야';
-    final resultMessage = correct ? '잘했어, 정확하게 풀었네' : '다시 한번 풀어 볼래?';
+    final resultCopy = _resultCopyForStep(step, correct);
+    final resultTitle = resultCopy[0];
+    final resultMessage = resultCopy[1];
 
     if (correct) {
       AppSfxController.playCorrect();
@@ -849,6 +883,13 @@ class _QuizScreenState extends State<QuizScreen> {
     final optionShapeSize = isMobile ? (screenWidth * 0.1).clamp(36.0, 48.0) : (isCompact ? 44.0 : 52.0);
     final actionFontSize = isMobile ? 18.0 : (isCompact ? 20.0 : 24.0);
     final actionButtonHeight = isMobile ? 48.0 : (isMagicSquare ? 52.0 : 56.0);
+    final submitButtonLabel = isMagicSquare
+        ? '숫자 확인'
+        : showHanoiVisual
+            ? '횟수 확인'
+            : renderChoicesAsShapes
+                ? '모양 확인'
+                : '답 확인';
     
     final hanoiHeight = (screenHeight * (isMobile ? 0.42 : (isCompact ? 0.48 : 0.52)))
         .clamp(isMobile ? 280.0 : 360.0, 680.0)
@@ -1308,7 +1349,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         minimumSize: Size.fromHeight(actionButtonHeight),
                       ),
                       child: Text(
-                        '정답 제출',
+                        submitButtonLabel,
                         style: TextStyle(
                           fontSize: actionFontSize,
                           fontWeight: FontWeight.w800,
@@ -1655,156 +1696,116 @@ class _TessellationFloorPainter extends CustomPainter {
           }
         }
       }
-      // 2. 오각형 (정오각형 변-대-변 테셀레이션 실패 묘사 - 로제트 구조)
+      // 2. 오각형: 한 꼭짓점에 3개를 모으면 108도 x 3 = 324도라
+      // 36도 빈틈이 남고, 4개째는 겹친다는 사실을 각도로 보여줍니다.
       else if (selectedShape == _ShapeChoiceType.pentagon) {
         final double cx = size.width / 2;
         final double cy = size.height / 2;
-        final double R = size.width / 5.5; // 오각형 외접원 반지름
-
-        // 2-1. 중앙 정오각형 생성 및 렌더링
-        final List<Offset> centralVertices = [];
-        for (int i = 0; i < 5; i++) {
-          final double angle = -math.pi / 2 + (i * 2 * math.pi / 5);
-          centralVertices.add(Offset(cx + R * math.cos(angle), cy + R * math.sin(angle)));
-        }
-
-        final Path centralPath = Path();
-        centralPath.moveTo(centralVertices[0].dx, centralVertices[0].dy);
-        for (int j = 1; j < 5; j++) {
-          centralPath.lineTo(centralVertices[j].dx, centralVertices[j].dy);
-        }
-        centralPath.close();
-        canvas.drawPath(centralPath, tilePaintA);
-        canvas.drawPath(centralPath, gridPaint);
-
-        // 2-2. 중앙 오각형의 5개 변을 기준으로 인접 오각형 5개(꽃잎 모양)를 기하학적 반사(Reflection)하여 배치
-        for (int i = 0; i < 5; i++) {
-          final Offset v1 = centralVertices[i];
-          final Offset v2 = centralVertices[(i + 1) % 5];
-          final Offset mid = Offset((v1.dx + v2.dx) / 2, (v1.dy + v2.dy) / 2);
-
-          // 바깥쪽 방향 법선 벡터 계산
-          final double phi = -math.pi / 2 + (i + 0.5) * 2 * math.pi / 5;
-          final Offset normal = Offset(math.cos(phi), math.sin(phi));
-
-          // 모든 꼭짓점을 현재 변(대칭축)에 대해 반사 대칭
-          final List<Offset> outerVertices = [];
-          for (final Offset p in centralVertices) {
-            final double dx = p.dx - mid.dx;
-            final double dy = p.dy - mid.dy;
-            final double dot = dx * normal.dx + dy * normal.dy;
-            final double rx = p.dx - 2 * dot * normal.dx;
-            final double ry = p.dy - 2 * dot * normal.dy;
-            outerVertices.add(Offset(rx, ry));
-          }
-
-          final Path outerPath = Path();
-          outerPath.moveTo(outerVertices[0].dx, outerVertices[0].dy);
-          for (int j = 1; j < 5; j++) {
-            outerPath.lineTo(outerVertices[j].dx, outerVertices[j].dy);
-          }
-          outerPath.close();
-          canvas.drawPath(outerPath, i.isEven ? tilePaintB : tilePaintA);
-          canvas.drawPath(outerPath, gridPaint);
-        }
-
-        // 2-3. 변끼리 맞닿아 꽃잎을 이룬 5개의 오각형 틈새(36도 벌어짐)에 억지로 다른 오각형을 끼워넣어 72도 겹치는 모순 묘사
-        // 1시 방향(우상단 꼭짓점인 Vertex 1 방향)에 겹침 유도용 붉은색 오각형 렌더링
-        final double gapAngle = -math.pi / 2 + 2 * math.pi / 5; // Vertex 1 방향 (-18도)
-        final double D = 2 * R * math.cos(math.pi / 5); // 1.618 * R (인접 중심 거리)
-        final double gapCx = cx + D * math.cos(gapAngle);
-        final double gapCy = cy + D * math.sin(gapAngle);
-
-        final List<Offset> gapVertices = [];
-        for (int j = 0; j < 5; j++) {
-          final double angle = gapAngle + math.pi + (j * 2 * math.pi / 5);
-          gapVertices.add(Offset(gapCx + R * math.cos(angle), gapCy + R * math.sin(angle)));
-        }
-
-        final Path gapPath = Path();
-        gapPath.moveTo(gapVertices[0].dx, gapVertices[0].dy);
-        for (int j = 1; j < 5; j++) {
-          gapPath.lineTo(gapVertices[j].dx, gapVertices[j].dy);
-        }
-        gapPath.close();
-
-        // 겹침 오류용 강렬한 반투명 붉은 칠과 빨간 외곽 테두리
-        final Paint gapPaint = Paint()
-          ..color = const Color(0xFFEF9A9A).withValues(alpha: 0.55)
-          ..style = PaintingStyle.fill;
-        final Paint gapBorderPaint = Paint()
-          ..color = const Color(0xFFC62828)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5;
-
-        canvas.drawPath(gapPath, gapPaint);
-        canvas.drawPath(gapPath, gapBorderPaint);
-
-        // 겹쳐진 기하학적 모순을 아이들이 직관적으로 알 수 있도록 경고 태그 렌더링
-        final textPainter = TextPainter(
-          text: const TextSpan(
-            text: '⚠️ 겹침!',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              color: Color(0xFFC62828),
-              backgroundColor: Colors.white,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        textPainter.paint(
-          canvas,
-          Offset(gapCx - textPainter.width / 2, gapCy - textPainter.height / 2),
-        );
-      }
-      // 3. 별 (정오각별 테셀레이션 실패 묘사 - 꼭짓점 접합 구조)
-      else if (selectedShape == _ShapeChoiceType.star) {
-        final double cx = size.width / 2;
-        final double cy = size.height / 2;
-        final double R = size.width / 6.5; // 별 외접원 반지름
-
-        // 3-1. 중앙 정오각별 렌더링
-        _drawStar(canvas, Offset(cx, cy), R, tilePaintA);
+        final sharedVertex = Offset(cx - size.width * 0.05, cy + size.height * 0.04);
+        final side = math.min(size.width, size.height) / 4.6;
+        final startAngle = math.pi / 10; // 18도. 36도 빈틈이 오른쪽에 보이도록 배치.
         final strokePaint = Paint()
           ..color = gridPaint.color
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5;
-        _drawStar(canvas, Offset(cx, cy), R, strokePaint);
+          ..strokeWidth = 1.8;
 
-        // 3-2. 중앙 별의 5개 꼭짓점(깃)에 맞닿아 접하도록 5개의 외부 별 배치 (꼭짓점 공유 묘사)
-        for (int i = 0; i < 5; i++) {
-          final double angle = -math.pi / 2 + (i * 2 * math.pi / 5);
-          final double outerCx = cx + 2 * R * math.cos(angle);
-          final double outerCy = cy + 2 * R * math.sin(angle);
-          final Offset outerCenter = Offset(outerCx, outerCy);
-
-          _drawStar(canvas, outerCenter, R, i.isEven ? tilePaintB : tilePaintA);
-          _drawStar(canvas, outerCenter, R, strokePaint);
+        for (var i = 0; i < 3; i++) {
+          final path = _regularPentagonFromVertex(
+            sharedVertex,
+            side,
+            startAngle + i * 3 * math.pi / 5,
+          );
+          canvas.drawPath(path, i.isEven ? tilePaintA : tilePaintB);
+          canvas.drawPath(path, strokePaint);
         }
 
-        // 3-3. 별과 별 사이에 남는 거대한 기하학적 빈틈(다이아몬드 및 오각형 모양의 틈)을 경고 문구로 시각화
-        final textPainter = TextPainter(
-          text: const TextSpan(
-            text: '⚠️ 거대한 빈틈!',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              color: Color(0xFFC62828),
-              backgroundColor: Colors.white,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
+        final gapStart = startAngle + 9 * math.pi / 5;
+        final gapSweep = math.pi / 5;
+        final gapRadius = side * 1.08;
+        final gapPaint = Paint()
+          ..color = const Color(0xFFFFEB3B).withValues(alpha: 0.82)
+          ..style = PaintingStyle.fill;
+        final gapBorderPaint = Paint()
+          ..color = const Color(0xFFC62828)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3.0;
+        final gapPath = Path()
+          ..moveTo(sharedVertex.dx, sharedVertex.dy)
+          ..arcTo(
+            Rect.fromCircle(center: sharedVertex, radius: gapRadius),
+            gapStart,
+            gapSweep,
+            false,
+          )
+          ..close();
+        canvas.drawPath(gapPath, gapPaint);
+        canvas.drawPath(gapPath, gapBorderPaint);
+
+        canvas.drawCircle(
+          sharedVertex,
+          4.5,
+          Paint()..color = const Color(0xFFC62828),
         );
-        textPainter.layout();
-        // 중앙 별 바로 옆(골이 형성되는 위치)에 빈틈 경고 배치
-        final double gapAngle = -math.pi / 2 + math.pi / 5; // 꼭짓점 사이의 골 방향 (36도)
-        final double D = R * 1.1;
-        canvas.drawCircle(Offset(cx + D * math.cos(gapAngle), cy + D * math.sin(gapAngle)), 8.0, Paint()..color = const Color(0xFFC62828).withValues(alpha: 0.15));
-        textPainter.paint(
+
+        _drawWarningLabel(
           canvas,
-          Offset(cx + D * math.cos(gapAngle) - textPainter.width / 2, cy + D * math.sin(gapAngle) - textPainter.height / 2),
+          '36도 빈틈',
+          Offset(
+            sharedVertex.dx + gapRadius * 0.74 * math.cos(gapStart + gapSweep / 2),
+            sharedVertex.dy + gapRadius * 0.74 * math.sin(gapStart + gapSweep / 2),
+          ),
+        );
+        _drawWarningLabel(
+          canvas,
+          '108도 x 3 = 324도',
+          Offset(sharedVertex.dx - side * 0.35, sharedVertex.dy - side * 1.08),
+        );
+      }
+      // 3. 별: 꼭짓점을 맞대도 넓은 빈 공간이 남는 모습을 강조합니다.
+      else if (selectedShape == _ShapeChoiceType.star) {
+        final double cx = size.width / 2;
+        final double cy = size.height / 2;
+        final double r = math.min(size.width, size.height) / 7.0;
+        final double gap = r * 2.05;
+        final strokePaint = Paint()
+          ..color = gridPaint.color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.8;
+
+        final centers = <Offset>[
+          Offset(cx - gap, cy - gap * 0.55),
+          Offset(cx, cy - gap * 0.55),
+          Offset(cx + gap, cy - gap * 0.55),
+          Offset(cx - gap * 0.5, cy + gap * 0.55),
+          Offset(cx + gap * 0.5, cy + gap * 0.55),
+        ];
+
+        final gapPaint = Paint()
+          ..color = const Color(0xFFFFEB3B).withValues(alpha: 0.72)
+          ..style = PaintingStyle.fill;
+        final gapBorderPaint = Paint()
+          ..color = const Color(0xFFC62828)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.6;
+
+        final bigGap = Path()
+          ..moveTo(cx, cy - r * 0.9)
+          ..lineTo(cx + r * 0.9, cy)
+          ..lineTo(cx, cy + r * 0.9)
+          ..lineTo(cx - r * 0.9, cy)
+          ..close();
+        canvas.drawPath(bigGap, gapPaint);
+        canvas.drawPath(bigGap, gapBorderPaint);
+
+        for (var i = 0; i < centers.length; i++) {
+          _drawStar(canvas, centers[i], r, i.isEven ? tilePaintA : tilePaintB);
+          _drawStar(canvas, centers[i], r, strokePaint);
+        }
+
+        _drawWarningLabel(
+          canvas,
+          '큰 빈틈!',
+          Offset(cx, cy),
         );
       }
       // 4. 원 (기타 테셀레이션 불가능한 도형 - 탄젠트 5x5 접합 렌더링)
@@ -1912,6 +1913,62 @@ class _TessellationFloorPainter extends CustomPainter {
       default:
         break;
     }
+  }
+
+  Path _regularPentagonFromVertex(
+    Offset vertex,
+    double side,
+    double firstEdgeAngle,
+  ) {
+    final path = Path()..moveTo(vertex.dx, vertex.dy);
+    var current = vertex;
+    for (var i = 0; i < 4; i++) {
+      final angle = firstEdgeAngle + i * 2 * math.pi / 5;
+      current = Offset(
+        current.dx + side * math.cos(angle),
+        current.dy + side * math.sin(angle),
+      );
+      path.lineTo(current.dx, current.dy);
+    }
+    path.close();
+    return path;
+  }
+
+  void _drawWarningLabel(Canvas canvas, String text, Offset center) {
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w900,
+          color: Color(0xFFC62828),
+          backgroundColor: Colors.white,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    final padding = const EdgeInsets.symmetric(horizontal: 6, vertical: 3);
+    final rect = Rect.fromCenter(
+      center: center,
+      width: textPainter.width + padding.horizontal,
+      height: textPainter.height + padding.vertical,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(5)),
+      Paint()..color = Colors.white.withValues(alpha: 0.9),
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(5)),
+      Paint()
+        ..color = const Color(0xFFC62828)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.4,
+    );
+    textPainter.paint(
+      canvas,
+      Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2),
+    );
   }
 
   void _drawStar(Canvas canvas, Offset center, double r, Paint paint) {
