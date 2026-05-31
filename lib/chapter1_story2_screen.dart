@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 
-class Chapter1Story2TbdScreen extends StatefulWidget {
-  const Chapter1Story2TbdScreen({super.key});
+class Chapter1Story2Screen extends StatefulWidget {
+  const Chapter1Story2Screen({super.key});
 
   @override
-  State<Chapter1Story2TbdScreen> createState() =>
-      _Chapter1Story2TbdScreenState();
+  State<Chapter1Story2Screen> createState() =>
+      _Chapter1Story2ScreenState();
 }
 
-class _Chapter1Story2TbdScreenState extends State<Chapter1Story2TbdScreen> {
+class _Chapter1Story2ScreenState extends State<Chapter1Story2Screen> {
   int _sceneIndex = 0;
 
   static const List<_Chapter2Scene> _scenes = [

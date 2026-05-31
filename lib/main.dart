@@ -10,13 +10,15 @@ import 'bgm_toggle_button.dart';
 import 'bgm_controller.dart';
 import 'mission_low.dart';
 import 'story_dummy_screen.dart';
-import 'chapter1_story2_tbd_screen.dart';
+import 'chapter1_story2_screen.dart';
 import 'chapter2_story_screen.dart';
 import 'chapter2_story2_screen.dart';
 import 'chapter2_story3_screen.dart';
 import 'chapter3_story_screen.dart';
 import 'chapter3_story2_screen.dart';
 import 'chapter4_story_screen.dart';
+import 'chapter4_problem1_brick_puzzle.dart';
+import 'chapter4_problem2_hidden_word.dart';
 import 'ending_story_screen.dart';
 
 void main() {
@@ -39,7 +41,7 @@ class MissionTourApp extends StatelessWidget {
       routes: {
         '/home': (context) => const MissionHomeScreen(),
         '/story_low_dummy': (context) => const StoryDummyScreen(),
-        '/chapter1_story2_tbd': (context) => const Chapter1Story2TbdScreen(),
+        '/chapter1_story2': (context) => const Chapter1Story2Screen(),
         '/chapter2_story': (context) => const Chapter2StoryScreen(),
         '/chapter2_story2': (context) => const Chapter2Story2Screen(),
         '/chapter2_story3': (context) => const Chapter2Story3Screen(),
@@ -48,18 +50,14 @@ class MissionTourApp extends StatelessWidget {
         '/chapter4_story': (context) => const Chapter4StoryScreen(),
         '/chapter4_story2': (context) => const Chapter4Story2Screen(),
         '/chapter4_story3': (context) => const Chapter4Story3Screen(),
-        '/mission_chapter4_q1_tbd': (context) =>
-            const Chapter4ProblemPlaceholderScreen(
-              question: '문제1: 아래 보기 중 같은 블록 모양은 무엇일까요?',
-              nextRouteName: '/chapter4_story2',
+        '/mission_chapter4_q1': (context) => const BrickPuzzleScreen(
+              completedRouteName: '/chapter4_story2',
             ),
-        '/mission_chapter4_q2_tbd': (context) =>
-            const Chapter4ProblemPlaceholderScreen(
-              question: '문제2: 글자판에서 찾을 수 있는 수학 낱말은 무엇일까요?',
-              nextRouteName: '/chapter4_story3',
+        '/mission_chapter4_q2': (context) => const HiddenWordPuzzleScreen(
+              completedRouteName: '/chapter4_story3',
             ),
         '/mission_low': (context) =>
-            const MissionLowScreen(completedRouteName: '/chapter1_story2_tbd'),
+            const MissionLowScreen(completedRouteName: '/chapter1_story2'),
         '/mission_ch1_q2': (context) => const MissionLowScreen(
           missionDataPath: 'assets/data/mission_chapter1_q2.json',
           completedRouteName: '/chapter2_story',

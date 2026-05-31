@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'bgm_controller.dart';
 import 'bgm_toggle_button.dart';
-import 'chapter4_problem1_brick_puzzle.dart' as chapter4_problem1;
-import 'chapter4_problem2_hidden_word.dart' as chapter4_problem2;
+
 
 class Chapter4StoryScreen extends StatelessWidget {
   const Chapter4StoryScreen({super.key});
@@ -52,7 +51,7 @@ class Chapter4StoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
-      nextRouteName: '/mission_chapter4_q1_tbd',
+      nextRouteName: '/mission_chapter4_q1',
     );
   }
 }
@@ -82,7 +81,7 @@ class Chapter4Story2Screen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
-      nextRouteName: '/mission_chapter4_q2_tbd',
+      nextRouteName: '/mission_chapter4_q2',
     );
   }
 }
@@ -108,92 +107,6 @@ class Chapter4Story3Screen extends StatelessWidget {
   }
 }
 
-class Chapter4ProblemPlaceholderScreen extends StatelessWidget {
-  const Chapter4ProblemPlaceholderScreen({
-    super.key,
-    required this.question,
-    required this.nextRouteName,
-  });
-
-  final String question;
-  final String nextRouteName;
-
-  @override
-  Widget build(BuildContext context) {
-    if (nextRouteName == '/chapter4_story2') {
-      return chapter4_problem1.BrickPuzzleScreen(
-        completedRouteName: nextRouteName,
-      );
-    }
-    if (nextRouteName == '/chapter4_story3') {
-      return chapter4_problem2.HiddenWordPuzzleScreen(
-        completedRouteName: nextRouteName,
-      );
-    }
-
-    return Scaffold(
-      appBar: _chapter4AppBar(context),
-      backgroundColor: const Color(0xFFF4F8FF),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
-                ),
-                child: Text(
-                  question,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF091F59),
-                    height: 1.2,
-                  ),
-                ),
-              ),
-              const Expanded(
-                child: Center(
-                  child: Text(
-                    '문제는 준비 중이에요.',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF355AA8),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => Navigator.pushReplacementNamed(context, nextRouteName),
-                  icon: const Icon(Icons.skip_next_rounded),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF133E97),
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(58),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  label: const Text(
-                    '테스트용: 다음 화면으로',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _Chapter4StoryFlow extends StatefulWidget {
   const _Chapter4StoryFlow({
