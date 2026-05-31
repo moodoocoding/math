@@ -876,10 +876,10 @@ class _QuizScreenState extends State<QuizScreen> {
     return Column(
       children: [
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: renderChoicesAsShapes
-                ? Column(
+          child: renderChoicesAsShapes
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  child: Column(
                     children: [
                       const SizedBox(height: 8),
                       Container(
@@ -1042,8 +1042,11 @@ class _QuizScreenState extends State<QuizScreen> {
                         ),
                       ),
                     ],
-                  )
-                : Column(
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  child: Column(
                     children: [
                       const SizedBox(height: 8),
                       Container(
