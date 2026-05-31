@@ -775,7 +775,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
                 return Draggable<_CardDef>(
                   data: card,
-                  dragAnchorStrategy: pointerDragAnchorStrategy,
+                  dragAnchorStrategy: (draggable, context, position) {
+                    final maxC = card.rotations[0].map((c) => c.$1).reduce(math.max) + 1;
+                    final maxR = card.rotations[0].map((c) => c.$2).reduce(math.max) + 1;
+                    return Offset(cellSz * maxC / 2, cellSz * maxR / 2);
+                  },
                   maxSimultaneousDrags: 1,
                   feedback: Material(
                     color: Colors.transparent,
@@ -1010,11 +1014,14 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final cardIndex = _kCards.indexOf(card);
                 if (cardIndex == _rightIdx && _rightPlaced) return false;
                 final dragRot = _getDragRotation(card, true);
-                final isValid = card.isValidAt(dragRot, d);
+                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                int startDist = d - (mc ~/ 2);
+                startDist = startDist.clamp(1, 5 - mc);
+                final isValid = card.isValidAt(dragRot, startDist);
                 if (isValid) {
                   setState(() {
                     _hoverLeftIdx = cardIndex;
-                    _hoverLeftDist = d;
+                    _hoverLeftDist = startDist;
                   });
                 }
                 return isValid;
@@ -1029,9 +1036,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
                 final dragRot = _getDragRotation(card, true);
+                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                int startDist = d - (mc ~/ 2);
+                startDist = startDist.clamp(1, 5 - mc);
                 setState(() {
                   _leftIdx = cardIndex;
-                  _leftDist = d;
+                  _leftDist = startDist;
                   _leftRot = dragRot;
                   _leftPlaced = true;
                   _result = null;
@@ -1057,7 +1067,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (isOccupied) {
                   cellWidget = Draggable<_CardDef>(
                     data: _kCards[_leftIdx!],
-                    dragAnchorStrategy: pointerDragAnchorStrategy,
+                    dragAnchorStrategy: (draggable, context, position) {
+                      final maxC = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$1).reduce(math.max) + 1;
+                      final maxR = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$2).reduce(math.max) + 1;
+                      return Offset(sz * maxC / 2, sz * maxR / 2);
+                    },
                     maxSimultaneousDrags: 1,
                     feedback: Material(
                       color: Colors.transparent,
@@ -1144,11 +1158,14 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final cardIndex = _kCards.indexOf(card);
                 if (cardIndex == _leftIdx && _leftPlaced) return false;
                 final dragRot = _getDragRotation(card, false);
-                final isValid = card.isValidAt(dragRot, d);
+                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                int startDist = d - (mc ~/ 2);
+                startDist = startDist.clamp(1, 5 - mc);
+                final isValid = card.isValidAt(dragRot, startDist);
                 if (isValid) {
                   setState(() {
                     _hoverRightIdx = cardIndex;
-                    _hoverRightDist = d;
+                    _hoverRightDist = startDist;
                   });
                 }
                 return isValid;
@@ -1163,9 +1180,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final card = details.data;
                 final cardIndex = _kCards.indexOf(card);
                 final dragRot = _getDragRotation(card, false);
+                final mc = card.rotations[dragRot].map((c) => c.$1).reduce(math.max);
+                int startDist = d - (mc ~/ 2);
+                startDist = startDist.clamp(1, 5 - mc);
                 setState(() {
                   _rightIdx = cardIndex;
-                  _rightDist = d;
+                  _rightDist = startDist;
                   _rightRot = dragRot;
                   _rightPlaced = true;
                   _result = null;
@@ -1191,7 +1211,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 if (isOccupied) {
                   cellWidget = Draggable<_CardDef>(
                     data: _kCards[_rightIdx!],
-                    dragAnchorStrategy: pointerDragAnchorStrategy,
+                    dragAnchorStrategy: (draggable, context, position) {
+                      final maxC = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$1).reduce(math.max) + 1;
+                      final maxR = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$2).reduce(math.max) + 1;
+                      return Offset(sz * maxC / 2, sz * maxR / 2);
+                    },
                     maxSimultaneousDrags: 1,
                     feedback: Material(
                       color: Colors.transparent,
