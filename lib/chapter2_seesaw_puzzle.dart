@@ -100,19 +100,6 @@ const _kCards = <_CardDef>[
     rotationLabels: ['기본'],
     leftPresets: [(0, 2), (0, 3)],
   ),
-  // ⑤ T자
-  _CardDef(
-    name: 'T자',
-    color: Color(0xFF8E24AA),
-    rotations: [
-      [(0, 0), (1, 0), (2, 0), (1, 1)], // 0°
-      [(0, 0), (0, 1), (1, 1), (0, 2)], // 90°
-      [(1, 0), (0, 1), (1, 1), (2, 1)], // 180°
-      [(1, 0), (0, 1), (1, 1), (1, 2)], // 270°
-    ],
-    rotationLabels: ['0°', '90°', '180°', '270°'],
-    leftPresets: [(0, 1), (1, 2)],
-  ),
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -529,7 +516,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     final double gameAreaWidth = availWidth * 0.70;
 
                     // 우측 시소/그리드 영역을 위한 셀 크기 계산
-                    final double cellSz = (gameAreaWidth / 11.8).clamp(18.0, 30.0);
+                    final double cellSz = (gameAreaWidth / 11.8).clamp(32.0, 56.0);
                     final double gap = cellSz * 0.13;
 
                     return Row(
@@ -538,7 +525,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                         // [왼쪽] 도형 보관함 (28% 너비)
                         SizedBox(
                           width: storageWidth,
-                          child: _buildStorage(storageWidth, isMobile),
+                          child: _buildStorage(storageWidth, isMobile, cellSz),
                         ),
                         SizedBox(width: availWidth * 0.02),
                         // [오른쪽] 시소 및 5x5 그리드 보드 (70% 너비)
@@ -547,7 +534,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                             children: [
                               _seesawWidget(gameAreaWidth, cellSz, gap),
                               const SizedBox(height: 6),
-                              Expanded(child: _grid(cellSz, gap)),
+                              Expanded(child: _grid(cellSz, gap, isMobile)),
                             ],
                           ),
                         ),
@@ -595,7 +582,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   // ─────────────────────────────── 좌측 세로 도형 보관함
 
-  Widget _buildStorage(double width, bool isMobile) {
+  Widget _buildStorage(double width, bool isMobile, double cellSz) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
@@ -651,15 +638,22 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     color: Colors.transparent,
                     child: Opacity(
                       opacity: 0.75,
-                      child: SizedBox(
-                        width: tileSize * 0.9,
-                        height: tileSize * 0.9,
-                        child: CustomPaint(
-                          painter: _MiniShapePainter(
-                            cells: card.rotations[0],
-                            color: card.color,
-                          ),
-                        ),
+                      child: Builder(
+                        builder: (context) {
+                          final maxC = card.rotations[0].map((c) => c.$1).reduce(math.max) + 1;
+                          final maxR = card.rotations[0].map((c) => c.$2).reduce(math.max) + 1;
+                          return SizedBox(
+                            width: cellSz * maxC,
+                            height: cellSz * maxR,
+                            child: CustomPaint(
+                              painter: _MiniShapePainter(
+                                cells: card.rotations[0],
+                                color: card.color,
+                                fixedCellSize: cellSz,
+                              ),
+                            ),
+                          );
+                        }
                       ),
                     ),
                   ),
@@ -794,8 +788,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         builder: (context, child) => CustomPaint(
           painter: _SeesawPainter(
             tilt: _seesawAnim.value,
-            leftLabel: _leftIdx != null ? '$_leftTorque' : '',
-            rightLabel: _ghostPlaced ? '$_rightTorque' : '',
             balanced: _result == true,
             cellSz: cellSz,
             gap: gap,
@@ -807,7 +799,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   // ─────────────────────────────── 그리드
 
-  Widget _grid(double cellSz, double gap) {
+  Widget _grid(double cellSz, double gap, bool isMobile) {
     return Column(
       children: [
         _distRow(cellSz, gap),
@@ -819,6 +811,45 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           ),
         const SizedBox(height: 6),
         _distRow(cellSz, gap),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F4C3),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFCDDC39), width: 1.5),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                '왼쪽 기울기: $_leftTorque',
+                style: TextStyle(
+                  fontSize: isMobile ? 15 : 18,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF163988),
+                ),
+              ),
+              const SizedBox(
+                height: 18,
+                child: VerticalDivider(
+                  color: Color(0xFFCDDC39),
+                  width: 20,
+                  thickness: 2,
+                ),
+              ),
+              Text(
+                '오른쪽 기울기: ${_ghostPlaced ? _rightTorque : 0}',
+                style: TextStyle(
+                  fontSize: isMobile ? 15 : 18,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF163988),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -939,15 +970,22 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       color: Colors.transparent,
                       child: Opacity(
                         opacity: 0.7,
-                        child: SizedBox(
-                          width: sz * 3,
-                          height: sz * 3,
-                          child: CustomPaint(
-                            painter: _MiniShapePainter(
-                              cells: _kCards[_rightIdx!].rotations[_rightRot],
-                              color: _kCards[_rightIdx!].color,
-                            ),
-                          ),
+                        child: Builder(
+                          builder: (context) {
+                            final maxC = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$1).reduce(math.max) + 1;
+                            final maxR = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$2).reduce(math.max) + 1;
+                            return SizedBox(
+                              width: sz * maxC,
+                              height: sz * maxR,
+                              child: CustomPaint(
+                                painter: _MiniShapePainter(
+                                  cells: _kCards[_rightIdx!].rotations[_rightRot],
+                                  color: _kCards[_rightIdx!].color,
+                                  fixedCellSize: sz,
+                                ),
+                              ),
+                            );
+                          }
                         ),
                       ),
                     ),
@@ -1162,15 +1200,20 @@ class _Cell extends StatelessWidget {
 class _MiniShapePainter extends CustomPainter {
   final List<_Rel> cells;
   final Color color;
+  final double? fixedCellSize;
 
-  const _MiniShapePainter({required this.cells, required this.color});
+  const _MiniShapePainter({
+    required this.cells,
+    required this.color,
+    this.fixedCellSize,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (cells.isEmpty) return;
     final maxC = cells.map((c) => c.$1).reduce(math.max) + 1;
     final maxR = cells.map((c) => c.$2).reduce(math.max) + 1;
-    final cs = math.min(size.width / maxC, size.height / maxR) * 0.84;
+    final cs = fixedCellSize ?? (math.min(size.width / maxC, size.height / maxR) * 0.84);
     final ox = (size.width - maxC * cs) / 2;
     final oy = (size.height - maxR * cs) / 2;
     final paint = Paint()..color = color;
@@ -1187,22 +1230,19 @@ class _MiniShapePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_MiniShapePainter old) => old.color != color;
+  bool shouldRepaint(_MiniShapePainter old) =>
+      old.color != color || old.fixedCellSize != fixedCellSize;
 }
 
 /// 시소 빔 그리기
 class _SeesawPainter extends CustomPainter {
   final double tilt;
-  final String leftLabel;
-  final String rightLabel;
   final bool balanced;
   final double cellSz;
   final double gap;
 
   const _SeesawPainter({
     required this.tilt,
-    required this.leftLabel,
-    required this.rightLabel,
     required this.balanced,
     required this.cellSz,
     required this.gap,
@@ -1278,36 +1318,11 @@ class _SeesawPainter extends CustomPainter {
       );
     }
     canvas.restore();
-
-    // 토크 레이블
-    if (leftLabel.isNotEmpty) {
-      _drawLabel(canvas, leftLabel, Offset(cx - endCircleX, cy - 24));
-    }
-    if (rightLabel.isNotEmpty) {
-      _drawLabel(canvas, rightLabel, Offset(cx + endCircleX, cy - 24));
-    }
-  }
-
-  void _drawLabel(Canvas canvas, String text, Offset center) {
-    final tp = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: const TextStyle(
-          color: Color(0xFF1A237E),
-          fontSize: 16,
-          fontWeight: FontWeight.w900,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    tp.paint(canvas, Offset(center.dx - tp.width / 2, center.dy));
   }
 
   @override
   bool shouldRepaint(_SeesawPainter o) =>
       o.tilt != tilt ||
-      o.leftLabel != leftLabel ||
-      o.rightLabel != rightLabel ||
       o.balanced != balanced ||
       o.cellSz != cellSz ||
       o.gap != gap;
