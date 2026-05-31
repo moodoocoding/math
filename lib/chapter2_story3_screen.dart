@@ -125,7 +125,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                           _SpeakerBadge(name: '하우'),
                           SizedBox(height: 12),
                           Text(
-                            '좋아! 두 번째 별 조각을 찾으면 불빛이 더 밝아질 거야!',
+                            '좋아! 두 번째 별 조각을 찾으려면, 책 읽어주는 로봇 루카와 함께 수학책을 읽고 한 줄 감상문을 쓴 뒤 QR코드를 인증받아야 해!',
                             style: TextStyle(
                               fontSize: dialogFontSize,
                               fontWeight: FontWeight.w800,

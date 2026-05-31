@@ -144,7 +144,6 @@ class _Chapter4RpsQrScreenState extends State<Chapter4RpsQrScreen>
 
   // --- QR 스캐너 연동 로직 ---
   Future<void> _startScanner() async {
-    if (kDebugMode) return; // 디버그/테스트 모드에서는 카메라 하드웨어 방지
     if (!mounted || _isStartingScanner) return;
     if (_scannerController.value.isRunning) return;
 
@@ -860,27 +859,45 @@ class _Chapter4RpsQrScreenState extends State<Chapter4RpsQrScreen>
   }) {
     final bool disabled = _isThinking || _roundCompleted;
 
+    Color glowColor = const Color(0xFFBAC5E8);
+    Color btnBg = const Color(0xFF1E293B);
+    if (label == '가위') {
+      glowColor = const Color(0xFFFFB020);
+      btnBg = const Color(0xFF2E241E);
+    } else if (label == '바위') {
+      glowColor = const Color(0xFFFF528E);
+      btnBg = const Color(0xFF2E1C24);
+    } else if (label == '보') {
+      glowColor = const Color(0xFF06B6D4);
+      btnBg = const Color(0xFF172535);
+    }
+
     return Expanded(
       child: Opacity(
         opacity: disabled ? 0.6 : 1.0,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: const [
-              BoxShadow(color: Color(0x20000000), blurRadius: 4, offset: Offset(0, 3)),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: glowColor.withValues(alpha: 0.15),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: ElevatedButton(
             onPressed: disabled ? null : () => _playRound(label),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF334155),
+              backgroundColor: btnBg,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: Color(0xFF475569), width: 1.5),
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: glowColor, width: 2.2),
               ),
-              elevation: 0,
+              elevation: 4,
+              shadowColor: glowColor.withValues(alpha: 0.25),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1025,39 +1042,29 @@ class _Chapter4RpsQrScreenState extends State<Chapter4RpsQrScreen>
               borderRadius: BorderRadius.circular(22),
               child: Stack(
                 children: [
-                  // 카메라 실제 연동 뷰 (디버그 모드 아닐 때 작동)
-                  if (!kDebugMode)
-                    Positioned.fill(
-                      child: RotatedBox(
-                        quarterTurns: _previewRotationTurns,
-                        child: MobileScanner(
-                          controller: _scannerController,
-                          onDetect: (capture) {
-                            final List<Barcode> barcodes = capture.barcodes;
-                            if (barcodes.isNotEmpty) {
-                              final String? code = barcodes.first.rawValue;
-                              if (code != null) {
-                                _handleDetection(code);
-                              }
+                  Positioned.fill(
+                    child: RotatedBox(
+                      quarterTurns: _previewRotationTurns,
+                      child: MobileScanner(
+                        controller: _scannerController,
+                        onDetect: (capture) {
+                          final List<Barcode> barcodes = capture.barcodes;
+                          if (barcodes.isNotEmpty) {
+                            final String? code = barcodes.first.rawValue;
+                            if (code != null) {
+                              _handleDetection(code);
                             }
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildViewfinderMockup(
-                              title: '스캐너 연동 오류',
-                              subtitle: '카메라 장치를 활성화할 수 없습니다.',
-                            );
-                          },
-                        ),
-                      ),
-                    )
-                  else
-                    // 디버그 또는 에뮬레이터 모드일 때 뷰파인더 모형 노출
-                    Positioned.fill(
-                      child: _buildViewfinderMockup(
-                        title: '📸 스캐너 시뮬레이션 작동 중',
-                        subtitle: '테스트용 디버그 환경입니다. 수동 입력을 이용하세요.',
+                          }
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildViewfinderMockup(
+                            title: '📸 스캐너 시뮬레이션 및 안내',
+                            subtitle: '에뮬레이터 환경이거나 카메라 권한이 없습니다. 실기기에서는 카메라가 정상 구동되며, 테스트 시 수동 입력을 이용하세요.',
+                          );
+                        },
                       ),
                     ),
+                  ),
 
                   // 뷰파인더 포커스 프레임 오버레이
                   Positioned.fill(

@@ -1035,7 +1035,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                                       Padding(
                                                         padding: const EdgeInsets.only(bottom: 8),
                                                         child: Icon(
-                                                          Icons.check_circle_rounded,
+                                                          Icons.radio_button_checked_rounded,
                                                           color: textColor,
                                                           size: 26,
                                                         ),

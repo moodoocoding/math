@@ -274,7 +274,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   }
 
   void _animateSeesaw() {
-    final diff = (_leftTorque - _rightTorque).toDouble();
+    final diff = (_rightTorque - _leftTorque).toDouble();
     final target = (diff / 20.0 * 0.20).clamp(-0.20, 0.20);
     _seesawAnim = Tween<double>(begin: _prevTilt, end: target).animate(
       CurvedAnimation(parent: _seesawCtrl, curve: Curves.easeInOut),
@@ -793,9 +793,16 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFF4C430), width: 2),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withValues(alpha: 0.85),
+        border: Border.all(color: const Color(0xFFBAC5E8), width: 2.5),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F1A367C),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -954,11 +961,18 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         _distRow(cellSz, gap),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F4C3),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCDDC39), width: 1.5),
+            color: const Color(0xFFEBF0FF),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFBAC5E8), width: 2),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0C000000),
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -975,9 +989,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               const SizedBox(
                 height: 14,
                 child: VerticalDivider(
-                  color: Color(0xFFCDDC39),
+                  color: Color(0xFFBAC5E8),
                   width: 16,
-                  thickness: 1.5,
+                  thickness: 2.0,
                 ),
               ),
               Text(

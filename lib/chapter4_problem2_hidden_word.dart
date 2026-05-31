@@ -62,6 +62,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   late List<(int, int)> currentSelection; // 현재 선택 중인 칸들
   late Map<String, List<(int, int)>> foundPositions; // 찾은 낱말들의 위치들
   int lastHintIndex = -1;
+  List<(int, int)>? _hintPositions;
 
   static const List<String> layout = [
     '알고리즘가머나루다라',
@@ -89,6 +90,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     foundWords = {};
     currentSelection = [];
     foundPositions = {};
+    _hintPositions = null;
 
     _generateBoard();
   }
@@ -162,6 +164,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
           foundWords.add(word.word);
           foundPositions[word.word] = List.from(word.positions);
           currentSelection = [];
+          _hintPositions = null;
         });
         
         if (foundWords.length == words.length) {
@@ -274,6 +277,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
       foundWords = {};
       foundPositions = {};
       currentSelection = [];
+      _hintPositions = null;
     });
   }
 
@@ -289,7 +293,12 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     if (count == words.length) return;
 
     lastHintIndex = nextHintIndex;
-    final hintWord = words[nextHintIndex].word;
+    final targetWord = words[nextHintIndex];
+    final hintWord = targetWord.word;
+
+    setState(() {
+      _hintPositions = targetWord.positions;
+    });
 
     showDialog(
       context: context,
@@ -311,17 +320,29 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                '\'$hintWord\'을(를) 찾아보세요!',
+                '찾아야 할 낱말: \'$hintWord\'',
                 style: const TextStyle(
                   fontSize: 28,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   fontFamily: 'GangwonEduAll',
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
+              Text(
+                '위치 힌트: ${targetWord.startRow + 1}번째 줄, ${targetWord.startCol + 1}번째 칸에서 시작해서 ${targetWord.direction == 'horizontal' ? '가로(오른쪽)' : '세로(아래쪽)'} 방향으로 있습니다!\n글자판에 빨간색으로 표시된 글자들을 찾아보세요.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF4B5563),
+                  height: 1.35,
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+              const SizedBox(height: 24),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('확인', style: TextStyle(fontSize: 22)),
+                child: const Text('확인', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -566,10 +587,10 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
       margin: EdgeInsets.only(right: screenSize.width * 0.02),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: found ? const Color(0xFFC8E6C9) : const Color(0xFFFFE0B2),
+        color: found ? const Color(0xFFE2F9E5) : const Color(0xFFEBF0FF),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: found ? const Color(0xFF4CAF50) : const Color(0xFFFFA726),
+          color: found ? const Color(0xFF78DB8F) : const Color(0xFF9FB2EB),
           width: 2,
         ),
       ),
@@ -581,14 +602,14 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
             style: TextStyle(
               fontSize: isCompact ? 16 : 20,
               fontWeight: FontWeight.w800,
-              color: found ? const Color(0xFF2E7D32) : const Color(0xFFE65100),
+              color: found ? const Color(0xFF1D6B30) : const Color(0xFF1A367C),
               decoration: found ? TextDecoration.lineThrough : null,
               fontFamily: 'GangwonEduAll',
             ),
           ),
           if (found) ...[
             const SizedBox(width: 8),
-            const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 20),
+            const Icon(Icons.check_circle, color: Color(0xFF1D6B30), size: 20),
           ],
         ],
       ),
@@ -606,6 +627,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
             final pos = _getGridPosition(details.localPosition, cellSize);
             if (pos != null) {
               setState(() {
+                _hintPositions = null;
                 currentSelection = [pos];
               });
             }
@@ -640,6 +662,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 int col = index % 10;
                 bool isSelected = currentSelection.contains((row, col));
                 bool isFoundCell = _isCellInFoundWord(row, col);
+                bool isHintCell = _hintPositions != null && _hintPositions!.contains((row, col));
 
                 return Container(
                   decoration: BoxDecoration(
@@ -647,8 +670,12 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                         ? const Color(0xFFB3E5FC).withValues(alpha: 0.8)
                         : isSelected
                             ? const Color(0xFFFFF9C4)
-                            : Colors.white,
-                    border: Border.all(color: const Color(0xFFBDBDBD), width: 1),
+                            : isHintCell
+                                ? const Color(0xFFFFEBEE)
+                                : Colors.white,
+                    border: isHintCell
+                        ? Border.all(color: Colors.redAccent, width: 2.5)
+                        : Border.all(color: const Color(0xFFBDBDBD), width: 1),
                   ),
                   child: Center(
                     child: Text(
@@ -656,7 +683,11 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       style: TextStyle(
                         fontSize: cellSize * 0.5,
                         fontWeight: FontWeight.w900,
-                        color: isFoundCell ? const Color(0xFF01579B) : const Color(0xFF091F59),
+                        color: isFoundCell
+                            ? const Color(0xFF01579B)
+                            : isHintCell
+                                ? Colors.red
+                                : const Color(0xFF091F59),
                         fontFamily: 'GangwonEduAll',
                       ),
                     ),

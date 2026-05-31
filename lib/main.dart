@@ -281,10 +281,10 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
     final isUltraWide = screenWidth / screenHeight >= 2.1;
 
     const horizontalPadding = 18.0;
-    // Mobile: 1 card per row, Tablet: 2 cards per row
+    // Mobile: 1 card per row, Tablet: 3 cards per row (가로 단일행 정렬)
     final cardWidth = isMobile
         ? (screenWidth - (horizontalPadding * 2))
-        : (screenWidth - (horizontalPadding * 2) - 16) / 2;
+        : (screenWidth - (horizontalPadding * 2) - 32) / 3;
 
     final welcomeSize = isMobile ? screenWidth * 0.075 : (isUltraWide ? 44.0 : 28.0);
     final adventureSize = isMobile ? screenWidth * 0.085 : (isUltraWide ? 46.0 : 32.0);
@@ -519,7 +519,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                           width: cardWidth,
                           icon: Icons.landscape_rounded,
                           title: '미션! 수학체험센터의\n반짝별을 찾아서',
-                          subtitle: '초등 저학년 추천',
+                          subtitle: '초등 중학년 추천',
                           backgroundColor: const Color(0xFFE9DCE9),
                           subtitleColor: const Color(0xFFDE5C85),
                           selected: true,
@@ -538,14 +538,6 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                           icon: Icons.edit_note_rounded,
                           title: '수학자의 비밀\n노트를 찾아라!',
                           subtitle: '중학생 추천',
-                          backgroundColor: const Color(0xFFDDE2F5),
-                          subtitleColor: const Color(0xFF4A67BF),
-                        ),
-                        _MissionCard(
-                          width: cardWidth,
-                          icon: Icons.menu_book_rounded,
-                          title: '역설, 혹은\n모호함',
-                          subtitle: '고등학생 추천',
                           backgroundColor: const Color(0xFFDDE2F5),
                           subtitleColor: const Color(0xFF4A67BF),
                         ),
@@ -949,9 +941,16 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
       child: Container(
         decoration: BoxDecoration(
           border: selected
-              ? Border.all(color: const Color(0xFF2F6BDD), width: 3)
-              : null,
+              ? Border.all(color: const Color(0xFF4A66B6), width: 3.5)
+              : Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.0),
           borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1F000000),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: Transform.rotate(
           angle: rotationQuarterTurns * (math.pi / 2),
@@ -1101,10 +1100,11 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                   decoration: BoxDecoration(
                     color: candidateData.isNotEmpty
                         ? const Color(0xFFE2F7E7)
-                        : Colors.white,
+                        : const Color(0xFFF4F8FF),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFF9DB4E8),
-                      width: 1.6,
+                      color: const Color(0xFFBAC5E8),
+                      width: 1.5,
                     ),
                   ),
                   child: piece == null
@@ -1155,8 +1155,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
 
             return Container(
               decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: const Color(0xFF9DB4E8), width: 1.6),
+                color: const Color(0xFFF4F8FF),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
               ),
               child: Center(
                 child: _buildPieceVisual(
@@ -1674,10 +1675,6 @@ class _Chapter2QrVerificationScreenState
   }
 
   Future<void> _startScanner() async {
-    if (kDebugMode) {
-      // In debug/test mode, we do NOT spin up the physical camera scanner.
-      return;
-    }
     if (!mounted || _isStartingScanner) return;
     if (_scannerController.value.isRunning) return;
 
@@ -1931,7 +1928,7 @@ class _Chapter2QrVerificationScreenState
                     child: Column(
                       children: [
                         Text(
-                          '다음 단계 QR 인증',
+                          '책 읽어주는 로봇 루카',
                           style: TextStyle(
                             fontSize: isMobile ? (screenWidth * 0.07).clamp(22, 28) : 28,
                             fontWeight: FontWeight.w900,
@@ -1941,7 +1938,7 @@ class _Chapter2QrVerificationScreenState
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '다음 단계로 이동하려면 현장 QR 코드를 스캔해 인증해 보세요.',
+                          '루카와 함께 수학책 읽고 한 줄 감상문 쓰고 QR코드를 받으세요!',
                           style: TextStyle(
                             fontSize: isMobile ? (screenWidth * 0.05).clamp(16, 20) : 20,
                             fontWeight: FontWeight.w700,
@@ -1972,45 +1969,22 @@ class _Chapter2QrVerificationScreenState
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              if (kDebugMode)
-                                Container(
-                                  color: Colors.black.withValues(alpha: 0.8),
-                                  child: const Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.camera_alt_outlined, color: Colors.white60, size: 56),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          '테스트 모드\n카메라 비활성화됨',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              else
-                                RotatedBox(
-                                  quarterTurns: _previewRotationTurns,
-                                  child: MobileScanner(
-                                    controller: _scannerController,
-                                    errorBuilder: (context, error, child) {
-                                      return _buildScannerError(error);
-                                    },
-                                    onDetect: (capture) {
-                                      final rawValue = capture.barcodes
-                                          .map((barcode) => barcode.rawValue?.trim() ?? '')
-                                          .firstWhere((value) => value.isNotEmpty, orElse: () => '');
-                                      if (rawValue.isEmpty) return;
-                                      _handleDetection(rawValue);
-                                    },
-                                  ),
+                              RotatedBox(
+                                quarterTurns: _previewRotationTurns,
+                                child: MobileScanner(
+                                  controller: _scannerController,
+                                  errorBuilder: (context, error, child) {
+                                    return _buildScannerError(error);
+                                  },
+                                  onDetect: (capture) {
+                                    final rawValue = capture.barcodes
+                                        .map((barcode) => barcode.rawValue?.trim() ?? '')
+                                        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                    if (rawValue.isEmpty) return;
+                                    _handleDetection(rawValue);
+                                  },
                                 ),
+                              ),
                               IgnorePointer(
                                 child: Container(
                                   decoration: BoxDecoration(

@@ -29,43 +29,44 @@ class _QuizQuestion {
 class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
   int _currentQuestionIndex = 0;
   final Set<String> _correctlyAnswered = {};
+  late List<List<String>> _shuffledChoices;
 
   static const List<_QuizQuestion> _questions = [
     _QuizQuestion(
       question: '컴퓨터과학의 선구자로, 알고리즘과 계산 개념을 튜링 기계로 형식화하고, 기계 지능을 평가하는 튜링 테스트를 제안한 수학자는 누구일까요?',
       correctAnswer: '앨런 튜링',
       choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
-      explanation: '앨런 튜링은 현대 컴퓨터 과학의 아버지로 불리며, 튜링 기계와 튜링 테스트를 고안하였습니다.',
+      explanation: '제2차 세계대전 당시 독일군의 극비 암호인 \'에니그마\'를 해독하여 연합군의 승리를 견인하고 인류 수천만 명의 목숨을 구했습니다.',
     ),
     _QuizQuestion(
       question: '『구수략』을 저술하고, 오일러의 직교 라틴 마방진보다 61년 앞서 마방진을 연구한 수학자는 누구일까요?',
       correctAnswer: '최석정',
       choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
-      explanation: '최석정은 조선 시대의 수학자이자 정치가로, 저서 『구수략』에서 오일러보다 앞서 마방진을 연구하였습니다.',
+      explanation: '오일러보다 61년 앞서 직교라틴방진을 발견했고, 마방진의 구성 원리를 음양오행 및 주역의 원리와 접목하여 철학적으로 규명했습니다.',
     ),
     _QuizQuestion(
       question: '이탈리아의 수학자로, 『산반서』를 저술하고 인도-아라비아 수 체계를 유럽에 소개하여 피보나치 수열로도 널리 알려진 수학자는 누구일까요?',
       correctAnswer: '피보나치',
       choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
-      explanation: '피보나치는 『산반서』를 통해 아라비아 숫자를 유럽에 전파하고 아름다운 피보나치 수열을 소개하였습니다.',
+      explanation: '그가 소개한 수열은 꽃잎 수, 파인애플 비늘, 달팽이 껍질 등 대자연의 황금비율 속에서 끊임없이 발견되는 신비한 성질을 가집니다.',
     ),
     _QuizQuestion(
       question: '1부터 100까지의 합을 순식간에 구한 일화로 유명하며, 정수론, 전자기학 등 수학과 과학의 다양한 분야에 큰 업적을 남겨 \'수학의 왕\'으로 불리는 수학자는 누구일까요?',
       correctAnswer: '가우스',
       choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
-      explanation: '가우스는 독일의 천재 수학자로 대수학, 정수론 등을 발전시켜 역사상 가장 위대한 수학자 중 한 명으로 꼽힙니다.',
+      explanation: '그는 정17각형을 작도하는 방법을 눈금 없는 자와 컴퍼스만으로 발견하여 자신의 묘비에 정17각형을 새겨달라고 유언을 남겼습니다.',
     ),
     _QuizQuestion(
       question: '헤이그 특사 중 한 명이자 독립운동가로, 한국 최초의 근대 수학 교과서인 『산술신서』를 저술하여 한국 근대 수학교육의 아버지로 불리는 분은 누구일까요?',
       correctAnswer: '이상설',
       choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
-      explanation: '이상설은 조국의 독립을 위해 헌신한 정치가이자, 우리나라의 근대 수학 교육을 개척한 훌륭한 수학자입니다.',
+      explanation: '그는 헤이그 특사 파견 외에도 최초의 신학문 학교인 서전서숙을 세워 수학을 직접 가르쳤으며 대한제국 최고의 수학 천재로 칭송받았습니다.',
     ),
     _QuizQuestion(
       question: '‘리 군(Ree group)’ 이론으로 세계 수학계에 이름을 알렸으며, 캐나다 수학회 등에서 활약하며 세계에 이름을 알린 최초의 한국인 수학자는 누구일까요?',
       correctAnswer: '이임학',
       choices: ['앨런 튜링', '최석정', '피보나치', '가우스', '이상설', '이임학'],
-      explanation: '이임학은 세계 수학 교과서에 등장하는 고유 명사 이론인 \'리 군\' 이론을 정립한 자랑스러운 대한민국의 첫 수학자입니다.',
+      explanation: '미국 수학회지에 실린 논문을 우연히 발견해 편지로 수학적 오류를 지적하면서 세계적인 천재로 인정받았고 이 메일은 리 군 이론의 시초가 되었습니다.',
     ),
   ];
 
@@ -73,6 +74,11 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
   void initState() {
     super.initState();
     AppBgmController.playProblem();
+    _shuffledChoices = _questions.map((q) {
+      final list = List<String>.from(q.choices);
+      list.shuffle();
+      return list;
+    }).toList();
   }
 
   void _handleChoice(String selectedChoice) {
@@ -82,6 +88,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
       _showCorrectDialog(currentQuestion.explanation);
     } else {
       AppSfxController.playWrong();
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Container(
@@ -93,7 +100,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
             ),
           ),
           backgroundColor: const Color(0xFFD64A45),
-          duration: const Duration(seconds: 2),
+          duration: const Duration(milliseconds: 900),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(20),
@@ -266,9 +273,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
     final screenWidth = screenSize.width;
     final isMobile = screenWidth < 600;
     final currentQuestion = _questions[_currentQuestionIndex];
-    final filteredChoices = currentQuestion.choices
-        .where((choice) => !_correctlyAnswered.contains(choice))
-        .toList();
+    final filteredChoices = _shuffledChoices[_currentQuestionIndex];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F6FF),
@@ -374,12 +379,12 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
               Expanded(
                 flex: 6,
                 child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  physics: const BouncingScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 14,
-                    childAspectRatio: 3.4,
+                    childAspectRatio: isMobile ? 3.4 : 4.5,
                   ),
                   itemCount: filteredChoices.length,
                   itemBuilder: (context, index) {
@@ -394,13 +399,14 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
                       child: ElevatedButton(
                         onPressed: () => _handleChoice(choice),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF1E293B),
+                          backgroundColor: const Color(0xFFF5F8FF),
+                          foregroundColor: const Color(0xFF1E3A8A),
                           surfaceTintColor: Colors.white,
-                          elevation: 0,
+                          elevation: 1,
+                          shadowColor: const Color(0x1F1A367C),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+                            borderRadius: BorderRadius.circular(18),
+                            side: const BorderSide(color: Color(0xFFBAC5E8), width: 2),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                         ),
