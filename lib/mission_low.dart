@@ -405,7 +405,7 @@ class _QuizScreenState extends State<QuizScreen> {
     }
     if (hasHanoiVisual) {
       return correct
-          ? const ['최소 횟수를 찾았어', '원반 장치가 안정되었어!']
+          ? const ['최소 횟수를 찾았어', '작은 원판 블록들이 모두 제자리를 찾았어!']
           : const ['아직 최소 횟수가 아니야', '원반을 더 적게 옮기는 방법을 떠올려 보자.'];
     }
     if (visualType == 'magic_square') {

@@ -698,13 +698,28 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '(가이드: 도형을 드래그하여 시소 위에 올려놓은 후, 올려진 도형을 탭하면 90도씩 회전시킬 수 있습니다.)',
+                    '(가이드: 도형을 드래그하여 회색 동그라미 빈칸에 올려놓은 후, 올려진 도형을 탭하면 90도씩 회전시킬 수 있습니다.)',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: isMobile ? 12.0 : 14.0,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey.shade600,
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _SeesawStepChip(stepNo: '1', label: '왼쪽에 도형 놓기', isActive: !_leftPlaced),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF97B0E9)),
+                      const SizedBox(width: 8),
+                      _SeesawStepChip(stepNo: '2', label: '오른쪽에 도형 놓기', isActive: _leftPlaced && !_rightPlaced),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF97B0E9)),
+                      const SizedBox(width: 8),
+                      _SeesawStepChip(stepNo: '3', label: '균형 확인', isActive: _leftPlaced && _rightPlaced),
+                    ],
                   ),
                 ],
               ),
@@ -1667,4 +1682,60 @@ class _SeesawPainter extends CustomPainter {
       o.balanced != balanced ||
       o.cellSz != cellSz ||
       o.gap != gap;
+}
+
+class _SeesawStepChip extends StatelessWidget {
+  final String stepNo;
+  final String label;
+  final bool isActive;
+
+  const _SeesawStepChip({
+    required this.stepNo,
+    required this.label,
+    required this.isActive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFFEBF0FF) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isActive ? const Color(0xFF3B82F6) : const Color(0xFFDDE3F0),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: isActive ? const Color(0xFF133E97) : Colors.grey.shade400,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              stepNo,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? const Color(0xFF133E97) : Colors.grey.shade500,
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

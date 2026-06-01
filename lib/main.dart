@@ -1128,7 +1128,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   }
 
   Widget _buildTargetPreview({required double side}) {
-    final cellSize = (side - 12) / _boardSize;
+    final double innerSide = side - 12;
+    final double totalSpacing = (_boardSize - 1) * 2; // (4 - 1) * 2px = 6px
+    final double cellSize = (innerSide - totalSpacing) / _boardSize;
 
     return Container(
       padding: const EdgeInsets.all(6),
@@ -1138,9 +1140,10 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         border: Border.all(color: const Color(0xFF97B0E9), width: 2),
       ),
       child: SizedBox(
-        width: side - 12,
-        height: side - 12,
+        width: innerSide,
+        height: innerSide,
         child: GridView.builder(
+          padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _totalCells,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
