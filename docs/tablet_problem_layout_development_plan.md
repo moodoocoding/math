@@ -41,7 +41,7 @@ Not complete:
 | 1 | `/mission_low` | `MissionLowScreen` | Tessellation shape choice | Partially improved | Recheck prompt height, board priority, shape choice card sizing, result copy placement |
 | 1 | `/mission_ch1_q2` | `MissionLowScreen` | Hanoi visual + choice | Not fully reviewed | Fit visual and choices without scroll-heavy layout, keep choices readable |
 | 2 | `/mission_chapter2_q1` | `SeesawPuzzleScreen` | Balance board | Updated | Visual QA on SM-T595N size, verify no overflow |
-| 2 | `/mission_chapter2_q2` | `Chapter2PuzzleQ2Screen` in `main.dart` | Pattern board puzzle | Target preview fixed only | Redesign right panel/board relationship, enlarge target and tray, reduce redundant step chips |
+| 2 | `/mission_chapter2_q2` | `Chapter2PuzzleQ2Screen` in `main.dart` | Pattern board puzzle | Updated | Left step panel + center board + right target/tray layout applied, target preview overflow fixed |
 | 2 | `/mission_chapter2_q3_qr` | `Chapter2QrVerificationScreen` in `main.dart` | QR verification | Not fully reviewed | Move debug skip to app bar if needed, reduce debug/manual elements so layout stays stable |
 | 3 | `/mission_chapter3_q1` | `MissionLowScreen` | Rod numeral + choice | Not fully reviewed | Ensure visual and 4-choice row fit in tablet landscape |
 | 3 | `/mission_chapter3_quiz` | `Chapter3MathQuizScreen` | Choice quiz | Partially improved | Verify 4-choice rhythm and prompt/choice balance |
