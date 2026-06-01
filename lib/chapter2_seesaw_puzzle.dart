@@ -613,6 +613,450 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     );
   }
 
+  Widget _buildSlide1Diagram() {
+    return Container(
+      height: 130,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F8FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 시소 받침대와 빔
+          Positioned(
+            bottom: 26,
+            child: Container(
+              width: 320,
+              height: 8,
+              decoration: BoxDecoration(
+                color: const Color(0xFF8D6E63),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 6,
+            child: Container(
+              width: 0,
+              height: 0,
+              decoration: const BoxDecoration(
+                border: Border(
+                  left: BorderSide(width: 14, color: Colors.transparent),
+                  right: BorderSide(width: 14, color: Colors.transparent),
+                  bottom: BorderSide(width: 22, color: Color(0xFF1A237E)),
+                ),
+              ),
+            ),
+          ),
+          // 3번 위치에 배치된 세로 블록 (2칸으로 축소하여 3 + 3 = 6점 단순화!)
+          Positioned(
+            left: 111,
+            bottom: 34,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(2, (index) => Container(
+                width: 20,
+                height: 20,
+                margin: const EdgeInsets.only(bottom: 1.5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E88E5),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+              )),
+            ),
+          ),
+          // 왼쪽에 표시되는 4, 3, 2, 1 숫자 라벨들
+          Positioned(
+            left: 86,
+            bottom: 8,
+            child: const Text(
+              '4',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF7986CB),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 119,
+            bottom: 8,
+            child: const Text(
+              '3',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF1A237E),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 152,
+            bottom: 8,
+            child: const Text(
+              '2',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF7986CB),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 185,
+            bottom: 8,
+            child: const Text(
+              '1',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF7986CB),
+              ),
+            ),
+          ),
+          // 점수 합산 말풍선 (3 + 3 = 6점)
+          Positioned(
+            right: 15,
+            top: 15,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF1E88E5), width: 2),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+                ],
+              ),
+              child: const Text(
+                '3 + 3\n= 6 점! 🎉',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF1E88E5),
+                  fontFamily: 'GangwonEduAll',
+                ),
+              ),
+            ),
+          ),
+          // 지시선 화살표
+          Positioned(
+            left: 140,
+            top: 48,
+            child: const Icon(
+              Icons.arrow_forward_rounded,
+              color: Color(0xFF1E88E5),
+              size: 26,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSlide2Diagram() {
+    return Container(
+      height: 130,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F8FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 시소 받침대와 수평 빔
+          Positioned(
+            bottom: 26,
+            child: Container(
+              width: 320,
+              height: 8,
+              decoration: BoxDecoration(
+                color: const Color(0xFF8D6E63),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 6,
+            child: Container(
+              width: 0,
+              height: 0,
+              decoration: const BoxDecoration(
+                border: Border(
+                  left: BorderSide(width: 14, color: Colors.transparent),
+                  right: BorderSide(width: 14, color: Colors.transparent),
+                  bottom: BorderSide(width: 22, color: Color(0xFF1A237E)),
+                ),
+              ),
+            ),
+          ),
+          // 왼쪽 3번 칸의 보라색 T 블록 (4칸 = 12점)
+          Positioned(
+            left: 70,
+            bottom: 34,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(3, (index) => Container(
+                    width: 14,
+                    height: 14,
+                    margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9C27B0),
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                  )),
+                ),
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF9C27B0),
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // 오른쪽 3번 칸의 초록색 S 블록 (4칸 = 12점)
+          Positioned(
+            right: 70,
+            bottom: 34,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(width: 7),
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF43A047),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                    ),
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF43A047),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF43A047),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                    ),
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF43A047),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                    ),
+                    const SizedBox(width: 7),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // 왼쪽 점수 & 오른쪽 점수 라벨
+          Positioned(
+            left: 45,
+            top: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3E5F5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                '왼쪽: 12점',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF7B1FA2)),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 45,
+            top: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                '오른쪽: 12점',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF2E7D32)),
+              ),
+            ),
+          ),
+          // 수평 균형 마크
+          const Positioned(
+            top: 40,
+            child: Icon(
+              Icons.check_circle_rounded,
+              color: Color(0xFF2E7D32),
+              size: 38,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSlide3Diagram() {
+    return Container(
+      height: 130,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F8FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // 0도 원래 모양 (L 블록)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                '원래 모양 0°',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFE65100)),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    children: List.generate(3, (index) => Container(
+                      width: 14,
+                      height: 14,
+                      margin: const EdgeInsets.only(bottom: 0.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFB8C00),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: Colors.white, width: 0.8),
+                      ),
+                    )),
+                  ),
+                  const SizedBox(width: 0.5),
+                  Column(
+                    children: [
+                      const SizedBox(height: 29),
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFB8C00),
+                          borderRadius: BorderRadius.circular(3),
+                          border: Border.all(color: Colors.white, width: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // 탭하기 조작 화살표
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.touch_app_rounded,
+                color: Color(0xFFFF4081),
+                size: 32,
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text(
+                    '톡! 터치',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Color(0xFFFF4081)),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Color(0xFFFF4081),
+                    size: 14,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // 회전 후 모양 (90도 회전된 L 블록)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                '돌아간 모양 90°',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFE65100)),
+              ),
+              const SizedBox(height: 14),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(3, (index) => Container(
+                      width: 14,
+                      height: 14,
+                      margin: const EdgeInsets.only(right: 0.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFB8C00),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: Colors.white, width: 0.8),
+                      ),
+                    )),
+                  ),
+                  const SizedBox(height: 0.5),
+                  Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFB8C00),
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(color: Colors.white, width: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showOnboardingTutorial() {
     int tutorialStep = 0;
     showDialog(
@@ -675,25 +1119,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F4FF),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
-                      ),
-                      child: const Text(
-                        '💡 예시:\n파란 블록을 3번 칸에 세로로 올리면,\n3이 4개니까 3 + 3 + 3 + 3 = 12 점!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1A237E),
-                          height: 1.3,
-                          fontFamily: 'GangwonEduAll',
-                        ),
-                      ),
-                    ),
+                    _buildSlide1Diagram(),
                   ] else if (tutorialStep == 1) ...[
                     const Text(
                       '왼쪽 먼저, 오른쪽은 똑같이! 👈',
@@ -717,7 +1143,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Icon(Icons.compare_arrows_rounded, size: 80, color: Color(0xFF133E97)),
+                    _buildSlide2Diagram(),
                   ] else ...[
                     const Text(
                       '블록을 톡! 터치해봐요! 🔄',
@@ -741,7 +1167,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Icon(Icons.touch_app_outlined, size: 80, color: Color(0xFFFF6B80)),
+                    _buildSlide3Diagram(),
                   ],
                   const SizedBox(height: 28),
                   SizedBox(
