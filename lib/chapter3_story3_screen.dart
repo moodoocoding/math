@@ -140,7 +140,7 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        '문제 해결하기',
+                        '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

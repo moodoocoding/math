@@ -196,8 +196,6 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
     final dialogFontSize = isMobile ? (width * 0.06).clamp(20.0, 26.0) : 32.0;
     final buttonFontSize = isMobile ? 22.0 : 26.0;
     final scene = _scenes[_sceneIndex];
-    final isLast = _sceneIndex == _scenes.length - 1;
-
 
     return Scaffold(
       appBar: AppBar(
@@ -302,7 +300,7 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '문제 해결하기' : '다음',
+                        '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

@@ -103,7 +103,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
       }
     }
 
-    // 9개 AI & 코딩 낱말 설정 및 좌표 정의
+    // 8개 AI & 코딩 낱말 설정 및 좌표 정의
     words.add(WordData(word: '알고리즘', startRow: 0, startCol: 0, direction: 'horizontal'));
     words.add(WordData(word: '인공지능', startRow: 2, startCol: 0, direction: 'horizontal'));
     words.add(WordData(word: '코딩블록', startRow: 4, startCol: 0, direction: 'horizontal'));
@@ -112,7 +112,6 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     words.add(WordData(word: '조건문', startRow: 1, startCol: 4, direction: 'vertical'));
     words.add(WordData(word: '루프', startRow: 0, startCol: 7, direction: 'vertical'));
     words.add(WordData(word: '페이스로봇', startRow: 1, startCol: 8, direction: 'vertical'));
-    words.add(WordData(word: '로봇', startRow: 1, startCol: 9, direction: 'vertical'));
   }
 
   bool _isValidSelection(List<(int, int)> selected) {
@@ -458,15 +457,31 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
-              child: Text(
-                '글자판 속에 숨어든 AI와 코딩 단서 낱말을 모두 찾아보세요!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: isCompact ? 22 : 28,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFF091F59),
-                  fontFamily: 'GangwonEduAll',
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '글자판 속에 숨어든 AI와 코딩 단서 낱말을 모두 찾아보세요!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isCompact ? 22 : 28,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF091F59),
+                      fontFamily: 'GangwonEduAll',
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '(가이드: 글자판의 글자들을 드래그하여 단어를 연결해 보세요.)',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isCompact ? 15 : 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF3B82F6),
+                      fontFamily: 'GangwonEduAll',
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(

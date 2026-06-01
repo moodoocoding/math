@@ -458,15 +458,31 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(6)),
               ),
-              child: Text(
-                '초상화 속 6명의 수학자 이름을 글자판에서 모두 찾아보세요!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: isCompact ? 22 : 28,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFF091F59),
-                  fontFamily: 'GangwonEduAll',
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '초상화 속 6명의 수학자 이름을 글자판에서 모두 찾아보세요!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isCompact ? 22 : 28,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF091F59),
+                      fontFamily: 'GangwonEduAll',
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '(가이드: 글자판의 글자들을 드래그하여 단어를 연결해 보세요.)',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isCompact ? 15 : 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF3B82F6),
+                      fontFamily: 'GangwonEduAll',
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(

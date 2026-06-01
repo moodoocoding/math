@@ -129,7 +129,7 @@ class Chapter4Story3Screen extends StatelessWidget {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
       nextRouteName: '/ending_story',
-      finalButtonText: '문제 해결하기',
+      finalButtonText: '다음',
     );
   }
 }

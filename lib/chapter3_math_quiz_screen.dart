@@ -63,7 +63,7 @@ class _Chapter3MathQuizScreenState extends State<Chapter3MathQuizScreen> {
       explanation: '그는 헤이그 특사 파견 외에도 최초의 신학문 학교인 서전서숙을 세워 수학을 직접 가르쳤으며 대한제국 최고의 수학 천재로 칭송받았습니다.',
     ),
     _QuizQuestion(
-      question: '‘리 군(Ree group)’ 이론으로 세계 수학계에 이름을 알렸으며, 캐나다 수학회 등에서 활약하며 세계에 이름을 알린 최초의 한국인 수학자는 누구일까요?',
+      question: '‘리 군(Ree group)’ 이론으로 세계 수학계에 이름을 알렸으며, 캐나다 수학회 등에서 활약하며\n세계에 이름을 알린 최초의 한국인 수학자는 누구일까요?',
       correctAnswer: '이임학',
       choices: ['이임학', '이상설', '앨런 튜링', '피보나치'],
       explanation: '미국 수학회지에 실린 논문을 우연히 발견해 편지로 수학적 오류를 지적하면서 세계적인 천재로 인정받았고 이 메일은 리 군 이론의 시초가 되었습니다.',
