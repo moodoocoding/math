@@ -902,6 +902,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
     });
   }
 
+  int get _placedPiecesCount =>
+      _boardCells.where((cell) => cell != null).length;
+
   bool _isSquarePiece(_PlacedPiece piece) => piece.id == 'piece1';
 
   bool _isCenterPiece(_PlacedPiece piece) => piece.id == 'piece4';
@@ -1269,13 +1272,23 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
     );
   }
 
-  Widget _buildPuzzleStepChip({required String stepNo, required String label}) {
+  Widget _buildPuzzleStepChip({
+    required String stepNo,
+    required String label,
+    bool active = false,
+  }) {
+    final borderColor = active
+        ? const Color(0xFF2D56B3)
+        : const Color(0xFFD4DDF3);
+    final bgColor = active ? const Color(0xFFEAF1FF) : const Color(0xFFF8FAFF);
+    final stepBg = active ? const Color(0xFF2D56B3) : const Color(0xFFA8B9E2);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: bgColor,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFB8CAEE), width: 1.5),
+        border: Border.all(color: borderColor, width: active ? 2 : 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1283,8 +1296,8 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
           Container(
             width: 22,
             height: 22,
-            decoration: const BoxDecoration(
-              color: Color(0xFF2F6BDD),
+            decoration: BoxDecoration(
+              color: stepBg,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
@@ -1300,10 +1313,10 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
-              color: Color(0xFF29427A),
+            style: TextStyle(
+              color: active ? const Color(0xFF163988) : const Color(0xFF29427A),
               fontSize: 14,
-              fontWeight: FontWeight.w800,
+              fontWeight: active ? FontWeight.w900 : FontWeight.w800,
             ),
           ),
         ],
@@ -1312,6 +1325,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   }
 
   Widget _buildPuzzleStagePanel() {
+    final placedCount = _placedPiecesCount;
+    final isCorrect = _isCorrect();
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
@@ -1327,19 +1343,21 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
             stepNo: '1',
             title: '1단계: 조각 놓기',
             subtitle: '빈 칸에 조각 6개 배치',
-            active: true,
+            active: placedCount < 6,
           ),
           const SizedBox(height: 8),
           _buildPuzzleStageCard(
             stepNo: '2',
             title: '2단계: 필요하면 돌리기',
             subtitle: '조각을 탭해 회전',
+            active: placedCount == 6 && !isCorrect,
           ),
           const SizedBox(height: 8),
           _buildPuzzleStageCard(
             stepNo: '3',
             title: '3단계: 완성 확인',
             subtitle: '완성확인으로 정답 판정',
+            active: placedCount == 6 && isCorrect,
           ),
         ],
       ),
@@ -1484,9 +1502,21 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                       runSpacing: 8,
                       alignment: WrapAlignment.center,
                       children: [
-                        _buildPuzzleStepChip(stepNo: '1', label: '조각 놓기'),
-                        _buildPuzzleStepChip(stepNo: '2', label: '필요하면 돌리기'),
-                        _buildPuzzleStepChip(stepNo: '3', label: '완성 확인'),
+                        _buildPuzzleStepChip(
+                          stepNo: '1',
+                          label: '조각 놓기',
+                          active: _placedPiecesCount < 6,
+                        ),
+                        _buildPuzzleStepChip(
+                          stepNo: '2',
+                          label: '필요하면 돌리기',
+                          active: _placedPiecesCount == 6 && !_isCorrect(),
+                        ),
+                        _buildPuzzleStepChip(
+                          stepNo: '3',
+                          label: '완성 확인',
+                          active: _placedPiecesCount == 6 && _isCorrect(),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
