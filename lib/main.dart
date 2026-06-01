@@ -1180,7 +1180,9 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   Widget _buildTargetPreviewGrid({required double side}) {
     const double previewPadding = 6;
     const double cellGap = 2;
-    final double innerSide = side - previewPadding * 2;
+    const double borderWidth = 2;
+    // 패딩(위아래 총 12)과 테두리 두께(위아래 총 4)를 모두 제외한 크기를 내부 가용 크기로 잡아야 함
+    final double innerSide = side - (previewPadding * 2) - (borderWidth * 2);
     final double cellSize =
         (innerSide - (_boardSize - 1) * cellGap) / _boardSize;
 
@@ -1191,7 +1193,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         decoration: BoxDecoration(
           color: const Color(0xFFEAF1FF),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF97B0E9), width: 2),
+          border: Border.all(color: const Color(0xFF97B0E9), width: borderWidth),
         ),
         child: Column(
           children: [
