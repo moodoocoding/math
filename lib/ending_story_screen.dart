@@ -19,12 +19,12 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
   final List<_EndingScene> _scenes = [
     const _EndingScene(
       speaker: '하우',
-      line: '우리가 되찾은 네 개의 별 조각들이 반짝별의 품으로 날아가고 있어!',
+      line: '우리가 꼭 안아준 네 조각의 빛이 반짝별 속으로 은은하게 흩어지며 녹아들고 있어...',
       characterAsset: 'assets/images/chr_how_cheering.png', // 기본 캐릭터 사용
     ),
     const _EndingScene(
       speaker: '플레이',
-      line: '우와! 조각들이 하나로 맞춰지면서 반짝별이 다시 밤하늘처럼 눈부시게 빛나기 시작해!',
+      line: '와아... 수학체험센터가 다시 밤하늘 가득 메운 은하수처럼 따뜻하고 눈부시게 빛나! 정말 아름답다...',
       characterAsset: 'assets/images/chr_play_happy.png', // 기본 캐릭터 사용
     ),
   ];

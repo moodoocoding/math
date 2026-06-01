@@ -15,12 +15,12 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
       speaker: '하우',
-      line: '열렸어! 시소 아래에서 반짝이는 무늬판이 나타났어!',
+      line: '시소가 수평을 찾았어! 시소 밑에서 반짝이는 무늬판이 서서히 솟아올라!',
       characterAsset: 'assets/images/chr_how_clapping.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '조각 6개를 움직여 같은 무늬를 만들면 지나갈 수 있대!',
+      line: '조각 6개를 움직여서 이 무늬판의 조화를 완성하면, 다음 통로로 갈 수 있나 봐!',
       characterAsset: 'assets/images/chr_play_right.png',
     ),
   ];
@@ -188,7 +188,7 @@ class _Chapter2Story2ScreenState extends State<Chapter2Story2Screen> {
                         ),
                       ),
                       child: Text(
-                        isLast ? '무늬 장치 도전하기' : '다음',
+                        isLast ? '문제 해결하기' : '다음',
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,

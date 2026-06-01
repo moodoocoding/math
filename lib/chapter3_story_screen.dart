@@ -20,32 +20,22 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
     ),
     _Chapter3Scene(
       speaker: '플레이',
-      line: '봐! 조각을 찾으니까 체험센터가 더 환해졌어!',
+      line: '두 번째 별 조각을 찾으니 체험센터가 더 환해졌어! 빛이 퍼져나가며 잠들었던 공간이 다시 밝아지고 있어.',
       characterAsset: 'assets/images/chr_play_clapping.png',
     ),
     _Chapter3Scene(
       speaker: '하우',
-      line: '다음 단서가 보여! 세 번째 별 조각은 수학역사실에 있대!',
+      line: '단서가 가리키는 다음 목적지는 위대한 지혜들이 잠든 \'수학역사실\'이야!',
       characterAsset: 'assets/images/chr_how_lefttalk.png',
     ),
     _Chapter3Scene(
       speaker: '플레이',
-      line: '서둘러 가자! 다음 조각을 찾으면 빛이 더 돌아올 거야!',
-      characterAsset: 'assets/images/chr_play_running.png',
-    ),
-    _Chapter3Scene(
-      speaker: '하우',
-      line: '와! 여기가 수학역사실이구나!',
-      characterAsset: 'assets/images/chr_how_jump.png',
-    ),
-    _Chapter3Scene(
-      speaker: '플레이',
-      line: '저기 빛나는 계산 막대가 보여. 첫 번째 장치인가 봐!',
+      line: '여기가 수학역사실이구나... 저기 신비로운 기운이 흐르는 계산 막대들이 놓여 있어!',
       characterAsset: 'assets/images/chr_play_surprised.png',
     ),
     _Chapter3Scene(
       speaker: '하우',
-      line: '산가지 숫자를 맞히면 문이 열릴 것 같아!',
+      line: '계산 막대들에 숨겨진 숫자의 비밀을 밝혀내면 문이 열릴 것 같아!',
       characterAsset: 'assets/images/chr_how_thinking.png',
     ),
   ];
@@ -203,7 +193,7 @@ class _Chapter3StoryScreenState extends State<Chapter3StoryScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '산가지 장치 도전하기' : '다음',
+                        isLast ? '문제 해결하기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

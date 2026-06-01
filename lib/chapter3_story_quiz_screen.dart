@@ -15,12 +15,12 @@ class _Chapter3StoryQuizScreenState extends State<Chapter3StoryQuizScreen> {
   static const List<_Chapter3Scene> _scenes = [
     _Chapter3Scene(
       speaker: '하우',
-      line: '잠깐! 벽에 수학자들의 초상화가 걸려 있어!',
+      line: '문이 열렸어! 어? 벽에 옛날 수학자들의 초상화가 걸려 있어!',
       characterAsset: 'assets/images/chr_how_running.png',
     ),
     _Chapter3Scene(
       speaker: '플레이',
-      line: '수학자가 누구인지 맞히면 다음 장치가 열릴 것 같아!',
+      line: '이 초상화들 속에 숨겨진 이야기를 알아맞히면 다음 공간의 문이 열릴 거야!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
   ];
@@ -178,7 +178,7 @@ class _Chapter3StoryQuizScreenState extends State<Chapter3StoryQuizScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '초상화 비밀 풀기' : '다음',
+                        isLast ? '문제 해결하기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

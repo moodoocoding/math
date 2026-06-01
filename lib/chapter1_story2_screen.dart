@@ -6,8 +6,7 @@ class Chapter1Story2Screen extends StatefulWidget {
   const Chapter1Story2Screen({super.key});
 
   @override
-  State<Chapter1Story2Screen> createState() =>
-      _Chapter1Story2ScreenState();
+  State<Chapter1Story2Screen> createState() => _Chapter1Story2ScreenState();
 }
 
 class _Chapter1Story2ScreenState extends State<Chapter1Story2Screen> {
@@ -16,22 +15,22 @@ class _Chapter1Story2ScreenState extends State<Chapter1Story2Screen> {
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
       speaker: '하우',
-      line: '문이 열렸어! 바닥에 반짝이는 길이 나타났어!',
+      line: '문이 열렸다! 바닥을 채운 문양들 위로 은은한 길이 반짝이며 번져나가고 있어!',
       characterAsset: 'assets/images/chr_how_heart.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '저 길 끝에 다음 장치가 있어! 얼른 가 보자!',
+      line: '와... 이 빛나는 길이 복도 너머 어두운 곳까지 뻗어 있어. 우리 저 빛을 따라가 볼까?',
       characterAsset: 'assets/images/chr_play_lefthand2.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '어? 이번에는 원판이 기둥에 쌓여 있어!',
+      line: '길 끝에 이르니까 크기가 다른 원판 블록들이 차례대로 예쁘게 꽂혀 있어!',
       characterAsset: 'assets/images/chr_how_right.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '원판을 규칙대로 옮기면 첫 번째 별 조각을 꺼낼 수 있대!',
+      line: '이 원판 블록들을 알맞게 움직여서 원래 자리를 찾아주면, 첫 번째 별 조각을 얻을 수 있을 것 같아!',
       characterAsset: 'assets/images/chr_play_explaining.png',
     ),
   ];
@@ -230,7 +229,7 @@ class _Chapter1Story2ScreenState extends State<Chapter1Story2Screen> {
                         ),
                       ),
                       child: Text(
-                        isLast ? '원반 장치 도전하기' : '다음',
+                        isLast ? '문제 해결하기' : '다음',
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,

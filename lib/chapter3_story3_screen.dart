@@ -29,9 +29,14 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
 
   @override
   Widget build(BuildContext context) {
-
     final width = MediaQuery.of(context).size.width;
-    final charHeight = width < 1100 ? width * 0.42 : 420.0;
+    final isMobile = width < 600;
+    final charHeight = isMobile 
+        ? (MediaQuery.of(context).size.height * 0.42).clamp(180.0, 320.0)
+        : (width < 1100 ? width * 0.42 : 420.0);
+    
+    final dialogFontSize = isMobile ? (width * 0.055).clamp(18.0, 24.0) : 28.0;
+    final buttonFontSize = isMobile ? 22.0 : 26.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -99,19 +104,19 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                         )
                       ],
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.fromLTRB(22, 18, 22, 20),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _SpeakerBadge(name: '하우'),
-                          SizedBox(height: 12),
+                          const _SpeakerBadge(name: '하우'),
+                          const SizedBox(height: 12),
                           Text(
-                            '좋아! 세 번째 별 조각을 찾으면 마지막 빛도 돌아올 거야!',
+                            '돌판의 숫자들이 황금빛으로 물들더니 세 번째 별 조각이 둥실 떠올랐어! 이제 마지막 한 조각만 찾으면 돼!',
                             style: TextStyle(
-                              fontSize: 28,
+                              fontSize: dialogFontSize,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF1E1E1E),
+                              color: const Color(0xFF1E1E1E),
                               height: 1.25,
                               fontFamily: 'GangwonEduAll',
                             ),
@@ -134,9 +139,9 @@ class _Chapter3Story3ScreenState extends State<Chapter3Story3Screen> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text(
-                        '다음으로',
-                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+                      child: Text(
+                        '문제 해결하기',
+                        style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),
                   ),

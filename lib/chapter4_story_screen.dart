@@ -8,40 +8,30 @@ class Chapter4StoryScreen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '플레이',
-      line: '찾았다! 세 번째 별 조각이야!',
+      line: '세 번째 별 조각을 품에 안으니 체험센터가 거의 다 환해졌어!',
       characterAsset: 'assets/images/chr_play_cheering.png',
       backgroundAsset: 'assets/images/chapter3_bg_1.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '와! 체험센터가 거의 다 밝아졌어!',
+      line: '정말! 마지막 조각만 되찾으면 반짝별이 밤하늘을 수놓을 거야!',
       characterAsset: 'assets/images/chr_how_laughing.png',
       backgroundAsset: 'assets/images/chapter3_bg_1.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '다음 단서가 보여! 마지막 별 조각은 수학융합실에 있대!',
+      line: '마지막 단서는 지혜가 한데 모여 융합된 \'수학융합실\'을 가리키고 있어.',
       characterAsset: 'assets/images/chr_play_waving.png',
       backgroundAsset: 'assets/images/chapter3_bg_1.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '마지막 조각만 찾으면 반짝별이 다시 빛날 거야!',
+      line: '수학융합실 문이 열렸다! 저 안쪽에 조각조각 나눠진 신기한 블록판이 보여!',
       characterAsset: 'assets/images/chr_how_thumbs_up.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '와! 여기가 수학융합실이구나!',
-      characterAsset: 'assets/images/chr_play_laughing.png',
-    ),
-    _Chapter4Scene(
-      speaker: '하우',
-      line: '저기 빛나는 블록판이 보여! 첫 번째 장치인가 봐!',
-      characterAsset: 'assets/images/chr_how_running.png',
-    ),
-    _Chapter4Scene(
-      speaker: '플레이',
-      line: '같은 모양의 블록을 찾으면 길이 열릴 것 같아!',
+      line: '빈틈없이 딱 들어맞는 도형 블록들을 찾아서 이 판을 곱게 채워주자!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
   ];
@@ -62,17 +52,17 @@ class Chapter4Story2Screen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: '열렸어! 안쪽에 단서가 숨어 있었어!',
+      line: '블록들이 단단히 결합하더니 안쪽에서 또 다른 방바닥이 열렸어!',
       characterAsset: 'assets/images/chr_how_surprised.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '벽에 코딩과 인공지능에 대한 단서가 나타났어. 마지막 별 조각이 가까워지고 있는 것 같아!',
+      line: '벽에 반짝이는 전자 글자판이 스르륵 내려오네? 수학과 컴퓨터 과학의 비밀이 숨겨져 있나 봐.',
       characterAsset: 'assets/images/chr_play_right.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '단서의 뜻을 알아내고, 숨어 있는 낱말을 찾으면 별 조각이 있는 곳을 알 수 있을 거야!',
+      line: '글자판 속에 흩어진 낱말들을 연결하다 보면 마지막 별 조각을 품은 곳이 짜잔 나타날 거야!',
       characterAsset: 'assets/images/chr_how_presenting.png',
     ),
   ];

@@ -15,33 +15,28 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
   static const List<_Chapter2Scene> _scenes = [
     _Chapter2Scene(
       speaker: '하우',
-      line: '와! 첫 번째 별 조각을 찾으니까 불빛이 다시 켜졌어!',
+      line: '와! 첫 번째 별 조각을 돌려놓으니까 복도의 불빛이 다시 환하게 켜졌어!',
       characterAsset: 'assets/images/chr_how_happy.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '좋아! 다음 조각을 찾으면 체험센터가 더 밝아질 거야!',
+      line: '별 조각이 되살아나면서 새로운 길이 열린 거야. 조각 뒤에 새겨진 단서를 함께 읽어보자!',
       characterAsset: 'assets/images/chr_play_thumbs_up.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '첫 번째 조각 뒤에 다음 단서가 있어!',
+      line: '두 번째 별 조각은 움직임의 힘이 깃든 \'수학놀이실\'에 있대!',
       characterAsset: 'assets/images/chr_how_presenting.png',
     ),
     _Chapter2Scene(
       speaker: '플레이',
-      line: '두 번째 별 조각은 수학놀이실에 있대!',
+      line: '여기가 수학놀이실이구나! 저기 공중에 은은하게 떠올라 있는 시소가 보여.',
       characterAsset: 'assets/images/chr_play_idea.png',
     ),
     _Chapter2Scene(
       speaker: '하우',
-      line: '와! 여기가 수학놀이실이구나! 저기 반짝이는 시소가 보여!',
+      line: '시소의 무너진 균형을 다시 맞춰주면, 다음 공간으로 향하는 닫힌 문이 열릴 거야!',
       characterAsset: 'assets/images/chr_how_laughing.png',
-    ),
-    _Chapter2Scene(
-      speaker: '플레이',
-      line: '시소 양쪽의 균형을 맞히면 다음 장치가 열릴 거야!',
-      characterAsset: 'assets/images/chr_play_lefthand.png',
     ),
   ];
 
@@ -224,7 +219,7 @@ class _Chapter2StoryScreenState extends State<Chapter2StoryScreen> {
                         ),
                       ),
                       child: Text(
-                        isLast ? '시소 장치 도전하기' : '다음',
+                        isLast ? '문제 해결하기' : '다음',
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,

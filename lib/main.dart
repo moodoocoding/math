@@ -16,6 +16,7 @@ import 'chapter2_story2_screen.dart';
 import 'chapter2_story3_screen.dart';
 import 'chapter3_story_screen.dart';
 import 'chapter3_story2_screen.dart';
+import 'chapter3_story3_screen.dart';
 import 'chapter4_story_screen.dart';
 import 'chapter4_problem1_brick_puzzle.dart';
 import 'chapter4_problem2_hidden_word.dart';
@@ -66,6 +67,7 @@ class MissionTourApp extends StatelessWidget {
               completedRouteName: '/chapter3_story2',
             ),
         '/chapter3_story2': (context) => const Chapter3Story2Screen(),
+        '/chapter3_story3': (context) => const Chapter3Story3Screen(),
         '/chapter4_story': (context) => const Chapter4StoryScreen(),
         '/chapter4_story2': (context) => const Chapter4Story2Screen(),
         '/chapter4_story3': (context) => const Chapter4Story3Screen(),
@@ -100,7 +102,7 @@ class MissionTourApp extends StatelessWidget {
         ),
         '/mission_chapter3_q2': (context) => const MissionLowScreen(
           missionDataPath: 'assets/data/mission_chapter3_q2.json',
-          completedRouteName: '/chapter4_story',
+          completedRouteName: '/chapter3_story3',
         ),
         '/ending_story': (context) => const EndingStoryScreen(),
       },
