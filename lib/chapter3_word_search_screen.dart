@@ -424,6 +424,316 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
     final screenWidth = screenSize.width;
     final isCompact = screenSize.height < 600;
     final isMobile = screenWidth < 600;
+    final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    Widget mainContent;
+
+    if (isLandscape) {
+      mainContent = Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: screenWidth * 0.35,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFDDE3F0), width: 1.5),
+                    ),
+                    child: const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '초상화 속 6명의 수학자 이름을 찾아보세요!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF091F59),
+                            fontFamily: 'GangwonEduAll',
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '(가이드: 글자판의 글자들을 드래그하여 단어를 연결해 보세요.)',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF3B82F6),
+                            fontFamily: 'GangwonEduAll',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+                      ),
+                      child: GridView.builder(
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 6,
+                          mainAxisSpacing: 6,
+                          childAspectRatio: 2.1,
+                        ),
+                        itemCount: words.length,
+                        itemBuilder: (context, i) {
+                          final word = words[i];
+                          final found = foundWords.contains(word.word);
+                          return _buildWordCard(word.word, found, true, screenSize);
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: _showHint,
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: const Color(0xFF6F63D1),
+                                  side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                child: const Text('힌트', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: _resetPuzzle,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF8A8A8A),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                child: const Text('다시하기', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _checkAnswer,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF123E97),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            child: const Text('이름 확인', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                        if (kDebugMode) ...[
+                          const SizedBox(height: 6),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: _skipPuzzleForTest,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF315FB8),
+                                side: const BorderSide(color: Color(0xFF5B80D7), width: 1.5),
+                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: const Text('테스트 스킵', style: TextStyle(fontSize: 12)),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Center(
+                child: _buildGameBoard(screenSize, isCompact),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      mainContent = Column(
+        children: [
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+            padding: EdgeInsets.symmetric(vertical: isCompact ? 8 : 12),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(6)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '초상화 속 6명의 수학자 이름을 글자판에서 모두 찾아보세요!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: isCompact ? 22 : 28,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF091F59),
+                    fontFamily: 'GangwonEduAll',
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '(가이드: 글자판의 글자들을 드래그하여 단어를 연결해 보세요.)',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: isCompact ? 15 : 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF3B82F6),
+                    fontFamily: 'GangwonEduAll',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenSize.width * 0.04,
+              vertical: screenSize.height * 0.01,
+            ),
+            child: SizedBox(
+              height: isCompact ? 50 : 66,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (var word in words)
+                    _buildWordCard(
+                      word.word,
+                      foundWords.contains(word.word),
+                      isCompact,
+                      screenSize,
+                    ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: _buildGameBoard(screenSize, isCompact),
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: screenSize.width * 0.03,
+              vertical: isCompact ? 10 : 14,
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(color: Color(0xFFE1E1E4), width: 1)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _showHint,
+                        icon: Icon(Icons.lightbulb_outline, size: isMobile ? 20 : 24),
+                        label: Text(
+                          '힌트',
+                          style: TextStyle(fontSize: isMobile ? 16 : 18),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF6F63D1),
+                          side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _resetPuzzle,
+                        icon: Icon(Icons.refresh, size: isMobile ? 20 : 24),
+                        label: Text(
+                          '다시하기',
+                          style: TextStyle(fontSize: isMobile ? 16 : 18),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF8A8A8A),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _checkAnswer,
+                        icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
+                        label: Text(
+                          '이름 확인',
+                          style: TextStyle(fontSize: isMobile ? 16 : 18),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF123E97),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (kDebugMode) ...[
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _skipPuzzleForTest,
+                      icon: const Icon(Icons.skip_next_rounded),
+                      label: const Text('테스트용: 문제 건너뛰고 다음으로'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF315FB8),
+                        side: const BorderSide(color: Color(0xFF5B80D7), width: 2),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F8FF),
@@ -448,155 +758,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-              padding: EdgeInsets.symmetric(vertical: isCompact ? 8 : 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(6)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '초상화 속 6명의 수학자 이름을 글자판에서 모두 찾아보세요!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: isCompact ? 22 : 28,
-                      fontWeight: FontWeight.w900,
-                      color: const Color(0xFF091F59),
-                      fontFamily: 'GangwonEduAll',
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '(가이드: 글자판의 글자들을 드래그하여 단어를 연결해 보세요.)',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: isCompact ? 15 : 18,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF3B82F6),
-                      fontFamily: 'GangwonEduAll',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenSize.width * 0.04,
-                vertical: screenSize.height * 0.01,
-              ),
-              child: SizedBox(
-                height: isCompact ? 50 : 66,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (var word in words)
-                      _buildWordCard(
-                        word.word,
-                        foundWords.contains(word.word),
-                        isCompact,
-                        screenSize,
-                      ),
-                  ],
-                ),
-              ),
-            ),
-
-            Expanded(
-              child: Center(
-                child: _buildGameBoard(screenSize, isCompact),
-              ),
-            ),
-
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: screenSize.width * 0.03,
-                vertical: isCompact ? 10 : 14,
-              ),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Color(0xFFE1E1E4), width: 1)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _showHint,
-                          icon: Icon(Icons.lightbulb_outline, size: isMobile ? 20 : 24),
-                          label: Text(
-                            '힌트',
-                            style: TextStyle(fontSize: isMobile ? 16 : 18),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF6F63D1),
-                            side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _resetPuzzle,
-                          icon: Icon(Icons.refresh, size: isMobile ? 20 : 24),
-                          label: Text(
-                            '다시하기',
-                            style: TextStyle(fontSize: isMobile ? 16 : 18),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8A8A8A),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _checkAnswer,
-                          icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
-                          label: Text(
-                            '이름 확인',
-                            style: TextStyle(fontSize: isMobile ? 16 : 18),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF123E97),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (kDebugMode) ...[
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _skipPuzzleForTest,
-                        icon: const Icon(Icons.skip_next_rounded),
-                        label: const Text('테스트용: 문제 건너뛰고 다음으로'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF315FB8),
-                          side: const BorderSide(color: Color(0xFF5B80D7), width: 2),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
+        child: mainContent,
       ),
     );
   }

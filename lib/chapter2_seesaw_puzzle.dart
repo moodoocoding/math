@@ -234,6 +234,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     _rightDist = 1;
     _rightStartRow = 1;
     _rightVisibleCells = 0;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showOnboardingTutorial();
+    });
   }
 
   @override
@@ -271,6 +275,24 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       torque += _rightCells[i].$1;
     }
     return torque;
+  }
+
+  String get _leftFormulaText {
+    if (_leftIdx == null || !_leftPlaced) return '0 점';
+    final activeCount = math.min(_leftVisibleCells, _leftCells.length);
+    if (activeCount == 0) return '0 점';
+    final numbers = _leftCells.take(activeCount).map((c) => c.$1).toList();
+    numbers.sort();
+    return '${numbers.join(' + ')} = $_leftTorque 점';
+  }
+
+  String get _rightFormulaText {
+    if (_rightIdx == null || !_rightPlaced) return '0 점';
+    final activeCount = math.min(_rightVisibleCells, _rightCells.length);
+    if (activeCount == 0) return '0 점';
+    final numbers = _rightCells.take(activeCount).map((c) => c.$1).toList();
+    numbers.sort();
+    return '${numbers.join(' + ')} = $_rightTorque 점';
   }
 
   void _animateSeesaw() {
@@ -591,6 +613,173 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     );
   }
 
+  void _showOnboardingTutorial() {
+    int tutorialStep = 0;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            child: Container(
+              width: 520,
+              padding: const EdgeInsets.all(26),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '⚖️ 반짝별 시소 학교',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF133E97),
+                          fontFamily: 'GangwonEduAll',
+                        ),
+                      ),
+                      Text(
+                        '${tutorialStep + 1} / 3',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 20, thickness: 1.5),
+                  const SizedBox(height: 12),
+                  if (tutorialStep == 0) ...[
+                    const Text(
+                      '시소 칸 숫자의 비밀! 💡',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF091F59),
+                        fontFamily: 'GangwonEduAll',
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      '시소 아래에 적힌 숫자(1~5)는 그 칸의 점수예요.\n도형 블록이 올라간 칸의 숫자를 모두 더하면\n나의 시소 점수가 된답니다!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF4B5563),
+                        height: 1.35,
+                        fontFamily: 'GangwonEduAll',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0F4FF),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
+                      ),
+                      child: const Text(
+                        '💡 예시:\n파란 블록을 3번 칸에 세로로 올리면,\n3이 4개니까 3 + 3 + 3 + 3 = 12 점!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1A237E),
+                          height: 1.3,
+                          fontFamily: 'GangwonEduAll',
+                        ),
+                      ),
+                    ),
+                  ] else if (tutorialStep == 1) ...[
+                    const Text(
+                      '왼쪽 먼저, 오른쪽은 똑같이! 👈',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF091F59),
+                        fontFamily: 'GangwonEduAll',
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      '1단계: 먼저 왼쪽에 아무 블록이나 올려서 점수를 만들어요.\n2단계: 오른쪽에 다른 블록을 올려서 왼쪽 점수와\n똑같은 점수를 만들면 성공이에요!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF4B5563),
+                        height: 1.4,
+                        fontFamily: 'GangwonEduAll',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Icon(Icons.compare_arrows_rounded, size: 80, color: Color(0xFF133E97)),
+                  ] else ...[
+                    const Text(
+                      '블록을 톡! 터치해봐요! 🔄',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF091F59),
+                        fontFamily: 'GangwonEduAll',
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      '블록을 올려놓은 후에 손가락으로 톡! 터치하면\n90도씩 빙글빙글 돌아가요!\n도형을 돌려서 올려놓는 칸을 바꿔 점수를 조절해 보세요.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF4B5563),
+                        height: 1.4,
+                        fontFamily: 'GangwonEduAll',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Icon(Icons.touch_app_outlined, size: 80, color: Color(0xFFFF6B80)),
+                  ],
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (tutorialStep < 2) {
+                          setDialogState(() {
+                            tutorialStep++;
+                          });
+                        } else {
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF133E97),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: Text(
+                        tutorialStep < 2 ? '다음' : '도전 시작하기! ⚖️',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   void _showHint() {
     AppSfxController.playClick();
     showDialog(
@@ -687,23 +876,25 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               child: Column(
                 children: [
                   Text(
-                    '반짝이는 시소의 양쪽 힘이 같아지도록 도형을 움직여 보세요',
+                    '⚖️ 시소 양쪽의 칸에 적힌 숫자의 합이 똑같아지도록 만들어 봐요!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: isMobile ? 18 : 25,
                       fontWeight: FontWeight.w900,
                       color: const Color(0xFF091F59),
                       height: 1.25,
+                      fontFamily: 'GangwonEduAll',
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '(가이드: 도형을 드래그하여 회색 동그라미 빈칸에 올려놓은 후, 올려진 도형을 탭하면 90도씩 회전시킬 수 있습니다.)',
+                    '👉 도형을 끌어다 놓고, 톡! 터치하면 돌릴 수 있어요.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: isMobile ? 12.0 : 14.0,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade600,
+                      fontSize: isMobile ? 14.0 : 17.0,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF3B82F6),
+                      fontFamily: 'GangwonEduAll',
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -819,78 +1010,83 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.zero,
-              physics: const BouncingScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
-                childAspectRatio: 1.25,
-              ),
-              itemCount: _kCards.length,
-              itemBuilder: (context, i) {
-                final card = _kCards[i];
-                final isUsed = (_leftPlaced && _leftIdx == i) || (_rightPlaced && _rightIdx == i);
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double availHeight = constraints.maxHeight;
+          final double maxTileHeight = (availHeight - 20) / 3;
+          final double maxTileWidth = (width - 26) / 2;
+          final double tileSize = math.min(maxTileHeight * 1.25, maxTileWidth).clamp(36.0, 110.0);
+          final double tileHeight = tileSize / 1.25;
 
-                // 2열 격자에서의 각 타일 대략적인 너비
-                final double tileSize = (width - 28) / 2;
+          return Center(
+            child: SizedBox(
+              width: tileSize * 2 + 12,
+              height: tileHeight * 3 + 12,
+              child: GridView.builder(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 6,
+                  mainAxisSpacing: 6,
+                  childAspectRatio: 1.25,
+                ),
+                itemCount: _kCards.length,
+                itemBuilder: (context, i) {
+                  final card = _kCards[i];
+                  final isUsed = (_leftPlaced && _leftIdx == i) || (_rightPlaced && _rightIdx == i);
 
-                // 드래그 대상 빌드
-                Widget cardTile = _storageCardTile(i, tileSize, isUsed);
+                  Widget cardTile = _storageCardTile(i, tileSize, isUsed);
 
-                if (isUsed) {
-                  return cardTile; // 드래그 불가능 (잠금 상태)
-                }
+                  if (isUsed) {
+                    return cardTile;
+                  }
 
-                return Draggable<_CardDef>(
-                  data: card,
-                  maxSimultaneousDrags: 1,
-                  feedback: Material(
-                    color: Colors.transparent,
-                    child: Opacity(
-                      opacity: 0.75,
-                      child: Builder(
-                        builder: (context) {
-                          final maxC = card.rotations[0].map((c) => c.$1).reduce(math.max) + 1;
-                          final maxR = card.rotations[0].map((c) => c.$2).reduce(math.max) + 1;
-                          return SizedBox(
-                            width: cellSz * maxC,
-                            height: cellSz * maxR,
-                            child: CustomPaint(
-                              painter: _MiniShapePainter(
-                                cells: card.rotations[0],
-                                color: card.color,
-                                fixedCellSize: cellSz,
+                  return Draggable<_CardDef>(
+                    data: card,
+                    maxSimultaneousDrags: 1,
+                    feedback: Material(
+                      color: Colors.transparent,
+                      child: Opacity(
+                        opacity: 0.75,
+                        child: Builder(
+                          builder: (context) {
+                            final maxC = card.rotations[0].map((c) => c.$1).reduce(math.max) + 1;
+                            final maxR = card.rotations[0].map((c) => c.$2).reduce(math.max) + 1;
+                            return SizedBox(
+                              width: cellSz * maxC,
+                              height: cellSz * maxR,
+                              child: CustomPaint(
+                                painter: _MiniShapePainter(
+                                  cells: card.rotations[0],
+                                  color: card.color,
+                                  fixedCellSize: cellSz,
+                                ),
                               ),
-                            ),
-                          );
-                        }
+                            );
+                          }
+                        ),
                       ),
                     ),
-                  ),
-                  childWhenDragging: Opacity(
-                    opacity: 0.4,
+                    childWhenDragging: Opacity(
+                      opacity: 0.4,
+                      child: cardTile,
+                    ),
+                    onDragEnd: (_) {
+                      setState(() {
+                        _hoverLeftIdx = null;
+                        _hoverLeftDist = null;
+                        _hoverRightIdx = null;
+                        _hoverRightDist = null;
+                      });
+                    },
                     child: cardTile,
-                  ),
-                  onDragEnd: (_) {
-                    setState(() {
-                      _hoverLeftIdx = null;
-                      _hoverLeftDist = null;
-                      _hoverRightIdx = null;
-                      _hoverRightDist = null;
-                    });
-                  },
-                  child: cardTile,
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          );
+        }
       ),
     );
   }
@@ -994,11 +1190,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                '왼쪽 기울기: $_leftTorque',
+                '왼쪽 점수: $_leftFormulaText',
                 style: TextStyle(
-                  fontSize: isMobile ? 13 : 15,
-                  fontWeight: FontWeight.w800,
+                  fontSize: isMobile ? 13 : 17,
+                  fontWeight: FontWeight.w900,
                   color: const Color(0xFF163988),
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
               const SizedBox(
@@ -1010,11 +1207,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 ),
               ),
               Text(
-                '오른쪽 기울기: ${_rightPlaced ? _rightTorque : 0}',
+                '오른쪽 점수: ${_rightPlaced ? _rightFormulaText : "0 점"}',
                 style: TextStyle(
-                  fontSize: isMobile ? 13 : 15,
-                  fontWeight: FontWeight.w800,
+                  fontSize: isMobile ? 13 : 17,
+                  fontWeight: FontWeight.w900,
                   color: const Color(0xFF163988),
+                  fontFamily: 'GangwonEduAll',
                 ),
               ),
             ],
