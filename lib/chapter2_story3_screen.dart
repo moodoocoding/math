@@ -125,7 +125,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                           const _SpeakerBadge(name: '하우'),
                           const SizedBox(height: 12),
                           Text(
-                            '무늬판이 완성되자 아래에서 귀여운 올빼미 로봇 \'루카\'의 따뜻한 쪽지가 반짝이고 있어! 책 읽어주는 로봇 루카에게 지혜의 수학책을 보여주면, 커다란 눈으로 책을 비춰서 재미있게 읽어준대! 루카와 책을 읽고 마음을 남기면 두 번째 별 조각을 찾을 수 있는 신비한 별빛이 켜질 거야!',
+                            '와! 무늬판 아래에서 책 읽어주는 귀여운 올빼미 로봇 \'루카\'의 쪽지가 반짝여! 루카와 수학책을 읽고 한 줄 마음을 남기면, 두 번째 별 조각을 찾을 수 있는 신비한 빛을 받을 수 있대!',
                             style: TextStyle(
                               fontSize: dialogFontSize,
                               fontWeight: FontWeight.w800,
