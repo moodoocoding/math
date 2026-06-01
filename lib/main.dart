@@ -1269,148 +1269,6 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
     );
   }
 
-  Widget _buildPuzzleStepChip({required String stepNo, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFB8CAEE), width: 1.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 22,
-            height: 22,
-            decoration: const BoxDecoration(
-              color: Color(0xFF2F6BDD),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              stepNo,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF29427A),
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPuzzleStagePanel() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildPuzzleStageCard(
-            stepNo: '1',
-            title: '1단계: 조각 놓기',
-            subtitle: '빈 칸에 조각 6개 배치',
-            active: true,
-          ),
-          const SizedBox(height: 8),
-          _buildPuzzleStageCard(
-            stepNo: '2',
-            title: '2단계: 필요하면 돌리기',
-            subtitle: '조각을 탭해 회전',
-          ),
-          const SizedBox(height: 8),
-          _buildPuzzleStageCard(
-            stepNo: '3',
-            title: '3단계: 완성 확인',
-            subtitle: '완성확인으로 정답 판정',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPuzzleStageCard({
-    required String stepNo,
-    required String title,
-    required String subtitle,
-    bool active = false,
-  }) {
-    final borderColor = active
-        ? const Color(0xFF2D56B3)
-        : const Color(0xFFD4DDF3);
-    final bgColor = active ? const Color(0xFFEAF1FF) : const Color(0xFFF8FAFF);
-    final stepBg = active ? const Color(0xFF2D56B3) : const Color(0xFFA8B9E2);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: borderColor, width: active ? 2 : 1.5),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(color: stepBg, shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: Text(
-              stepNo,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Color(0xFF163988),
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Color(0xFF4B5A84),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1478,50 +1336,28 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  if (!wide) ...[
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        _buildPuzzleStepChip(stepNo: '1', label: '조각 놓기'),
-                        _buildPuzzleStepChip(stepNo: '2', label: '필요하면 돌리기'),
-                        _buildPuzzleStepChip(stepNo: '3', label: '완성 확인'),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                  ],
+
                   Expanded(
                     child: wide
                         ? LayoutBuilder(
                             builder: (context, rightConstraints) {
-                              final stagePanelWidth =
-                                  (rightConstraints.maxWidth * 0.19)
-                                      .clamp(220.0, 270.0)
-                                      .toDouble();
                               final sidePanelWidth =
-                                  (rightConstraints.maxWidth * 0.28)
-                                      .clamp(230.0, 300.0)
+                                  (rightConstraints.maxWidth * 0.25)
+                                      .clamp(220.0, 300.0)
                                       .toDouble();
                               final boardSide = math
                                   .min(
                                     rightConstraints.maxHeight - 6,
                                     rightConstraints.maxWidth -
-                                        stagePanelWidth -
                                         sidePanelWidth -
-                                        24,
+                                        16,
                                   )
-                                  .clamp(260.0, 560.0)
+                                  .clamp(260.0, 600.0)
                                   .toDouble();
 
                               return Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    width: stagePanelWidth,
-                                    child: _buildPuzzleStagePanel(),
-                                  ),
-                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Center(
                                       child: _buildBoard(boardWidth: boardSide),
@@ -1542,10 +1378,12 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                               const titleToPreviewGap = 6.0;
                                               const titleBlockHeight =
                                                   titleFontSize + 6.0;
+                                              const safetyMargin = 10.0;
                                               const chromeHeight =
                                                   cardPadding * 2 +
                                                   titleToPreviewGap +
-                                                  titleBlockHeight;
+                                                  titleBlockHeight +
+                                                  safetyMargin;
                                               final previewSide = math
                                                   .max(
                                                     40.0,
@@ -1580,7 +1418,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   mainAxisSize:
-                                                      MainAxisSize.max,
+                                                      MainAxisSize.min,
                                                   children: [
                                                     const Text(
                                                       '목표 모양',
