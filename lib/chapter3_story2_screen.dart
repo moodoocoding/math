@@ -15,17 +15,17 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
   static const List<_Chapter3Scene> _scenes = [
     _Chapter3Scene(
       speaker: '플레이',
-      line: '열렸어! 안쪽에 숫자판이 또 숨어 있었어!',
+      line: '우와, 초상화 뒤에 격자 모양의 신비로운 돌판이 나타났어! 군데군데 숫자가 새겨져 있네?',
       characterAsset: 'assets/images/chr_play_jumping.png',
     ),
     _Chapter3Scene(
       speaker: '하우',
-      line: '이번엔 빈칸에 알맞은 수를 넣어야 하나 봐!',
+      line: '이건... 가로, 세로 어디를 더해도 신기하게 합이 똑같아지는 마법의 숫자판 같아!',
       characterAsset: 'assets/images/chr_how_confused.png',
     ),
     _Chapter3Scene(
       speaker: '플레이',
-      line: '가로와 세로의 합을 잘 보면 답을 찾을 수 있어!',
+      line: '비어 있는 칸에 딱 맞는 숫자를 채워 넣으면 돌판이 찬란한 힘을 되찾을 거야!',
       characterAsset: 'assets/images/chr_play_laughing.png',
     ),
   ];
@@ -183,7 +183,7 @@ class _Chapter3Story2ScreenState extends State<Chapter3Story2Screen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '숫자판 도전하기' : '다음',
+                        isLast ? '문제 해결하기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),
