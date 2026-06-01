@@ -118,14 +118,14 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                       ],
                     ),
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(22, 18, 22, 20),
+                      padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _SpeakerBadge(name: '하우'),
-                          SizedBox(height: 12),
+                          const _SpeakerBadge(name: '하우'),
+                          const SizedBox(height: 12),
                           Text(
-                            '무늬판 아래에서 루카의 안내 쪽지가 나왔어! 루카와 수학책을 읽고 한 줄 감상을 남기면 QR 인증을 받을 수 있대. 그게 두 번째 별 조각을 찾는 열쇠야!',
+                            '무늬판이 완성되자 아래에서 귀여운 올빼미 로봇 \'루카\'의 따뜻한 쪽지가 반짝이고 있어! 책 읽어주는 로봇 루카에게 지혜의 수학책을 보여주면, 커다란 눈으로 책을 비춰서 재미있게 읽어준대! 루카와 책을 읽고 마음을 남기면 두 번째 별 조각을 찾을 수 있는 신비한 별빛이 켜질 거야!',
                             style: TextStyle(
                               fontSize: dialogFontSize,
                               fontWeight: FontWeight.w800,
@@ -155,7 +155,7 @@ class _Chapter2Story3ScreenState extends State<Chapter2Story3Screen> {
                         ),
                       ),
                       child: Text(
-                        '루카 QR 인증 받기',
+                        '문제 해결하기',
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w800,
