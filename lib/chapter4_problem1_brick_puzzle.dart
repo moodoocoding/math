@@ -14,10 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '수학 브릭 퍼즐',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const BrickPuzzleScreen(),
     );
   }
@@ -74,10 +71,7 @@ class NumberBoard {
   final List<List<bool>> grid; // true인 칸만 채워야 함
   late List<List<String?>> occupied; // 어느 브릭이 놓여있는지 추적
 
-  NumberBoard({
-    required this.number,
-    required this.grid,
-  }) {
+  NumberBoard({required this.number, required this.grid}) {
     occupied = List.generate(
       grid.length,
       (i) => List.generate(grid[i].length, (j) => null),
@@ -242,6 +236,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
       initialPositions[bricks[i].id] = (i ~/ 4, i % 4);
     }
   }
+
   void _initializeBoards() {
     boards = {
       'number1': NumberBoard(
@@ -599,6 +594,12 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               (route) => false,
             ),
           ),
+          if (kDebugMode)
+            IconButton(
+              tooltip: '테스트용 스킵',
+              icon: const Icon(Icons.skip_next_rounded, size: 40),
+              onPressed: _skipPuzzleForTest,
+            ),
         ],
       ),
       body: SafeArea(
@@ -609,9 +610,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               height: 14,
               decoration: const BoxDecoration(
                 color: Color(0xFFF6B51E),
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(8),
-                ),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
               ),
             ),
             Container(
@@ -663,10 +662,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
-                  top: BorderSide(
-                    color: const Color(0xFFE1E1E4),
-                    width: 1,
-                  ),
+                  top: BorderSide(color: const Color(0xFFE1E1E4), width: 1),
                 ),
               ),
               child: Column(
@@ -677,7 +673,10 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _showHint,
-                          icon: Icon(Icons.lightbulb_outline, size: isMobile ? 20 : 24),
+                          icon: Icon(
+                            Icons.lightbulb_outline,
+                            size: isMobile ? 20 : 24,
+                          ),
                           label: Text(
                             '힌트',
                             style: TextStyle(
@@ -687,8 +686,13 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                           ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF6F63D1),
-                            side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
-                            padding: EdgeInsets.symmetric(vertical: isCompact ? 10 : 14),
+                            side: const BorderSide(
+                              color: Color(0xFF6F63D1),
+                              width: 2,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: isCompact ? 10 : 14,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -710,7 +714,9 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF8A8A8A),
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: isCompact ? 10 : 14),
+                            padding: EdgeInsets.symmetric(
+                              vertical: isCompact ? 10 : 14,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -721,7 +727,10 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _checkAnswer,
-                          icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
+                          icon: Icon(
+                            Icons.check_circle,
+                            size: isMobile ? 20 : 24,
+                          ),
                           label: Text(
                             '블록 확인',
                             style: TextStyle(
@@ -732,7 +741,9 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF123E97),
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: isCompact ? 10 : 14),
+                            padding: EdgeInsets.symmetric(
+                              vertical: isCompact ? 10 : 14,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -741,32 +752,6 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                       ),
                     ],
                   ),
-                  if (kDebugMode) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _skipPuzzleForTest,
-                        icon: const Icon(Icons.skip_next_rounded),
-                        label: const Text('테스트용: 문제 건너뛰고 다음으로'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF315FB8),
-                          side: const BorderSide(
-                            color: Color(0xFF5B80D7),
-                            width: 2,
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          textStyle: TextStyle(
-                            fontSize: isCompact ? 14 : 18,
-                            fontWeight: FontWeight.w800,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -832,10 +817,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
       data: brick,
       feedback: Material(
         color: Colors.transparent,
-        child: Opacity(
-          opacity: 0.7,
-          child: _buildBrickGrid(brick, cellSize),
-        ),
+        child: Opacity(opacity: 0.7, child: _buildBrickGrid(brick, cellSize)),
       ),
       childWhenDragging: _buildBrickGrid(brick, cellSize),
       child: _buildBrickGrid(brick, cellSize),
@@ -866,10 +848,7 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
                 height: cellSize,
                 decoration: BoxDecoration(
                   color: brick.color,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.2,
-                  ),
+                  border: Border.all(color: Colors.white, width: 1.2),
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
                     BoxShadow(
@@ -1038,10 +1017,11 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
           decoration: BoxDecoration(
             color: isActive
                 ? (occupiedBy != null
-                    ? (board.placedBricks[occupiedBy]?.brick.color ?? Colors.grey)
-                    : isHovering
-                        ? borderColor.withValues(alpha: 0.18)
-                        : Colors.white.withValues(alpha: 0.62))
+                      ? (board.placedBricks[occupiedBy]?.brick.color ??
+                            Colors.grey)
+                      : isHovering
+                      ? borderColor.withValues(alpha: 0.18)
+                      : Colors.white.withValues(alpha: 0.62))
                 : Colors.transparent,
             border: Border.all(
               color: isActive
@@ -1108,9 +1088,4 @@ class _BrickPuzzleScreenState extends State<BrickPuzzleScreen> {
       }
     }
   }
-
-
 }
-
-
-

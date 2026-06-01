@@ -56,8 +56,7 @@ class _CardDef {
     }
   }
 
-  int torque(int ri, int d) =>
-      cells(ri, d).fold(0, (s, c) => s + c.$1);
+  int torque(int ri, int d) => cells(ri, d).fold(0, (s, c) => s + c.$1);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -195,7 +194,13 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     }
   }
 
-  (int, int)? _findValidAnchor(_CardDef card, int dragRot, int d, int row, bool isLeft) {
+  (int, int)? _findValidAnchor(
+    _CardDef card,
+    int dragRot,
+    int d,
+    int row,
+    bool isLeft,
+  ) {
     final cells = card.rotations[dragRot];
     final mc = card._maxCol(dragRot);
     for (final c in cells) {
@@ -217,7 +222,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   void initState() {
     super.initState();
     _seesawCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     _seesawAnim = const AlwaysStoppedAnimation(0);
     AppBgmController.playProblem();
 
@@ -251,7 +258,12 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   // ── 계산값 ─────────────────────────────────────────
   List<_Abs> get _leftCells {
     if (_leftIdx == null) return const [];
-    return _kCards[_leftIdx!].cells(_leftRot, _leftDist, r: _leftStartRow, isLeft: true);
+    return _kCards[_leftIdx!].cells(
+      _leftRot,
+      _leftDist,
+      r: _leftStartRow,
+      isLeft: true,
+    );
   }
 
   int get _leftTorque {
@@ -298,9 +310,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
   void _animateSeesaw() {
     final diff = (_rightTorque - _leftTorque).toDouble();
     final target = (diff / 20.0 * 0.20).clamp(-0.20, 0.20);
-    _seesawAnim = Tween<double>(begin: _prevTilt, end: target).animate(
-      CurvedAnimation(parent: _seesawCtrl, curve: Curves.easeInOut),
-    );
+    _seesawAnim = Tween<double>(
+      begin: _prevTilt,
+      end: target,
+    ).animate(CurvedAnimation(parent: _seesawCtrl, curve: Curves.easeInOut));
     _prevTilt = target;
     _seesawCtrl.forward(from: 0);
   }
@@ -511,7 +524,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, widget.completedRouteName);
+                    Navigator.pushReplacementNamed(
+                      context,
+                      widget.completedRouteName,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF133E97),
@@ -657,16 +673,19 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             bottom: 34,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: List.generate(2, (index) => Container(
-                width: 20,
-                height: 20,
-                margin: const EdgeInsets.only(bottom: 1.5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E88E5),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Colors.white, width: 1.5),
+              children: List.generate(
+                2,
+                (index) => Container(
+                  width: 20,
+                  height: 20,
+                  margin: const EdgeInsets.only(bottom: 1.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E88E5),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
                 ),
-              )),
+              ),
             ),
           ),
           // 왼쪽에 표시되는 4, 3, 2, 1 숫자 라벨들
@@ -729,7 +748,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFF1E88E5), width: 2),
                 boxShadow: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
                 ],
               ),
               child: const Text(
@@ -806,16 +829,19 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: List.generate(3, (index) => Container(
-                    width: 14,
-                    height: 14,
-                    margin: const EdgeInsets.symmetric(horizontal: 0.5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF9C27B0),
-                      borderRadius: BorderRadius.circular(3),
-                      border: Border.all(color: Colors.white, width: 1),
+                  children: List.generate(
+                    3,
+                    (index) => Container(
+                      width: 14,
+                      height: 14,
+                      margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF9C27B0),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
                     ),
-                  )),
+                  ),
                 ),
                 Container(
                   width: 14,
@@ -899,7 +925,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               child: const Text(
                 '왼쪽: 12점',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF7B1FA2)),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF7B1FA2),
+                ),
               ),
             ),
           ),
@@ -914,7 +944,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
               child: const Text(
                 '오른쪽: 12점',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF2E7D32)),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2E7D32),
+                ),
               ),
             ),
           ),
@@ -950,23 +984,30 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             children: [
               const Text(
                 '원래 모양 0°',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFE65100)),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFE65100),
+                ),
               ),
               const SizedBox(height: 8),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Column(
-                    children: List.generate(3, (index) => Container(
-                      width: 14,
-                      height: 14,
-                      margin: const EdgeInsets.only(bottom: 0.5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFB8C00),
-                        borderRadius: BorderRadius.circular(3),
-                        border: Border.all(color: Colors.white, width: 0.8),
+                    children: List.generate(
+                      3,
+                      (index) => Container(
+                        width: 14,
+                        height: 14,
+                        margin: const EdgeInsets.only(bottom: 0.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFB8C00),
+                          borderRadius: BorderRadius.circular(3),
+                          border: Border.all(color: Colors.white, width: 0.8),
+                        ),
                       ),
-                    )),
+                    ),
                   ),
                   const SizedBox(width: 0.5),
                   Column(
@@ -1002,7 +1043,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 children: const [
                   Text(
                     '톡! 터치',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Color(0xFFFF4081)),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFFFF4081),
+                    ),
                   ),
                   Icon(
                     Icons.arrow_forward_rounded,
@@ -1019,7 +1064,11 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             children: [
               const Text(
                 '돌아간 모양 90°',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFE65100)),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFE65100),
+                ),
               ),
               const SizedBox(height: 14),
               Column(
@@ -1027,16 +1076,19 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 children: [
                   Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: List.generate(3, (index) => Container(
-                      width: 14,
-                      height: 14,
-                      margin: const EdgeInsets.only(right: 0.5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFB8C00),
-                        borderRadius: BorderRadius.circular(3),
-                        border: Border.all(color: Colors.white, width: 0.8),
+                    children: List.generate(
+                      3,
+                      (index) => Container(
+                        width: 14,
+                        height: 14,
+                        margin: const EdgeInsets.only(right: 0.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFB8C00),
+                          borderRadius: BorderRadius.circular(3),
+                          border: Border.all(color: Colors.white, width: 0.8),
+                        ),
                       ),
-                    )),
+                    ),
                   ),
                   const SizedBox(height: 0.5),
                   Container(
@@ -1065,7 +1117,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
             child: Container(
               width: 520,
               padding: const EdgeInsets.all(26),
@@ -1185,7 +1239,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF133E97),
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                       child: Text(
                         tutorialStep < 2 ? '다음' : '도전 시작하기! ⚖️',
@@ -1291,19 +1347,34 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final double availWidth = constraints.maxWidth;
                     final double availHeight = constraints.maxHeight;
-                    
+
                     // 가로 모드 여부 판단 (태블릿 가로 또는 모바일 가로)
-                    final bool isLandscape = mq.orientation == Orientation.landscape || availWidth > 750;
+                    final bool isLandscape =
+                        mq.orientation == Orientation.landscape ||
+                        availWidth > 750;
 
                     if (isLandscape) {
-                      return _buildLandscapeLayout(availWidth, availHeight, isMobile, mq);
+                      return _buildLandscapeLayout(
+                        availWidth,
+                        availHeight,
+                        isMobile,
+                        mq,
+                      );
                     } else {
-                      return _buildPortraitLayout(availWidth, availHeight, isMobile, mq);
+                      return _buildPortraitLayout(
+                        availWidth,
+                        availHeight,
+                        isMobile,
+                        mq,
+                      );
                     }
                   },
                 ),
@@ -1318,51 +1389,47 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   // ─────────────────────────────── 가로/세로 전용 레이아웃 위젯 빌더
 
-  Widget _buildLandscapeLayout(double availWidth, double availHeight, bool isMobile, MediaQueryData mq) {
-    // 2단 레이아웃: 도형 보관함(15%) + 게임 영역(83%)
-    final double storageWidth = availWidth * 0.15;
-    final double gameAreaWidth = availWidth * 0.83;
-    
+  Widget _buildLandscapeLayout(
+    double availWidth,
+    double availHeight,
+    bool isMobile,
+    MediaQueryData mq,
+  ) {
+    // 2단 레이아웃: 좌측 단계/도구 패널은 고정 폭에 가깝게 잡고,
+    // 남은 영역을 시소판에 몰아준다.
+    final double sidebarWidth = (availWidth * 0.22).clamp(250.0, 330.0);
+    final double gutter = (availWidth * 0.018).clamp(14.0, 24.0);
+    final double gameAreaWidth = availWidth - sidebarWidth - gutter;
+
     // 셀 크기를 최대한 크게 계산 (사용 가능한 높이/너비에 맞춰)
-    final double cellSzWidth = gameAreaWidth / 12.5;
-    final double cellSzHeight = (availHeight - 100) / 5.2;
+    final double cellSzWidth = gameAreaWidth / 12.0;
+    final double cellSzHeight = (availHeight - 142) / 4.8;
     final double cellSz = math.min(cellSzWidth, cellSzHeight).clamp(32.0, 72.0);
     final double gap = cellSz * 0.10;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // [좌측] 도형 보관함 (15%)
+        // [좌측] 단계 가이드 + 도형 보관함
         SizedBox(
-          width: storageWidth,
-          child: _buildStorage(storageWidth, isMobile),
+          width: sidebarWidth,
+          child: _buildLeftSidebar(sidebarWidth, isMobile, true),
         ),
-        SizedBox(width: availWidth * 0.01),
-        // [우측] 시소 + 그리드 (83%)
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _seesawWidget(gameAreaWidth, cellSz, gap),
-              const SizedBox(height: 4),
-              Expanded(
-                child: Center(
-                  child: SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    child: _grid(cellSz, gap, isMobile),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        SizedBox(width: gutter),
+        // [우측] 균형 표시 + 좌우 점수 + 그리드
+        Expanded(child: _buildBoardArea(gameAreaWidth, cellSz, gap, isMobile)),
       ],
     );
   }
 
-  Widget _buildPortraitLayout(double availWidth, double availHeight, bool isMobile, MediaQueryData mq) {
-    // 세로 모드: 도형 보관함 → 시소 게임판 (세로 배치)
-    final double storageHeight = availHeight * 0.35;
+  Widget _buildPortraitLayout(
+    double availWidth,
+    double availHeight,
+    bool isMobile,
+    MediaQueryData mq,
+  ) {
+    // 세로 모드: 단계 가이드 → 도형 보관함 → 시소 게임판
+    final double storageHeight = availHeight * 0.27;
 
     final double cellSzWidth = availWidth / 12.5;
     final double cellSzHeight = (availHeight * 0.55 - 80) / 4.8;
@@ -1372,6 +1439,8 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _buildStageGuideCard(isMobile, false),
+        const SizedBox(height: 8),
         SizedBox(
           height: storageHeight,
           width: double.infinity,
@@ -1382,9 +1451,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _seesawWidget(availWidth, cellSz, gap),
-              const SizedBox(height: 4),
-              Expanded(child: _grid(cellSz, gap, isMobile)),
+              Expanded(
+                child: _buildBoardArea(availWidth, cellSz, gap, isMobile),
+              ),
             ],
           ),
         ),
@@ -1392,44 +1461,295 @@ class _SeesawState extends State<SeesawPuzzleScreen>
     );
   }
 
-  // ─────────────────────────────── AppBar
+  Widget _buildLeftSidebar(double width, bool isMobile, bool isLandscape) {
+    return Column(
+      children: [
+        _buildStageGuideCard(isMobile, isLandscape),
+        const SizedBox(height: 10),
+        Expanded(child: _buildStorage(width, isMobile)),
+      ],
+    );
+  }
 
-  PreferredSizeWidget _appBar() => AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF163988),
-        surfaceTintColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 38),
-          onPressed: () => Navigator.pop(context),
+  Widget _buildStageGuideCard(bool isMobile, bool isLandscape) {
+    final int stage = !_leftPlaced ? 1 : (_leftPlaced && !_rightPlaced ? 2 : 3);
+
+    Widget stageTile(int index, String title, String detail) {
+      final bool active = stage == index;
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFFE9F0FF) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: active ? const Color(0xFF1E4AA8) : const Color(0xFFD5DEF5),
+            width: active ? 2 : 1.4,
+          ),
         ),
-        centerTitle: true,
-        title: const Text(
-          '미션! 수학체험센터의 반짝별을 찾아서',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 12,
+              backgroundColor: active
+                  ? const Color(0xFF1E4AA8)
+                  : const Color(0xFFB7C4EA),
+              child: Text(
+                '$index',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: isMobile ? 12 : 13,
+                      fontWeight: FontWeight.w900,
+                      color: active
+                          ? const Color(0xFF173D8F)
+                          : const Color(0xFF44537C),
+                    ),
+                  ),
+                  Text(
+                    detail,
+                    style: TextStyle(
+                      fontSize: isMobile ? 10 : 11,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF5F6D8E),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        actions: [
-          const BgmToggleButton(iconSize: 40),
-          IconButton(
-            icon: const Icon(Icons.home_rounded, size: 44),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/home',
-              (route) => false,
+      );
+    }
+
+    final steps = [
+      stageTile(1, '1단계: 왼쪽 배치', '왼쪽에 첫 도형 놓기'),
+      stageTile(2, '2단계: 오른쪽 배치', '오른쪽에 도형 배치'),
+      stageTile(3, '3단계: 균형 확인', '두 점수가 같으면 성공'),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(9),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFC5D3F2), width: 2),
+      ),
+      child: isLandscape
+          ? Column(
+              children: [
+                for (final s in steps)
+                  Padding(padding: const EdgeInsets.only(bottom: 6), child: s),
+              ],
+            )
+          : Row(
+              children: [
+                for (int i = 0; i < steps.length; i++)
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(right: i < 2 ? 6 : 0),
+                      child: steps[i],
+                    ),
+                  ),
+              ],
+            ),
+    );
+  }
+
+  String get _balanceStatusText {
+    if (!_leftPlaced && !_rightPlaced) {
+      return '왼쪽에 첫 도형을 놓아 보세요';
+    }
+    if (_leftPlaced && !_rightPlaced) {
+      return '오른쪽에 도형을 놓아 왼쪽과 같은 점수를 만들어 보세요';
+    }
+    if (_leftTorque == _rightTorque) {
+      return '양쪽 점수가 같아요';
+    }
+    return _leftTorque > _rightTorque ? '왼쪽이 더 무거워요' : '오른쪽이 더 무거워요';
+  }
+
+  Widget _buildBoardArea(
+    double screenW,
+    double cellSz,
+    double gap,
+    bool isMobile,
+  ) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _seesawWidget(screenW, cellSz, gap),
+        const SizedBox(height: 8),
+        _buildSplitScoreRow(cellSz, gap, isMobile),
+        const SizedBox(height: 8),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.topCenter,
+            child: _grid(cellSz, gap, isMobile),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildBoardInstruction(isMobile),
+      ],
+    );
+  }
+
+  Widget _buildSplitScoreRow(double cellSz, double gap, bool isMobile) {
+    final leftWidth = 5 * (cellSz + gap);
+    final pivotWidth = cellSz * 0.65 + gap * 2;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: leftWidth,
+          child: _scoreChip(
+            title: '왼쪽',
+            value: _leftFormulaText,
+            color: const Color(0xFF1E88E5),
+            isMobile: isMobile,
+          ),
+        ),
+        SizedBox(width: pivotWidth),
+        SizedBox(
+          width: leftWidth,
+          child: _scoreChip(
+            title: '오른쪽',
+            value: _rightPlaced ? _rightFormulaText : '0 점',
+            color: const Color(0xFF13968F),
+            isMobile: isMobile,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _scoreChip({
+    required String title,
+    required String value,
+    required Color color,
+    required bool isMobile,
+  }) {
+    return Container(
+      height: isMobile ? 34 : 38,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.45), width: 1.6),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: isMobile ? 12 : 14,
+              fontWeight: FontWeight.w900,
+              color: color,
+              fontFamily: 'GangwonEduAll',
+            ),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: isMobile ? 12 : 14,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFF1A367C),
+                fontFamily: 'GangwonEduAll',
+              ),
             ),
           ),
         ],
-      );
+      ),
+    );
+  }
+
+  Widget _buildBoardInstruction(bool isMobile) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFD7E0F5), width: 1.3),
+      ),
+      child: Text(
+        _balanceStatusText,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: isMobile ? 12 : 14,
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF29427A),
+          fontFamily: 'GangwonEduAll',
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────── AppBar
+
+  PreferredSizeWidget _appBar() => AppBar(
+    backgroundColor: Colors.white,
+    foregroundColor: const Color(0xFF163988),
+    surfaceTintColor: Colors.white,
+    elevation: 0,
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 38),
+      onPressed: () => Navigator.pop(context),
+    ),
+    centerTitle: true,
+    title: const Text(
+      '미션! 수학체험센터의 반짝별을 찾아서',
+      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+    ),
+    actions: [
+      const BgmToggleButton(iconSize: 40),
+      IconButton(
+        icon: const Icon(Icons.home_rounded, size: 44),
+        onPressed: () => Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/home',
+          (route) => false,
+        ),
+      ),
+      if (kDebugMode)
+        IconButton(
+          tooltip: '테스트용 스킵',
+          icon: const Icon(Icons.skip_next_rounded, size: 40),
+          onPressed: () => Navigator.pushReplacementNamed(
+            context,
+            widget.completedRouteName,
+          ),
+        ),
+    ],
+  );
 
   // ─────────────────────────────── 좌측 세로 도형 보관함
 
   Widget _buildStorage(double width, bool isMobile) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
+        color: Colors.white,
         border: Border.all(color: const Color(0xFFBAC5E8), width: 2),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(10),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0F1A367C),
@@ -1441,16 +1761,20 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 보관함 타이틀 헤더
+          // 도형 선택 헤더
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.inventory_2_rounded, color: Color(0xFF133E97), size: 16),
+              const Icon(
+                Icons.inventory_2_rounded,
+                color: Color(0xFF133E97),
+                size: 16,
+              ),
               const SizedBox(width: 4),
               const Text(
-                '도형 보관함',
+                '도형 카드',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 16,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFF133E97),
                   fontFamily: 'GangwonEduAll',
@@ -1458,7 +1782,20 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               ),
             ],
           ),
-          const Divider(height: 10, thickness: 1.5, color: Color(0xFFBAC5E8)),
+          const Padding(
+            padding: EdgeInsets.only(top: 4, bottom: 6),
+            child: Text(
+              '카드를 시소판으로 끌어 놓으세요',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF4B5F86),
+                fontFamily: 'GangwonEduAll',
+              ),
+            ),
+          ),
+          const Divider(height: 8, thickness: 1.2, color: Color(0xFFBAC5E8)),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -1466,15 +1803,17 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 final double boxWidth = constraints.maxWidth;
 
                 // Padding/Margin 보정
-                final double netHeight = boxHeight - 4;
-                final double netWidth = boxWidth - 4;
+                final double netHeight = boxHeight - 2;
+                final double netWidth = boxWidth - 2;
 
                 // 2열 3행 그리드
                 final double maxTileHeight = netHeight / 3;
                 final double maxTileWidth = netWidth / 2;
 
                 // 카드 크기 계산
-                final double tileSize = math.min(maxTileHeight * 1.25, maxTileWidth).clamp(36.0, 110.0);
+                final double tileSize = math
+                    .min(maxTileHeight * 1.22, maxTileWidth)
+                    .clamp(54.0, 132.0);
                 final double tileHeight = tileSize / 1.25;
 
                 // GridView 크기
@@ -1488,16 +1827,19 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     child: GridView.builder(
                       padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 4,
-                        mainAxisSpacing: 4,
-                        childAspectRatio: 1.25,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 4,
+                            mainAxisSpacing: 4,
+                            childAspectRatio: 1.25,
+                          ),
                       itemCount: _kCards.length,
                       itemBuilder: (context, i) {
                         final card = _kCards[i];
-                        final isUsed = (_leftPlaced && _leftIdx == i) || (_rightPlaced && _rightIdx == i);
+                        final isUsed =
+                            (_leftPlaced && _leftIdx == i) ||
+                            (_rightPlaced && _rightIdx == i);
 
                         Widget cardTile = _storageCardTile(i, tileSize, isUsed);
 
@@ -1514,8 +1856,16 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                               opacity: 0.75,
                               child: Builder(
                                 builder: (context) {
-                                  final maxC = card.rotations[0].map((c) => c.$1).reduce(math.max) + 1;
-                                  final maxR = card.rotations[0].map((c) => c.$2).reduce(math.max) + 1;
+                                  final maxC =
+                                      card.rotations[0]
+                                          .map((c) => c.$1)
+                                          .reduce(math.max) +
+                                      1;
+                                  final maxR =
+                                      card.rotations[0]
+                                          .map((c) => c.$2)
+                                          .reduce(math.max) +
+                                      1;
                                   // 드래그 피드백 시에도 통일된 그리드 크기 유지
                                   final double feedbackCellSz = tileSize * 0.22;
                                   return SizedBox(
@@ -1529,7 +1879,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                                       ),
                                     ),
                                   );
-                                }
+                                },
                               ),
                             ),
                           ),
@@ -1553,7 +1903,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                     ),
                   ),
                 );
-              }
+              },
             ),
           ),
         ],
@@ -1573,14 +1923,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       width: tileSize,
       height: tileHeight,
       decoration: BoxDecoration(
-        color: isUsed
-            ? Colors.black.withAlpha(100)
-            : Colors.white,
+        color: isUsed ? Colors.black.withAlpha(100) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isUsed
-              ? Colors.black26
-              : card.color,
+          color: isUsed ? Colors.black26 : card.color,
           width: 2,
         ),
         boxShadow: isUsed
@@ -1590,7 +1936,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                   color: card.color.withValues(alpha: 0.15),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
-                )
+                ),
               ],
       ),
       child: Stack(
@@ -1612,29 +1958,38 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           ),
           if (isUsed)
             Center(
-              child: Icon(Icons.lock_rounded,
-                  color: Colors.white.withAlpha(180), size: tileSize * 0.26)),
+              child: Icon(
+                Icons.lock_rounded,
+                color: Colors.white.withAlpha(180),
+                size: tileSize * 0.26,
+              ),
+            ),
         ],
       ),
     );
   }
 
-
-
   // ─────────────────────────────── 시소 애니메이션
 
   Widget _seesawWidget(double screenW, double cellSz, double gap) {
     return SizedBox(
-      height: 74,
+      height: 58,
       width: screenW,
-      child: AnimatedBuilder(
-        animation: _seesawAnim,
-        builder: (context, child) => CustomPaint(
-          painter: _SeesawPainter(
-            tilt: _seesawAnim.value,
-            balanced: _result == true,
-            cellSz: cellSz,
-            gap: gap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.55),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFD7E0F5), width: 1.2),
+        ),
+        child: AnimatedBuilder(
+          animation: _seesawAnim,
+          builder: (context, child) => CustomPaint(
+            painter: _SeesawPainter(
+              tilt: _seesawAnim.value,
+              balanced: _result == true,
+              cellSz: cellSz,
+              gap: gap,
+            ),
           ),
         ),
       ),
@@ -1655,126 +2010,93 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           ),
         const SizedBox(height: 4),
         _distRow(cellSz, gap),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFEBF0FF),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFBAC5E8), width: 2),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x0C000000),
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 현재 단계 배지
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF133E97),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  !_leftPlaced ? '📌 1단계' : (_leftPlaced && !_rightPlaced ? '📌 2단계' : '📌 3단계'),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                '왼쪽: $_leftFormulaText',
-                style: TextStyle(
-                  fontSize: isMobile ? 13 : 16,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFF163988),
-                  fontFamily: 'GangwonEduAll',
-                ),
-              ),
-              const SizedBox(
-                height: 14,
-                child: VerticalDivider(
-                  color: Color(0xFFBAC5E8),
-                  width: 16,
-                  thickness: 2.0,
-                ),
-              ),
-              Text(
-                '오른쪽: ${_rightPlaced ? _rightFormulaText : "0 점"}',
-                style: TextStyle(
-                  fontSize: isMobile ? 13 : 16,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFF163988),
-                  fontFamily: 'GangwonEduAll',
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
 
   Widget _distRow(double sz, double gap) => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (int d = 5; d >= 1; d--)
-            _dLabel('$d', sz, gap),
-          _pivotLabel(sz, gap),
-          for (int d = 1; d <= 5; d++)
-            _dLabel('$d', sz, gap),
-        ],
-      );
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      for (int d = 5; d >= 1; d--) _dLabel('$d', sz, gap),
+      _pivotLabel(sz, gap),
+      for (int d = 1; d <= 5; d++) _dLabel('$d', sz, gap),
+    ],
+  );
 
   Widget _dLabel(String t, double sz, double gap) => SizedBox(
-        width: sz + gap,
-        child: Text(t,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF3949AB))),
-      );
+    width: sz + gap,
+    child: Text(
+      t,
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF3949AB),
+      ),
+    ),
+  );
 
   Widget _pivotLabel(double sz, double gap) => SizedBox(
-        width: sz * 0.65 + gap * 2,
-        child: const Text('0',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF1A237E))),
-      );
+    width: sz * 0.65 + gap * 2,
+    child: const Text(
+      '0',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w900,
+        color: Color(0xFF1A237E),
+      ),
+    ),
+  );
 
   Widget _gridRow(int row, double sz, double gap) {
     final activeLeftCells = _leftIdx != null && _leftPlaced
-        ? _kCards[_leftIdx!].cells(_leftRot, _leftDist, r: _leftStartRow, isLeft: true).take(_leftVisibleCells).toSet()
+        ? _kCards[_leftIdx!]
+              .cells(_leftRot, _leftDist, r: _leftStartRow, isLeft: true)
+              .take(_leftVisibleCells)
+              .toSet()
         : <_Abs>{};
 
     final activeRightCells = _rightIdx != null && _rightPlaced
-        ? _kCards[_rightIdx!].cells(_rightRot, _rightDist, r: _rightStartRow).take(_rightVisibleCells).toSet()
+        ? _kCards[_rightIdx!]
+              .cells(_rightRot, _rightDist, r: _rightStartRow)
+              .take(_rightVisibleCells)
+              .toSet()
         : <_Abs>{};
 
-    final dragRotLeft = _hoverLeftIdx != null ? _getDragRotation(_kCards[_hoverLeftIdx!], true) : 0;
-    final hoverLeftCells = _hoverLeftIdx != null && _hoverLeftDist != null && _hoverLeftStartRow != null
-        ? _kCards[_hoverLeftIdx!].cells(dragRotLeft, _hoverLeftDist!, r: _hoverLeftStartRow!, isLeft: true).toSet()
+    final dragRotLeft = _hoverLeftIdx != null
+        ? _getDragRotation(_kCards[_hoverLeftIdx!], true)
+        : 0;
+    final hoverLeftCells =
+        _hoverLeftIdx != null &&
+            _hoverLeftDist != null &&
+            _hoverLeftStartRow != null
+        ? _kCards[_hoverLeftIdx!]
+              .cells(
+                dragRotLeft,
+                _hoverLeftDist!,
+                r: _hoverLeftStartRow!,
+                isLeft: true,
+              )
+              .toSet()
         : <_Abs>{};
 
-    final dragRotRight = _hoverRightIdx != null ? _getDragRotation(_kCards[_hoverRightIdx!], false) : 0;
-    final hoverRightCells = _hoverRightIdx != null && _hoverRightDist != null && _hoverRightStartRow != null
-        ? _kCards[_hoverRightIdx!].cells(dragRotRight, _hoverRightDist!, r: _hoverRightStartRow!).toSet()
+    final dragRotRight = _hoverRightIdx != null
+        ? _getDragRotation(_kCards[_hoverRightIdx!], false)
+        : 0;
+    final hoverRightCells =
+        _hoverRightIdx != null &&
+            _hoverRightDist != null &&
+            _hoverRightStartRow != null
+        ? _kCards[_hoverRightIdx!]
+              .cells(dragRotRight, _hoverRightDist!, r: _hoverRightStartRow!)
+              .toSet()
         : <_Abs>{};
 
     final leftColor = _leftIdx != null ? _kCards[_leftIdx!].color : Colors.grey;
-    final rightColor = _rightIdx != null ? _kCards[_rightIdx!].color : Colors.grey;
+    final rightColor = _rightIdx != null
+        ? _kCards[_rightIdx!].color
+        : Colors.grey;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -1829,9 +2151,22 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 }
               },
               builder: (context, candidateData, rejectedData) {
-                final isHover = hoverLeftCells.any((c) => c.$1 == d && c.$2 == row);
-                final isPlaced = activeLeftCells.any((c) => c.$1 == d && c.$2 == row);
-                final isOccupied = _leftPlaced && _kCards[_leftIdx!].cells(_leftRot, _leftDist, r: _leftStartRow, isLeft: true).any((c) => c.$1 == d && c.$2 == row);
+                final isHover = hoverLeftCells.any(
+                  (c) => c.$1 == d && c.$2 == row,
+                );
+                final isPlaced = activeLeftCells.any(
+                  (c) => c.$1 == d && c.$2 == row,
+                );
+                final isOccupied =
+                    _leftPlaced &&
+                    _kCards[_leftIdx!]
+                        .cells(
+                          _leftRot,
+                          _leftDist,
+                          r: _leftStartRow,
+                          isLeft: true,
+                        )
+                        .any((c) => c.$1 == d && c.$2 == row);
 
                 Widget cellWidget = _Cell(
                   size: sz,
@@ -1851,8 +2186,16 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                         opacity: 0.7,
                         child: Builder(
                           builder: (context) {
-                            final maxC = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$1).reduce(math.max) + 1;
-                            final maxR = _kCards[_leftIdx!].rotations[_leftRot].map((c) => c.$2).reduce(math.max) + 1;
+                            final maxC =
+                                _kCards[_leftIdx!].rotations[_leftRot]
+                                    .map((c) => c.$1)
+                                    .reduce(math.max) +
+                                1;
+                            final maxR =
+                                _kCards[_leftIdx!].rotations[_leftRot]
+                                    .map((c) => c.$2)
+                                    .reduce(math.max) +
+                                1;
                             return SizedBox(
                               width: sz * maxC,
                               height: sz * maxR,
@@ -1864,7 +2207,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                                 ),
                               ),
                             );
-                          }
+                          },
                         ),
                       ),
                     ),
@@ -1972,9 +2315,17 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 }
               },
               builder: (context, candidateData, rejectedData) {
-                final isHover = hoverRightCells.any((c) => c.$1 == d && c.$2 == row);
-                final isPlaced = activeRightCells.any((c) => c.$1 == d && c.$2 == row);
-                final isOccupied = _rightPlaced && _kCards[_rightIdx!].cells(_rightRot, _rightDist, r: _rightStartRow).any((c) => c.$1 == d && c.$2 == row);
+                final isHover = hoverRightCells.any(
+                  (c) => c.$1 == d && c.$2 == row,
+                );
+                final isPlaced = activeRightCells.any(
+                  (c) => c.$1 == d && c.$2 == row,
+                );
+                final isOccupied =
+                    _rightPlaced &&
+                    _kCards[_rightIdx!]
+                        .cells(_rightRot, _rightDist, r: _rightStartRow)
+                        .any((c) => c.$1 == d && c.$2 == row);
 
                 Widget cellWidget = _Cell(
                   size: sz,
@@ -1994,20 +2345,29 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                         opacity: 0.7,
                         child: Builder(
                           builder: (context) {
-                            final maxC = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$1).reduce(math.max) + 1;
-                            final maxR = _kCards[_rightIdx!].rotations[_rightRot].map((c) => c.$2).reduce(math.max) + 1;
+                            final maxC =
+                                _kCards[_rightIdx!].rotations[_rightRot]
+                                    .map((c) => c.$1)
+                                    .reduce(math.max) +
+                                1;
+                            final maxR =
+                                _kCards[_rightIdx!].rotations[_rightRot]
+                                    .map((c) => c.$2)
+                                    .reduce(math.max) +
+                                1;
                             return SizedBox(
                               width: sz * maxC,
                               height: sz * maxR,
                               child: CustomPaint(
                                 painter: _MiniShapePainter(
-                                  cells: _kCards[_rightIdx!].rotations[_rightRot],
+                                  cells:
+                                      _kCards[_rightIdx!].rotations[_rightRot],
                                   color: _kCards[_rightIdx!].color,
                                   fixedCellSize: sz,
                                 ),
                               ),
                             );
-                          }
+                          },
                         ),
                       ),
                     ),
@@ -2067,25 +2427,6 @@ class _SeesawState extends State<SeesawPuzzleScreen>
         children: [
           // 기존 토크 표시(왼쪽 하단)는 요구에 따라 전면 삭제됨
           const Spacer(),
-          if (kDebugMode) ...[
-            OutlinedButton.icon(
-              onPressed: () => Navigator.pushReplacementNamed(context, widget.completedRouteName),
-              icon: const Icon(Icons.skip_next_rounded, size: 20),
-              label: const Text(
-                '테스트용 스킵',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF355AA8),
-                side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
           // 버튼 정렬 (기존 브릭 퍼즐 버튼 구성 매칭)
           OutlinedButton.icon(
             onPressed: _showHint,
@@ -2129,11 +2470,16 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
               ),
               onPressed: () => Navigator.pushReplacementNamed(
-                  context, widget.completedRouteName),
+                context,
+                widget.completedRouteName,
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF123E97),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -2151,7 +2497,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFE8EAF6),
                   foregroundColor: const Color(0xFF1A237E),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -2169,7 +2518,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF123E97),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -2212,22 +2564,23 @@ class _Cell extends StatelessWidget {
         color: hasWeight
             ? color
             : isHovering
-                ? color.withValues(alpha: 0.25)
-                : const Color(0xFFCFD8DC),
+            ? color.withValues(alpha: 0.25)
+            : const Color(0xFFCFD8DC),
         border: Border.all(
           color: hasWeight
               ? color.withValues(alpha: 0.9)
               : isHovering
-                  ? color.withValues(alpha: 0.8)
-                  : const Color(0xFFB0BEC5),
+              ? color.withValues(alpha: 0.8)
+              : const Color(0xFFB0BEC5),
           width: hasWeight || isHovering ? 2.5 : 1.2,
         ),
         boxShadow: hasWeight
             ? [
                 BoxShadow(
-                    color: color.withValues(alpha: 0.45),
-                    blurRadius: 5,
-                    offset: const Offset(0, 2))
+                  color: color.withValues(alpha: 0.45),
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
               ]
             : null,
       ),
@@ -2268,15 +2621,16 @@ class _MiniShapePainter extends CustomPainter {
     if (cells.isEmpty) return;
     final maxC = cells.map((c) => c.$1).reduce(math.max) + 1;
     final maxR = cells.map((c) => c.$2).reduce(math.max) + 1;
-    final cs = fixedCellSize ?? (math.min(size.width / maxC, size.height / maxR) * 0.84);
+    final cs =
+        fixedCellSize ??
+        (math.min(size.width / maxC, size.height / maxR) * 0.84);
     final ox = (size.width - maxC * cs) / 2;
     final oy = (size.height - maxR * cs) / 2;
     final paint = Paint()..color = color;
     for (final c in cells) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-              ox + c.$1 * cs + 1, oy + c.$2 * cs + 1, cs - 2, cs - 2),
+          Rect.fromLTWH(ox + c.$1 * cs + 1, oy + c.$2 * cs + 1, cs - 2, cs - 2),
           const Radius.circular(4),
         ),
         paint,
@@ -2306,24 +2660,21 @@ class _SeesawPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
-    final cy = size.height * 0.52;
+    final cy = size.height * 0.45;
 
-    // 받침점 삼각형
-    final pivotPaint = Paint()..color = const Color(0xFF1A237E);
+    final pivotPaint = Paint()..color = const Color(0xFF173A8A);
     canvas.drawPath(
       Path()
-        ..moveTo(cx, cy + 8)
-        ..lineTo(cx - 18, cy + 28)
-        ..lineTo(cx + 18, cy + 28)
+        ..moveTo(cx, cy + 6)
+        ..lineTo(cx - 14, cy + 23)
+        ..lineTo(cx + 14, cy + 23)
         ..close(),
       pivotPaint,
     );
-    // 받침대
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromCenter(
-            center: Offset(cx, cy + 32), width: 72, height: 8),
-        const Radius.circular(4),
+        Rect.fromCenter(center: Offset(cx, cy + 26), width: 58, height: 6),
+        const Radius.circular(3),
       ),
       pivotPaint,
     );
@@ -2333,43 +2684,41 @@ class _SeesawPainter extends CustomPainter {
     canvas.translate(cx, cy);
     canvas.rotate(tilt);
 
-    // 아래 숫자판 5번 셀 중심의 정확한 X좌표 계산 (중앙 0 기준)
-    final endCircleX = 4.825 * cellSz + 5 * gap;
-    final beamLen = endCircleX * 2 + 20; // 양옆에 10씩 마진 확보
+    final visualWidth = math.min(size.width * 0.38, 440.0);
 
-    // 빔 몸체
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset.zero, width: visualWidth, height: 8),
+        const Radius.circular(4),
+      ),
+      Paint()..color = const Color(0xFF2457B8),
+    );
+
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromCenter(
-            center: Offset.zero, width: beamLen, height: 14),
-        const Radius.circular(7),
+          center: const Offset(0, -2),
+          width: visualWidth - 10,
+          height: 3,
+        ),
+        const Radius.circular(2),
       ),
-      Paint()..color = const Color(0xFF8D6E63),
+      Paint()..color = Colors.white.withAlpha(95),
     );
 
-    // 빔 하이라이트
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-            center: const Offset(0, -3), width: beamLen - 12, height: 5),
-        const Radius.circular(3),
-      ),
-      Paint()..color = Colors.white.withAlpha(60),
-    );
-
-    // 양쪽 끝 원
-    final endColor =
-        balanced ? const Color(0xFF2E7D32) : const Color(0xFF3949AB);
+    final endColor = balanced
+        ? const Color(0xFF13968F)
+        : const Color(0xFF3C5CCF);
     for (final sign in [-1.0, 1.0]) {
       canvas.drawCircle(
-        Offset(sign * endCircleX, 0),
-        13,
+        Offset(sign * visualWidth / 2, 0),
+        9,
         Paint()..color = endColor,
       );
       canvas.drawCircle(
-        Offset(sign * endCircleX, -3),
-        5,
-        Paint()..color = Colors.white.withAlpha(80),
+        Offset(sign * visualWidth / 2, -2),
+        3.5,
+        Paint()..color = Colors.white.withAlpha(120),
       );
     }
     canvas.restore();

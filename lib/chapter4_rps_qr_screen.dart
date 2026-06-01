@@ -315,6 +315,15 @@ class _Chapter4RpsQrScreenState extends State<Chapter4RpsQrScreen>
         ),
         centerTitle: true,
         actions: [
+          const BgmToggleButton(iconSize: 32),
+          IconButton(
+            icon: const Icon(Icons.home_rounded, size: 34),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
+          ),
           if (kDebugMode)
             IconButton(
               icon: const Icon(
@@ -325,15 +334,6 @@ class _Chapter4RpsQrScreenState extends State<Chapter4RpsQrScreen>
               tooltip: '테스트용 스킵',
               onPressed: _skipForTest,
             ),
-          const BgmToggleButton(iconSize: 32),
-          IconButton(
-            icon: const Icon(Icons.home_rounded, size: 34),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/home',
-              (route) => false,
-            ),
-          ),
         ],
       ),
       body: SafeArea(
@@ -341,15 +341,9 @@ class _Chapter4RpsQrScreenState extends State<Chapter4RpsQrScreen>
           padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
           child: Row(
             children: [
-              Expanded(
-                flex: 6,
-                child: _buildScannerPanel(isCompact),
-              ),
+              Expanded(flex: 6, child: _buildScannerPanel(isCompact)),
               const SizedBox(width: 18),
-              Expanded(
-                flex: 5,
-                child: _buildGuidePanel(isCompact),
-              ),
+              Expanded(flex: 5, child: _buildGuidePanel(isCompact)),
             ],
           ),
         ),
@@ -419,10 +413,7 @@ class _Chapter4RpsQrScreenState extends State<Chapter4RpsQrScreen>
                     height: 250,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(26),
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 5,
-                      ),
+                      border: Border.all(color: Colors.white, width: 5),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x66000000),

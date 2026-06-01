@@ -855,13 +855,14 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     final screenSize = MediaQuery.of(context).size;
     final isCompact = screenSize.height < 600;
     final isMobile = screenSize.width < 600;
-
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final mainContent = Column(
       children: [
         Container(
           width: double.infinity,
-          margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-          padding: EdgeInsets.symmetric(vertical: isCompact ? 8 : 12),
+          margin: const EdgeInsets.fromLTRB(8, 4, 8, 3),
+          padding: EdgeInsets.symmetric(vertical: isCompact ? 7 : 10),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -873,18 +874,18 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 '글자판 속에 숨어든 AI와 코딩 단서 낱말을 모두 찾아보세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isCompact ? 22 : 28,
+                  fontSize: isCompact ? 22 : 26,
                   fontWeight: FontWeight.w900,
                   color: const Color(0xFF091F59),
                   fontFamily: 'GangwonEduAll',
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 '(가이드: 글자판의 글자들을 드래그하여 단어를 연결해 보세요.)',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: isCompact ? 15 : 18,
+                  fontSize: isCompact ? 14 : 16,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF3B82F6),
                   fontFamily: 'GangwonEduAll',
@@ -893,36 +894,110 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenSize.width * 0.04,
-            vertical: screenSize.height * 0.01,
-          ),
-          child: SizedBox(
-            height: isCompact ? 50 : 66,
-            child: Center(
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                children: [
-                  for (var word in words)
-                    _buildWordCard(
-                      word.word,
-                      foundWords.contains(word.word),
-                      isCompact,
-                      screenSize,
+        Expanded(
+          child: isLandscape
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wordPanelWidth = (constraints.maxWidth * 0.24).clamp(
+                      260.0,
+                      320.0,
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            width: wordPanelWidth,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.65),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(0xFFD8E0F3),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const Text(
+                                  '찾을 낱말 8개',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF133E97),
+                                    fontFamily: 'GangwonEduAll',
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Expanded(
+                                  child: ListView.separated(
+                                    itemCount: words.length,
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(height: 6),
+                                    itemBuilder: (context, i) => _buildWordCard(
+                                      words[i].word,
+                                      foundWords.contains(words[i].word),
+                                      true,
+                                      screenSize,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Center(
+                              child: _buildGameBoard(screenSize, isCompact),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                )
+              : Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenSize.width * 0.04,
+                        vertical: screenSize.height * 0.01,
+                      ),
+                      child: SizedBox(
+                        height: isCompact ? 50 : 66,
+                        child: Center(
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            children: [
+                              for (var word in words)
+                                _buildWordCard(
+                                  word.word,
+                                  foundWords.contains(word.word),
+                                  isCompact,
+                                  screenSize,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                ],
-              ),
-            ),
-          ),
+                    Expanded(
+                      child: Center(
+                        child: _buildGameBoard(screenSize, isCompact),
+                      ),
+                    ),
+                  ],
+                ),
         ),
-        Expanded(child: Center(child: _buildGameBoard(screenSize, isCompact))),
         Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(
             horizontal: screenSize.width * 0.03,
-            vertical: isCompact ? 10 : 14,
+            vertical: isCompact ? 8 : 10,
           ),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -950,7 +1025,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                           color: Color(0xFF6F63D1),
                           width: 2,
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 11),
                       ),
                     ),
                   ),
@@ -966,7 +1041,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF8A8A8A),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 11),
                       ),
                     ),
                   ),
@@ -982,30 +1057,12 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF123E97),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 11),
                       ),
                     ),
                   ),
                 ],
               ),
-              if (kDebugMode) ...[
-                const SizedBox(height: 6),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _skipPuzzleForTest,
-                    icon: const Icon(Icons.skip_next_rounded),
-                    label: const Text('테스트용: 문제 건너뛰고 다음으로'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF315FB8),
-                      side: const BorderSide(
-                        color: Color(0xFF5B80D7),
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -1040,6 +1097,12 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               (route) => false,
             ),
           ),
+          if (kDebugMode)
+            IconButton(
+              tooltip: '테스트용 스킵',
+              icon: const Icon(Icons.skip_next_rounded, size: 32),
+              onPressed: _skipPuzzleForTest,
+            ),
         ],
       ),
       body: SafeArea(child: mainContent),
@@ -1053,11 +1116,14 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     Size screenSize,
   ) {
     return Container(
-      margin: EdgeInsets.only(right: screenSize.width * 0.02),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.only(right: isCompact ? 0 : screenSize.width * 0.02),
+      padding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 12 : 16,
+        vertical: isCompact ? 7 : 8,
+      ),
       decoration: BoxDecoration(
         color: found ? const Color(0xFFE2F9E5) : const Color(0xFFEBF0FF),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: found ? const Color(0xFF78DB8F) : const Color(0xFF9FB2EB),
           width: 2,
@@ -1069,7 +1135,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
           Text(
             word,
             style: TextStyle(
-              fontSize: isCompact ? 16 : 20,
+              fontSize: isCompact ? 18 : 20,
               fontWeight: FontWeight.w800,
               color: found ? const Color(0xFF1D6B30) : const Color(0xFF1A367C),
               decoration: found ? TextDecoration.lineThrough : null,
@@ -1089,7 +1155,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final boardSize =
-            math.min(constraints.maxWidth, constraints.maxHeight) * 0.95;
+            math.min(constraints.maxWidth, constraints.maxHeight) * 0.98;
         final cellSize = boardSize / 10;
 
         return GestureDetector(
@@ -1119,7 +1185,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: const Color(0xFF163988), width: 3),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),

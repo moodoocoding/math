@@ -15,10 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '숨은 낱말 찾기 퍼즐',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const HiddenWordPuzzleScreen(),
     );
   }
@@ -80,8 +77,7 @@ class HiddenWordPuzzleScreen extends StatefulWidget {
   final String? completedRouteName;
 
   @override
-  State<HiddenWordPuzzleScreen> createState() =>
-      _HiddenWordPuzzleScreenState();
+  State<HiddenWordPuzzleScreen> createState() => _HiddenWordPuzzleScreenState();
 }
 
 class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
@@ -94,8 +90,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   List<(int, int)>? _hintPositions;
 
   // 글자판에 쓸 한글 문자들
-  static const String koreanChars =
-      '가나다라마바사아자차카타파하나누네노뭐버서어여오유이우은은인임일입인인';
+  static const String koreanChars = '가나다라마바사아자차카타파하나누네노뭐버서어여오유이우은은인임일입인인';
 
   @override
   void initState() {
@@ -125,55 +120,38 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     }
 
     // 챕터 1 단어들 설정 (실제 미션 내용에 맞게 조정 필요시 수정 가능)
-    words.add(WordData(
-      word: '수학',
-      startRow: 0,
-      startCol: 1,
-      direction: 'vertical',
-    ));
+    words.add(
+      WordData(word: '수학', startRow: 0, startCol: 1, direction: 'vertical'),
+    );
     _placeWord(words.last);
 
-    words.add(WordData(
-      word: '체험',
-      startRow: 2,
-      startCol: 2,
-      direction: 'horizontal',
-    ));
+    words.add(
+      WordData(word: '체험', startRow: 2, startCol: 2, direction: 'horizontal'),
+    );
     _placeWord(words.last);
 
-    words.add(WordData(
-      word: '센터',
-      startRow: 4,
-      startCol: 3,
-      direction: 'vertical',
-    ));
+    words.add(
+      WordData(word: '센터', startRow: 4, startCol: 3, direction: 'vertical'),
+    );
     _placeWord(words.last);
 
-    words.add(WordData(
-      word: '미션',
-      startRow: 5,
-      startCol: 0,
-      direction: 'horizontal',
-    ));
+    words.add(
+      WordData(word: '미션', startRow: 5, startCol: 0, direction: 'horizontal'),
+    );
     _placeWord(words.last);
 
-    words.add(WordData(
-      word: '성공',
-      startRow: 1,
-      startCol: 5,
-      direction: 'vertical',
-    ));
+    words.add(
+      WordData(word: '성공', startRow: 1, startCol: 5, direction: 'vertical'),
+    );
     _placeWord(words.last);
   }
 
   void _placeWord(WordData wordData) {
     for (int i = 0; i < wordData.word.length; i++) {
       if (wordData.direction == 'horizontal') {
-        board[wordData.startRow][wordData.startCol + i] =
-            wordData.word[i];
+        board[wordData.startRow][wordData.startCol + i] = wordData.word[i];
       } else {
-        board[wordData.startRow + i][wordData.startCol] =
-            wordData.word[i];
+        board[wordData.startRow + i][wordData.startCol] = wordData.word[i];
       }
     }
   }
@@ -215,7 +193,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     for (var word in words) {
       if (foundWords.contains(word.word)) continue;
 
-      if (word.matchesSelection(currentSelection) || 
+      if (word.matchesSelection(currentSelection) ||
           word.matchesSelectionReverse(currentSelection)) {
         AppSfxController.playCorrect();
         setState(() {
@@ -224,7 +202,7 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
           currentSelection = [];
           _hintPositions = null;
         });
-        
+
         if (foundWords.length == words.length) {
           _showSuccessDialog();
         }
@@ -341,7 +319,8 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     AppSfxController.playClick();
     int nextHintIndex = (lastHintIndex + 1) % words.length;
     int count = 0;
-    while (foundWords.contains(words[nextHintIndex].word) && count < words.length) {
+    while (foundWords.contains(words[nextHintIndex].word) &&
+        count < words.length) {
       nextHintIndex = (nextHintIndex + 1) % words.length;
       count++;
     }
@@ -398,7 +377,10 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               const SizedBox(height: 24),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('확인', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  '확인',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -415,16 +397,15 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
       showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Container(
             padding: const EdgeInsets.all(30),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  'assets/images/chr_how_fail.png',
-                  height: 150,
-                ),
+                Image.asset('assets/images/chr_how_fail.png', height: 150),
                 const SizedBox(height: 20),
                 const Text(
                   '아직 다 못 찾았어요!',
@@ -487,8 +468,25 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
           const BgmToggleButton(iconSize: 32),
           IconButton(
             icon: const Icon(Icons.home, size: 32),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            ),
           ),
+          if (kDebugMode)
+            IconButton(
+              tooltip: '테스트용 스킵',
+              icon: const Icon(Icons.skip_next_rounded, size: 32),
+              onPressed: () {
+                if (widget.completedRouteName != null) {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    widget.completedRouteName!,
+                  );
+                }
+              },
+            ),
         ],
       ),
       body: SafeArea(
@@ -502,7 +500,12 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(bottom: BorderSide(color: const Color(0xFFF4C430).withValues(alpha: 0.5), width: 2)),
+                border: Border(
+                  bottom: BorderSide(
+                    color: const Color(0xFFF4C430).withValues(alpha: 0.5),
+                    width: 2,
+                  ),
+                ),
               ),
               child: Column(
                 children: [
@@ -537,16 +540,19 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                   scrollDirection: Axis.horizontal,
                   children: [
                     for (var word in words)
-                      _buildWordCard(word.word, foundWords.contains(word.word), isCompact, screenSize),
+                      _buildWordCard(
+                        word.word,
+                        foundWords.contains(word.word),
+                        isCompact,
+                        screenSize,
+                      ),
                   ],
                 ),
               ),
             ),
 
             Expanded(
-              child: Center(
-                child: _buildGameBoard(screenSize, isCompact),
-              ),
+              child: Center(child: _buildGameBoard(screenSize, isCompact)),
             ),
 
             Container(
@@ -557,7 +563,9 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
               ),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: Color(0xFFE1E1E4), width: 1)),
+                border: Border(
+                  top: BorderSide(color: Color(0xFFE1E1E4), width: 1),
+                ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -567,14 +575,20 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _showHint,
-                          icon: Icon(Icons.lightbulb_outline, size: isMobile ? 20 : 24),
+                          icon: Icon(
+                            Icons.lightbulb_outline,
+                            size: isMobile ? 20 : 24,
+                          ),
                           label: Text(
                             '힌트',
                             style: TextStyle(fontSize: isMobile ? 16 : 18),
                           ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF6F63D1),
-                            side: const BorderSide(color: Color(0xFF6F63D1), width: 2),
+                            side: const BorderSide(
+                              color: Color(0xFF6F63D1),
+                              width: 2,
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
@@ -599,7 +613,10 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _checkAnswer,
-                          icon: Icon(Icons.check_circle, size: isMobile ? 20 : 24),
+                          icon: Icon(
+                            Icons.check_circle,
+                            size: isMobile ? 20 : 24,
+                          ),
                           label: Text(
                             '낱말 확인',
                             style: TextStyle(fontSize: isMobile ? 16 : 18),
@@ -613,28 +630,6 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                       ),
                     ],
                   ),
-                  if (kDebugMode) ...[
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          if (widget.completedRouteName != null) {
-                            Navigator.pushReplacementNamed(context, widget.completedRouteName!);
-                          }
-                        },
-                        icon: const Icon(Icons.skip_next_rounded),
-                        label: const Text('테스트용: 문제 건너뛰고 다음으로'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF355AA8),
-                          side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -644,7 +639,12 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     );
   }
 
-  Widget _buildWordCard(String word, bool found, bool isCompact, Size screenSize) {
+  Widget _buildWordCard(
+    String word,
+    bool found,
+    bool isCompact,
+    Size screenSize,
+  ) {
     return Container(
       margin: EdgeInsets.only(right: screenSize.width * 0.02),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -680,7 +680,8 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
   Widget _buildGameBoard(Size screenSize, bool isCompact) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final boardSize = math.min(constraints.maxWidth, constraints.maxHeight) * 0.95;
+        final boardSize =
+            math.min(constraints.maxWidth, constraints.maxHeight) * 0.95;
         final cellSize = boardSize / 8;
 
         return GestureDetector(
@@ -723,17 +724,19 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                 int col = index % 8;
                 bool isSelected = currentSelection.contains((row, col));
                 bool isFoundCell = _isCellInFoundWord(row, col);
-                bool isHintCell = _hintPositions != null && _hintPositions!.contains((row, col));
+                bool isHintCell =
+                    _hintPositions != null &&
+                    _hintPositions!.contains((row, col));
 
                 return Container(
                   decoration: BoxDecoration(
                     color: isFoundCell
                         ? const Color(0xFFB3E5FC).withValues(alpha: 0.8)
                         : isSelected
-                            ? const Color(0xFFFFF9C4)
-                            : isHintCell
-                                ? const Color(0xFFFFEBEE)
-                                : Colors.white,
+                        ? const Color(0xFFFFF9C4)
+                        : isHintCell
+                        ? const Color(0xFFFFEBEE)
+                        : Colors.white,
                     border: isHintCell
                         ? Border.all(color: Colors.redAccent, width: 2.5)
                         : Border.all(color: const Color(0xFFBDBDBD), width: 1),
@@ -747,8 +750,8 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
                         color: isFoundCell
                             ? const Color(0xFF01579B)
                             : isHintCell
-                                ? Colors.red
-                                : const Color(0xFF091F59),
+                            ? Colors.red
+                            : const Color(0xFF091F59),
                       ),
                     ),
                   ),
@@ -775,7 +778,8 @@ class _HiddenWordPuzzleScreenState extends State<HiddenWordPuzzleScreen> {
     int lastRow = currentSelection.last.$1;
     int lastCol = currentSelection.last.$2;
 
-    bool isAdjacent = (lastRow == newCell.$1 && (lastCol - newCell.$2).abs() == 1) ||
+    bool isAdjacent =
+        (lastRow == newCell.$1 && (lastCol - newCell.$2).abs() == 1) ||
         (lastCol == newCell.$2 && (lastRow - newCell.$1).abs() == 1);
 
     if (!isAdjacent) return false;

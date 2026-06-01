@@ -61,9 +61,10 @@ class MissionTourApp extends StatelessWidget {
         '/chapter3_story': (context) => const Chapter3StoryScreen(),
         '/chapter3_story_quiz': (context) => const Chapter3StoryQuizScreen(),
         '/mission_chapter3_quiz': (context) => const Chapter3MathQuizScreen(
-              completedRouteName: '/mission_chapter3_word_search',
-            ),
-        '/mission_chapter3_word_search': (context) => const Chapter3WordSearchScreen(
+          completedRouteName: '/mission_chapter3_word_search',
+        ),
+        '/mission_chapter3_word_search': (context) =>
+            const Chapter3WordSearchScreen(
               completedRouteName: '/chapter3_story2',
             ),
         '/chapter3_story2': (context) => const Chapter3Story2Screen(),
@@ -71,28 +72,26 @@ class MissionTourApp extends StatelessWidget {
         '/chapter4_story': (context) => const Chapter4StoryScreen(),
         '/chapter4_story2': (context) => const Chapter4Story2Screen(),
         '/chapter4_story3': (context) => const Chapter4Story3Screen(),
-        '/mission_chapter4_q1': (context) => const BrickPuzzleScreen(
-              completedRouteName: '/chapter4_story2',
-            ),
+        '/mission_chapter4_q1': (context) =>
+            const BrickPuzzleScreen(completedRouteName: '/chapter4_story2'),
         '/mission_chapter4_quiz': (context) => const Chapter4CodingQuizScreen(
-              completedRouteName: '/mission_chapter4_q2',
-            ),
+          completedRouteName: '/mission_chapter4_q2',
+        ),
         '/mission_chapter4_q2': (context) => const HiddenWordPuzzleScreen(
-              completedRouteName: '/chapter4_story_before_rps',
-            ),
-        '/chapter4_story_before_rps': (context) => const Chapter4StoryBeforeRpsScreen(),
-        '/mission_chapter4_rps_qr': (context) => const Chapter4RpsQrScreen(
-              completedRouteName: '/chapter4_story3',
-            ),
+          completedRouteName: '/chapter4_story_before_rps',
+        ),
+        '/chapter4_story_before_rps': (context) =>
+            const Chapter4StoryBeforeRpsScreen(),
+        '/mission_chapter4_rps_qr': (context) =>
+            const Chapter4RpsQrScreen(completedRouteName: '/chapter4_story3'),
         '/mission_low': (context) =>
             const MissionLowScreen(completedRouteName: '/chapter1_story2'),
         '/mission_ch1_q2': (context) => const MissionLowScreen(
           missionDataPath: 'assets/data/mission_chapter1_q2.json',
           completedRouteName: '/chapter2_story',
         ),
-        '/mission_chapter2_q1': (context) => const SeesawPuzzleScreen(
-          completedRouteName: '/chapter2_story2',
-        ),
+        '/mission_chapter2_q1': (context) =>
+            const SeesawPuzzleScreen(completedRouteName: '/chapter2_story2'),
         '/mission_chapter2_q2': (context) => const Chapter2PuzzleQ2Screen(),
         '/mission_chapter2_q3_qr': (context) =>
             const Chapter2QrVerificationScreen(),
@@ -147,10 +146,7 @@ class _IntroScreenState extends State<IntroScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x22000000),
-                  Color(0x99000000),
-                ],
+                colors: [Color(0x22000000), Color(0x99000000)],
               ),
             ),
           ),
@@ -173,7 +169,11 @@ class _IntroScreenState extends State<IntroScreen> {
                       letterSpacing: -0.5,
                       height: 1.2,
                       shadows: const [
-                        Shadow(color: Colors.black26, blurRadius: 12, offset: Offset(0, 4)),
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                        ),
                       ],
                     ),
                   ),
@@ -185,7 +185,11 @@ class _IntroScreenState extends State<IntroScreen> {
                       fontSize: isMobile ? screenWidth * 0.045 : 19,
                       fontWeight: FontWeight.w600,
                       shadows: const [
-                        Shadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
                       ],
                     ),
                   ),
@@ -288,8 +292,12 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
         ? (screenWidth - (horizontalPadding * 2))
         : (screenWidth - (horizontalPadding * 2) - 32) / 3;
 
-    final welcomeSize = isMobile ? screenWidth * 0.075 : (isUltraWide ? 44.0 : 28.0);
-    final adventureSize = isMobile ? screenWidth * 0.085 : (isUltraWide ? 46.0 : 32.0);
+    final welcomeSize = isMobile
+        ? screenWidth * 0.075
+        : (isUltraWide ? 44.0 : 28.0);
+    final adventureSize = isMobile
+        ? screenWidth * 0.085
+        : (isUltraWide ? 46.0 : 32.0);
     final infoTitleSize = isMobile ? 13.0 : 16.0;
     final infoBodySize = isMobile ? 16.0 : 20.0;
     final infoLinkSize = isMobile ? 14.0 : 18.0;
@@ -351,13 +359,26 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(14),
                               child: BackdropFilter(
-                                filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                filter: ui.ImageFilter.blur(
+                                  sigmaX: 8,
+                                  sigmaY: 8,
+                                ),
                                 child: Container(
-                                  padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+                                  padding: const EdgeInsets.fromLTRB(
+                                    10,
+                                    8,
+                                    14,
+                                    8,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withValues(alpha: 0.55),
                                     borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      width: 1.5,
+                                    ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -372,7 +393,8 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                                       const SizedBox(width: 10),
                                       Flexible(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
@@ -549,7 +571,8 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                   const SizedBox(height: 28),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: horizontalPadding),
+                      horizontal: horizontalPadding,
+                    ),
                     child: _StartButton(onPressed: _goMissionLow),
                   ),
                   const SizedBox(height: 40),
@@ -673,52 +696,59 @@ class _MissionCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: selected
                     ? Border.all(color: const Color(0xFF4A66B6), width: 4)
-                    : Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+                    : Border.all(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        width: 1.5,
+                      ),
               ),
               child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: iconCircleSize,
-              height: iconCircleSize,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: iconCircleSize,
+                    height: iconCircleSize,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Icon(
+                      icon,
+                      size: iconSize,
+                      color: const Color(0xFFDE4C78),
+                    ),
+                  ),
+                  SizedBox(height: isUltraWide ? 20 : (isWide ? 14 : 12)),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF2D2F36),
+                      height: 1.2,
+                    ),
+                  ),
+                  SizedBox(height: isUltraWide ? 16 : (isWide ? 10 : 8)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isUltraWide ? 18 : (isWide ? 12 : 10),
+                      vertical: isUltraWide ? 8 : (isWide ? 5 : 4),
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.72),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: subtitleSize,
+                        fontWeight: FontWeight.w800,
+                        color: subtitleColor,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: Icon(icon, size: iconSize, color: const Color(0xFFDE4C78)),
-            ),
-            SizedBox(height: isUltraWide ? 20 : (isWide ? 14 : 12)),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: titleSize,
-                fontWeight: FontWeight.w900,
-                color: const Color(0xFF2D2F36),
-                height: 1.2,
-              ),
-            ),
-            SizedBox(height: isUltraWide ? 16 : (isWide ? 10 : 8)),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isUltraWide ? 18 : (isWide ? 12 : 10),
-                vertical: isUltraWide ? 8 : (isWide ? 5 : 4),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.72),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: subtitleSize,
-                  fontWeight: FontWeight.w800,
-                  color: subtitleColor,
-                ),
-              ),
-            ),
-          ],
-        ),
             ),
           ),
         ),
@@ -937,6 +967,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
     required int rotationQuarterTurns,
     required bool selected,
     double size = 72,
+    BoxFit fit = BoxFit.cover,
   }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -944,7 +975,10 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         decoration: BoxDecoration(
           border: selected
               ? Border.all(color: const Color(0xFF4A66B6), width: 3.5)
-              : Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.0),
+              : Border.all(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  width: 1.0,
+                ),
           borderRadius: BorderRadius.circular(10),
           boxShadow: const [
             BoxShadow(
@@ -960,7 +994,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
             imagePath,
             width: size,
             height: size,
-            fit: BoxFit.cover,
+            fit: fit,
             errorBuilder: (context, error, stackTrace) => Container(
               width: size,
               height: size,
@@ -1128,53 +1162,69 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   }
 
   Widget _buildTargetPreview({required double side}) {
-    final double innerSide = side - 16.0;
-    final double totalSpacing = (_boardSize - 1) * 2; // (4 - 1) * 2px = 6px
-    final double cellSize = (innerSide - totalSpacing) / _boardSize;
+    final double outerSide = side.clamp(72.0, 260.0);
+    const double previewPadding = 6;
+    const double cellGap = 2;
+    final double innerSide = outerSide - previewPadding * 2;
+    final double cellSize =
+        (innerSide - (_boardSize - 1) * cellGap) / _boardSize;
 
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEAF1FF),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF97B0E9), width: 2),
+    return SizedBox.square(
+      dimension: outerSide,
+      child: Container(
+        padding: const EdgeInsets.all(previewPadding),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEAF1FF),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF97B0E9), width: 2),
+        ),
+        child: Column(
+          children: [
+            for (int row = 0; row < _boardSize; row++) ...[
+              if (row > 0) const SizedBox(height: cellGap),
+              Row(
+                children: [
+                  for (int col = 0; col < _boardSize; col++) ...[
+                    if (col > 0) const SizedBox(width: cellGap),
+                    _buildTargetPreviewCell(
+                      index: row * _boardSize + col,
+                      cellSize: cellSize,
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
-      child: SizedBox(
-        width: innerSide,
-        height: innerSide,
-        child: GridView.builder(
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _totalCells,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: _boardSize,
-            mainAxisSpacing: 2,
-            crossAxisSpacing: 2,
-          ),
-          itemBuilder: (context, index) {
-            final isCenter = _centerCells.contains(index);
-            final pieceId = isCenter ? 'piece4' : 'piece1';
-            final rotationQuarterTurns = isCenter
-                ? _targetRotationForCell(index)
-                : 0;
+    );
+  }
 
-            return Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF4F8FF),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
-              ),
-              child: Center(
-                child: _buildPieceVisual(
-                  pieceId: pieceId,
-                  imagePath: 'assets/pieces/$pieceId.png',
-                  rotationQuarterTurns: rotationQuarterTurns,
-                  selected: false,
-                  size: cellSize - 6,
-                ),
-              ),
-            );
-          },
+  Widget _buildTargetPreviewCell({
+    required int index,
+    required double cellSize,
+  }) {
+    final isCenter = _centerCells.contains(index);
+    final pieceId = isCenter ? 'piece4' : 'piece1';
+    final rotationQuarterTurns = isCenter ? _targetRotationForCell(index) : 0;
+
+    return SizedBox.square(
+      dimension: cellSize,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFF4F8FF),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFBAC5E8), width: 1.5),
+        ),
+        child: Center(
+          child: _buildPieceVisual(
+            pieceId: pieceId,
+            imagePath: 'assets/pieces/$pieceId.png',
+            rotationQuarterTurns: rotationQuarterTurns,
+            selected: false,
+            size: (cellSize - 6).clamp(12.0, cellSize),
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );
@@ -1272,6 +1322,12 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
               (route) => false,
             ),
           ),
+          if (kDebugMode)
+            IconButton(
+              tooltip: '테스트용 스킵',
+              icon: const Icon(Icons.skip_next_rounded, size: 36),
+              onPressed: _skipPuzzleForTest,
+            ),
         ],
       ),
       backgroundColor: const Color(0xFFF6FAFF),
@@ -1360,40 +1416,53 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                             builder: (ctx, sideC) {
                                               final previewSide = math
                                                   .min(
-                                                    sideC.maxWidth - 20,
-                                                    sideC.maxHeight - 48,
+                                                    sideC.maxWidth - 18,
+                                                    sideC.maxHeight - 42,
                                                   )
-                                                  .clamp(60.0, 260.0)
+                                                  .clamp(120.0, 260.0)
                                                   .toDouble();
                                               return Container(
                                                 width: double.infinity,
-                                                padding: const EdgeInsets.all(10),
+                                                padding: const EdgeInsets.all(
+                                                  10,
+                                                ),
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xFFFFF7D6),
-                                                  borderRadius: BorderRadius.circular(14),
+                                                  color: const Color(
+                                                    0xFFFFF7D6,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
                                                   border: Border.all(
-                                                    color: const Color(0xFFECC94B),
+                                                    color: const Color(
+                                                      0xFFECC94B,
+                                                    ),
                                                     width: 2,
                                                   ),
                                                 ),
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisSize: MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
                                                   children: [
                                                     const Text(
                                                       '목표 모양',
                                                       style: TextStyle(
                                                         fontSize: 18,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Color(0xFF7A5A00),
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                        color: Color(
+                                                          0xFF7A5A00,
+                                                        ),
                                                       ),
                                                     ),
                                                     const SizedBox(height: 8),
                                                     Expanded(
                                                       child: Center(
-                                                        child: _buildTargetPreview(
-                                                          side: previewSide,
-                                                        ),
+                                                        child:
+                                                            _buildTargetPreview(
+                                                              side: previewSide,
+                                                            ),
                                                       ),
                                                     ),
                                                   ],
@@ -1411,14 +1480,16 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                             padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(14),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
                                               border: Border.all(
                                                 color: const Color(0xFFC8D8F2),
                                                 width: 2,
                                               ),
                                             ),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 const Text(
                                                   '조각 보관함',
@@ -1432,24 +1503,47 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                 Expanded(
                                                   child: LayoutBuilder(
                                                     builder: (ctx, trayC) {
-                                                      final cellW = (trayC.maxWidth - 2 * 8) / 3;
-                                                      final cellH = (trayC.maxHeight - 8) / 2;
-                                                      final ratio = (cellW / cellH).clamp(0.4, 3.0);
-                                                      final pSize = (math.min(cellW, cellH) * 0.72).clamp(28.0, 64.0);
+                                                      final cellW =
+                                                          (trayC.maxWidth -
+                                                              2 * 8) /
+                                                          3;
+                                                      final cellH =
+                                                          (trayC.maxHeight -
+                                                              8) /
+                                                          2;
+                                                      final ratio =
+                                                          (cellW / cellH).clamp(
+                                                            0.4,
+                                                            3.0,
+                                                          );
+                                                      final pSize =
+                                                          (math.min(
+                                                                    cellW,
+                                                                    cellH,
+                                                                  ) *
+                                                                  0.72)
+                                                              .clamp(
+                                                                28.0,
+                                                                64.0,
+                                                              );
                                                       return GridView.count(
-                                                        physics: const NeverScrollableScrollPhysics(),
+                                                        physics:
+                                                            const NeverScrollableScrollPhysics(),
                                                         crossAxisCount: 3,
                                                         crossAxisSpacing: 8,
                                                         mainAxisSpacing: 8,
                                                         childAspectRatio: ratio,
                                                         children: _pieceTemplates
                                                             .map(
-                                                              (piece) => _buildTrayPiece(
-                                                                piece,
-                                                                size: pSize,
-                                                              ),
+                                                              (piece) =>
+                                                                  _buildTrayPiece(
+                                                                    piece,
+                                                                    size: pSize,
+                                                                  ),
                                                             )
-                                                            .toList(growable: false),
+                                                            .toList(
+                                                              growable: false,
+                                                            ),
                                                       );
                                                     },
                                                   ),
@@ -1603,34 +1697,6 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                       ),
                     ],
                   ),
-                  if (kDebugMode) ...[
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _skipPuzzleForTest,
-                        icon: const Icon(Icons.skip_next_rounded),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(42),
-                          side: const BorderSide(
-                            color: Color(0xFF5C7EC5),
-                            width: 2,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        label: const Text(
-                          '테스트용: 문제 건너뛰고 다음으로',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF355AA8),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             );
@@ -1663,7 +1729,8 @@ class _Chapter2QrVerificationScreenState
   bool _isStartingScanner = false;
   String? _lastScannedValue;
   final TextEditingController _manualQrController = TextEditingController();
-  int _previewRotationTurns = 3; // Default 3 for landscape-locked camera preview
+  int _previewRotationTurns =
+      3; // Default 3 for landscape-locked camera preview
 
   @override
   void initState() {
@@ -1725,11 +1792,16 @@ class _Chapter2QrVerificationScreenState
     if (value.isEmpty) return false;
 
     // '루카' 포함 여부만 확인 (NFC 및 NFD 형태 모두 지원)
-    if (value.contains('루카') || value.contains('\u1105\u116E\u110F\u1161')) return true;
+    if (value.contains('루카') || value.contains('\u1105\u116E\u110F\u1161')) {
+      return true;
+    }
 
     try {
       final decoded = Uri.decodeFull(value);
-      if (decoded.contains('루카') || decoded.contains('\u1105\u116E\u110F\u1161')) return true;
+      if (decoded.contains('루카') ||
+          decoded.contains('\u1105\u116E\u110F\u1161')) {
+        return true;
+      }
     } catch (_) {
       // Ignore decoding errors
     }
@@ -1892,6 +1964,13 @@ class _Chapter2QrVerificationScreenState
         ),
         centerTitle: true,
         actions: [
+          if (kDebugMode)
+            IconButton(
+              tooltip: '테스트용 스킵',
+              icon: const Icon(Icons.skip_next_rounded, size: 32),
+              onPressed: () =>
+                  Navigator.pushReplacementNamed(context, '/chapter3_story'),
+            ),
           IconButton(
             tooltip: '화면 회전',
             onPressed: () {
@@ -1928,14 +2007,19 @@ class _Chapter2QrVerificationScreenState
                     decoration: BoxDecoration(
                       color: const Color(0xFFE9F2FF),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFA8C1F5), width: 2),
+                      border: Border.all(
+                        color: const Color(0xFFA8C1F5),
+                        width: 2,
+                      ),
                     ),
                     child: Column(
                       children: [
                         Text(
                           '책 읽어주는 로봇 루카',
                           style: TextStyle(
-                            fontSize: isMobile ? (screenWidth * 0.07).clamp(22, 28) : 28,
+                            fontSize: isMobile
+                                ? (screenWidth * 0.07).clamp(22, 28)
+                                : 28,
                             fontWeight: FontWeight.w900,
                             color: const Color(0xFF163988),
                           ),
@@ -1945,7 +2029,9 @@ class _Chapter2QrVerificationScreenState
                         Text(
                           '루카와 함께 수학책 읽고 한 줄 감상문 쓰고 QR코드를 받으세요!',
                           style: TextStyle(
-                            fontSize: isMobile ? (screenWidth * 0.05).clamp(16, 20) : 20,
+                            fontSize: isMobile
+                                ? (screenWidth * 0.05).clamp(16, 20)
+                                : 20,
                             fontWeight: FontWeight.w700,
                             color: const Color(0xFF163988),
                             height: 1.25,
@@ -1963,7 +2049,10 @@ class _Chapter2QrVerificationScreenState
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                      border: Border.all(
+                        color: const Color(0xFFC8D8F2),
+                        width: 2,
+                      ),
                     ),
                     child: Center(
                       child: SizedBox(
@@ -1983,8 +2072,14 @@ class _Chapter2QrVerificationScreenState
                                   },
                                   onDetect: (capture) {
                                     final rawValue = capture.barcodes
-                                        .map((barcode) => barcode.rawValue?.trim() ?? '')
-                                        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+                                        .map(
+                                          (barcode) =>
+                                              barcode.rawValue?.trim() ?? '',
+                                        )
+                                        .firstWhere(
+                                          (value) => value.isNotEmpty,
+                                          orElse: () => '',
+                                        );
                                     if (rawValue.isEmpty) return;
                                     _handleDetection(rawValue);
                                   },
@@ -1994,7 +2089,10 @@ class _Chapter2QrVerificationScreenState
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: const Color(0x99FFFFFF), width: 3),
+                                    border: Border.all(
+                                      color: const Color(0x99FFFFFF),
+                                      width: 3,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -2007,11 +2105,17 @@ class _Chapter2QrVerificationScreenState
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                      border: Border.all(
+                        color: const Color(0xFFC8D8F2),
+                        width: 2,
+                      ),
                     ),
                     child: Text(
                       _lastScannedValue == null
@@ -2034,7 +2138,10 @@ class _Chapter2QrVerificationScreenState
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFFC8D8F2), width: 2),
+                        border: Border.all(
+                          color: const Color(0xFFC8D8F2),
+                          width: 2,
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -2054,28 +2161,14 @@ class _Chapter2QrVerificationScreenState
                               icon: const Icon(Icons.verified_outlined),
                               label: const Text(
                                 'QR 도장 확인',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.pushReplacementNamed(context, '/chapter3_story'),
-                        icon: const Icon(Icons.skip_next_rounded),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(42),
-                          side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
-                        label: const Text(
-                          '테스트용: 인증 건너뛰고 다음으로',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF355AA8)),
-                        ),
                       ),
                     ),
                   ],
@@ -2101,9 +2194,9 @@ class _StartButton extends StatelessWidget {
       height: 66,
       child: ElevatedButton(
         onPressed: () {
-        AppSfxController.playMissionStart();
-        onPressed();
-      },
+          AppSfxController.playMissionStart();
+          onPressed();
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF4358AD),
           foregroundColor: Colors.white,
@@ -2149,9 +2242,7 @@ Future<void> showPremiumFeedbackDialog({
       return Dialog(
         elevation: 20,
         shadowColor: Colors.black54,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Container(
           width: dialogWidth,
           padding: const EdgeInsets.all(24),

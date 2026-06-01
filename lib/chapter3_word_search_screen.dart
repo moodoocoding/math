@@ -890,6 +890,12 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
               (route) => false,
             ),
           ),
+          if (kDebugMode)
+            IconButton(
+              tooltip: '테스트용 스킵',
+              icon: const Icon(Icons.skip_next_rounded, size: 32),
+              onPressed: _skipPuzzleForTest,
+            ),
         ],
       ),
       body: SafeArea(
@@ -1034,24 +1040,6 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                       ),
                     ],
                   ),
-                  if (kDebugMode) ...[
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _skipPuzzleForTest,
-                        icon: const Icon(Icons.skip_next_rounded),
-                        label: const Text('테스트용: 문제 건너뛰고 다음으로'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF315FB8),
-                          side: const BorderSide(
-                            color: Color(0xFF5B80D7),
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),

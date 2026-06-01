@@ -220,6 +220,12 @@ class _MissionLowScreenState extends State<MissionLowScreen> {
               (route) => false,
             ),
           ),
+          if (kDebugMode && step['type'] != 'story')
+            IconButton(
+              tooltip: '테스트용 스킵',
+              icon: const Icon(Icons.skip_next_rounded, size: 40),
+              onPressed: nextStep,
+            ),
         ],
       ),
       body: step['type'] == 'story'
@@ -254,7 +260,9 @@ class StoryScreen extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final isMobile = screenWidth < 600;
-    final imageHeight = isMobile ? screenSize.height * 0.35 : (screenWidth < 900 ? screenWidth * 0.45 : 360.0);
+    final imageHeight = isMobile
+        ? screenSize.height * 0.35
+        : (screenWidth < 900 ? screenWidth * 0.45 : 360.0);
 
     return Center(
       child: SingleChildScrollView(
@@ -705,7 +713,9 @@ class _QuizScreenState extends State<QuizScreen> {
                 // 상단 배경색 제거 및 캐릭터 사이즈 확대
                 Center(
                   child: Image.asset(
-                    correct ? 'assets/images/chr_play_correct.png' : 'assets/images/chr_how_fail.png',
+                    correct
+                        ? 'assets/images/chr_play_correct.png'
+                        : 'assets/images/chr_how_fail.png',
                     height: imageHeight,
                     fit: BoxFit.contain,
                     cacheHeight: 500,
@@ -756,7 +766,9 @@ class _QuizScreenState extends State<QuizScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF133E97), // Main blue color
+                        backgroundColor: const Color(
+                          0xFF133E97,
+                        ), // Main blue color
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -878,30 +890,39 @@ class _QuizScreenState extends State<QuizScreen> {
     final isMobile = screenWidth < 600;
     final isCompact = screenWidth < 1100;
     final questionText = step['question'].toString();
-    final questionFontSize = isMobile ? (screenWidth * 0.06).clamp(18.0, 22.0) : (isCompact ? 24.0 : 30.0);
-    final optionTextSize = isMobile ? (screenWidth * 0.07).clamp(24.0, 28.0) : (isCompact ? 30.0 : 34.0);
-    final optionShapeSize = isMobile ? (screenWidth * 0.1).clamp(36.0, 48.0) : (isCompact ? 44.0 : 52.0);
+    final questionFontSize = isMobile
+        ? (screenWidth * 0.06).clamp(18.0, 22.0)
+        : (isCompact ? 24.0 : 30.0);
+    final optionTextSize = isMobile
+        ? (screenWidth * 0.07).clamp(24.0, 28.0)
+        : (isCompact ? 30.0 : 34.0);
+    final optionShapeSize = isMobile
+        ? (screenWidth * 0.1).clamp(36.0, 48.0)
+        : (isCompact ? 44.0 : 52.0);
     final actionFontSize = isMobile ? 18.0 : (isCompact ? 20.0 : 24.0);
     final actionButtonHeight = isMobile ? 48.0 : (isMagicSquare ? 52.0 : 56.0);
     final submitButtonLabel = isMagicSquare
         ? '숫자 확인'
         : showHanoiVisual
-            ? '횟수 확인'
-            : renderChoicesAsShapes
-                ? '모양 확인'
-                : '답 확인';
-    
-    final hanoiHeight = (screenHeight * (isMobile ? 0.42 : (isCompact ? 0.48 : 0.52)))
-        .clamp(isMobile ? 280.0 : 360.0, 680.0)
-        .toDouble();
+        ? '횟수 확인'
+        : renderChoicesAsShapes
+        ? '모양 확인'
+        : '답 확인';
 
-    final rodVisualHeight = (screenHeight * (isMobile ? 0.46 : (isCompact ? 0.52 : 0.56)))
-        .clamp(isMobile ? 320.0 : 390.0, 680.0)
-        .toDouble();
-    final magicSquareVisualHeight = (screenHeight * (isMobile ? 0.50 : (isCompact ? 0.56 : 0.60)))
-        .clamp(isMobile ? 350.0 : 430.0, 720.0)
-        .toDouble();
-        
+    final hanoiHeight =
+        (screenHeight * (isMobile ? 0.42 : (isCompact ? 0.48 : 0.52)))
+            .clamp(isMobile ? 280.0 : 360.0, 680.0)
+            .toDouble();
+
+    final rodVisualHeight =
+        (screenHeight * (isMobile ? 0.46 : (isCompact ? 0.52 : 0.56)))
+            .clamp(isMobile ? 320.0 : 390.0, 680.0)
+            .toDouble();
+    final magicSquareVisualHeight =
+        (screenHeight * (isMobile ? 0.50 : (isCompact ? 0.56 : 0.60)))
+            .clamp(isMobile ? 350.0 : 430.0, 720.0)
+            .toDouble();
+
     final hasTopVisualSection =
         hasSimulationImages ||
         showHanoiVisual ||
@@ -927,7 +948,10 @@ class _QuizScreenState extends State<QuizScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFDDE3F0), width: 1.5),
+                          border: Border.all(
+                            color: const Color(0xFFDDE3F0),
+                            width: 1.5,
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -962,15 +986,20 @@ class _QuizScreenState extends State<QuizScreen> {
                             final availableWidth = constraints.maxWidth;
 
                             // Calculate grid size to prevent overflow (leave space for the hint box)
-                            final gridSize = (math.min(availableWidth * 5 / 9 - 16, availableHeight - 90))
-                                .clamp(180.0, 420.0);
+                            final gridSize = (math.min(
+                              availableWidth * 5 / 9 - 16,
+                              availableHeight - 90,
+                            )).clamp(180.0, 420.0);
 
                             // Calculate childAspectRatio dynamically for right column 2x2 grid
                             final rightColW = availableWidth * 4 / 9 - 16;
                             final rightColH = availableHeight - 40;
                             final tileW = (rightColW - 10) / 2;
                             final tileH = (rightColH - 10) / 2;
-                            final dynamicAspectRatio = (tileW / tileH).clamp(1.05, 1.65);
+                            final dynamicAspectRatio = (tileW / tileH).clamp(
+                              1.05,
+                              1.65,
+                            );
 
                             return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -983,9 +1012,12 @@ class _QuizScreenState extends State<QuizScreen> {
                                     children: [
                                       _TessellationFloorPreview(
                                         height: gridSize,
-                                        selectedShape: selectedChoiceIndex != null
+                                        selectedShape:
+                                            selectedChoiceIndex != null
                                             ? _parseShapeChoiceType(
-                                                choices[selectedChoiceIndex!].toString())
+                                                choices[selectedChoiceIndex!]
+                                                    .toString(),
+                                              )
                                             : null,
                                       ),
                                     ],
@@ -1000,63 +1032,100 @@ class _QuizScreenState extends State<QuizScreen> {
                                     children: [
                                       GridView.builder(
                                         shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         itemCount: 4,
-                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 2,
-                                          crossAxisSpacing: 10,
-                                          mainAxisSpacing: 10,
-                                          childAspectRatio: isMobile ? 1.05 : dynamicAspectRatio,
-                                        ),
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 2,
+                                              crossAxisSpacing: 10,
+                                              mainAxisSpacing: 10,
+                                              childAspectRatio: isMobile
+                                                  ? 1.05
+                                                  : dynamicAspectRatio,
+                                            ),
                                         itemBuilder: (context, index) {
-                                          final selected = selectedChoiceIndex == index;
-                                          final color = _optionColors[index % _optionColors.length];
-                                          final isEnabled = index < choices.length;
+                                          final selected =
+                                              selectedChoiceIndex == index;
+                                          final color =
+                                              _optionColors[index %
+                                                  _optionColors.length];
+                                          final isEnabled =
+                                              index < choices.length;
                                           final choiceText = isEnabled
                                               ? choices[index].toString()
                                               : '준비 중';
-                                          final shapeType = _parseShapeChoiceType(choiceText);
-                                          final textColor = color.computeLuminance() > 0.55
+                                          final shapeType =
+                                              _parseShapeChoiceType(choiceText);
+                                          final textColor =
+                                              color.computeLuminance() > 0.55
                                               ? const Color(0xFF163988)
                                               : Colors.white;
 
                                           return AnimatedScale(
                                             scale: selected ? 1.03 : 1.0,
-                                            duration: const Duration(milliseconds: 180),
+                                            duration: const Duration(
+                                              milliseconds: 180,
+                                            ),
                                             curve: Curves.easeOutBack,
                                             child: GestureDetector(
                                               onTap: isEnabled
-                                                  ? () => setState(() => selectedChoiceIndex = index)
+                                                  ? () => setState(
+                                                      () =>
+                                                          selectedChoiceIndex =
+                                                              index,
+                                                    )
                                                   : null,
                                               child: AnimatedContainer(
-                                                duration: const Duration(milliseconds: 180),
+                                                duration: const Duration(
+                                                  milliseconds: 180,
+                                                ),
                                                 curve: Curves.easeOut,
                                                 decoration: BoxDecoration(
-                                                  color: selected ? color : Colors.white,
-                                                  borderRadius: BorderRadius.circular(18),
+                                                  color: selected
+                                                      ? color
+                                                      : Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(18),
                                                   border: Border.all(
                                                     color: selected
-                                                        ? const Color(0xFF0B1F61)
-                                                        : const Color(0xFFDDE3F0),
+                                                        ? const Color(
+                                                            0xFF0B1F61,
+                                                          )
+                                                        : const Color(
+                                                            0xFFDDE3F0,
+                                                          ),
                                                     width: selected ? 4 : 2,
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
                                                       color: selected
-                                                          ? color.withValues(alpha: 0.4)
-                                                          : const Color(0x14000000),
-                                                      blurRadius: selected ? 18 : 8,
-                                                      offset: const Offset(0, 4),
+                                                          ? color.withValues(
+                                                              alpha: 0.4,
+                                                            )
+                                                          : const Color(
+                                                              0x14000000,
+                                                            ),
+                                                      blurRadius: selected
+                                                          ? 18
+                                                          : 8,
+                                                      offset: const Offset(
+                                                        0,
+                                                        4,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
                                                 child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     const Spacer(),
                                                     _ShapeOptionSymbol(
                                                       type: shapeType,
-                                                      color: selected ? textColor : color,
+                                                      color: selected
+                                                          ? textColor
+                                                          : color,
                                                       size: optionShapeSize,
                                                       selected: selected,
                                                     ),
@@ -1064,25 +1133,36 @@ class _QuizScreenState extends State<QuizScreen> {
                                                     Text(
                                                       choiceText,
                                                       style: TextStyle(
-                                                        fontSize: isMobile ? 18 : 22,
-                                                        fontWeight: FontWeight.w900,
+                                                        fontSize: isMobile
+                                                            ? 18
+                                                            : 22,
+                                                        fontWeight:
+                                                            FontWeight.w900,
                                                         color: selected
                                                             ? textColor
-                                                            : const Color(0xFF2D3A5C),
+                                                            : const Color(
+                                                                0xFF2D3A5C,
+                                                              ),
                                                       ),
                                                     ),
                                                     const Spacer(),
                                                     if (selected)
                                                       Padding(
-                                                        padding: const EdgeInsets.only(bottom: 8),
+                                                        padding:
+                                                            const EdgeInsets.only(
+                                                              bottom: 8,
+                                                            ),
                                                         child: Icon(
-                                                          Icons.radio_button_checked_rounded,
+                                                          Icons
+                                                              .radio_button_checked_rounded,
                                                           color: textColor,
                                                           size: 26,
                                                         ),
                                                       )
                                                     else
-                                                      const SizedBox(height: 34),
+                                                      const SizedBox(
+                                                        height: 34,
+                                                      ),
                                                   ],
                                                 ),
                                               ),
@@ -1126,7 +1206,8 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                       if (hasSimulationImages)
                         _buildSimulationArea(
-                          (step['simulation_images'] as List<dynamic>).cast<String>(),
+                          (step['simulation_images'] as List<dynamic>)
+                              .cast<String>(),
                         ),
                       if (showHanoiVisual) ...[
                         const SizedBox(height: 14),
@@ -1168,17 +1249,21 @@ class _QuizScreenState extends State<QuizScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: 4,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: useFourAcrossChoices ? 4 : 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: useFourAcrossChoices
-                                ? (isMobile ? 3.0 : (isCompact ? 5.8 : 7.0))
-                                : (isMobile ? 3.5 : (isCompact ? 5.5 : 7.5)),
-                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: useFourAcrossChoices ? 4 : 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: useFourAcrossChoices
+                                    ? (isMobile ? 3.0 : (isCompact ? 5.8 : 7.0))
+                                    : (isMobile
+                                          ? 3.5
+                                          : (isCompact ? 5.5 : 7.5)),
+                              ),
                           itemBuilder: (context, index) {
                             final selected = selectedChoiceIndex == index;
-                            final color = _optionColors[index % _optionColors.length];
+                            final color =
+                                _optionColors[index % _optionColors.length];
                             final isEnabled = index < choices.length;
                             final choiceText = isEnabled
                                 ? choices[index].toString()
@@ -1197,7 +1282,10 @@ class _QuizScreenState extends State<QuizScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   border: selected
-                                      ? Border.all(color: const Color(0xFF0B1F61), width: 5)
+                                      ? Border.all(
+                                          color: const Color(0xFF0B1F61),
+                                          width: 5,
+                                        )
                                       : null,
                                   boxShadow: selected
                                       ? const [
@@ -1213,12 +1301,16 @@ class _QuizScreenState extends State<QuizScreen> {
                                   color: Colors.transparent,
                                   child: InkWell(
                                     onTap: isEnabled
-                                        ? () => setState(() => selectedChoiceIndex = index)
+                                        ? () => setState(
+                                            () => selectedChoiceIndex = index,
+                                          )
                                         : null,
                                     borderRadius: BorderRadius.circular(10),
                                     child: Ink(
                                       decoration: BoxDecoration(
-                                        color: isEnabled ? color : const Color(0xFFB8B8BE),
+                                        color: isEnabled
+                                            ? color
+                                            : const Color(0xFFB8B8BE),
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: const [
                                           BoxShadow(
@@ -1228,7 +1320,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                           ),
                                         ],
                                       ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                      ),
                                       child: Stack(
                                         children: [
                                           Center(
@@ -1244,7 +1338,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                                 shadows: selected
                                                     ? const [
                                                         Shadow(
-                                                          color: Color(0x55000000),
+                                                          color: Color(
+                                                            0x55000000,
+                                                          ),
                                                           blurRadius: 4,
                                                         ),
                                                       ]
@@ -1274,11 +1370,17 @@ class _QuizScreenState extends State<QuizScreen> {
                       else if (!isMagicSquare)
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFF243B78), width: 2),
+                            border: Border.all(
+                              color: const Color(0xFF243B78),
+                              width: 2,
+                            ),
                           ),
                           child: TextField(
                             controller: _inputController,
@@ -1290,7 +1392,9 @@ class _QuizScreenState extends State<QuizScreen> {
                             ),
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: quizType == 'qr' ? 'QR 결과를 입력하세요' : '답을 입력하세요',
+                              hintText: quizType == 'qr'
+                                  ? 'QR 결과를 입력하세요'
+                                  : '답을 입력하세요',
                               hintStyle: TextStyle(
                                 fontSize: isCompact ? 20 : 24,
                                 color: const Color(0xFF8A93AE),
@@ -1302,7 +1406,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       const SizedBox(height: 4),
                     ],
                   ),
-          ),
+                ),
         ),
         // ── 항상 하단에 고정되는 버튼 영역 ──
         Container(
@@ -1316,7 +1420,10 @@ class _QuizScreenState extends State<QuizScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _showHint(step['hint']?.toString()),
-                      icon: const Icon(Icons.chat_bubble_outline_rounded, size: 28),
+                      icon: const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        size: 28,
+                      ),
                       label: Text(
                         '힌트',
                         style: TextStyle(
@@ -1326,7 +1433,10 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFF163988),
-                        side: const BorderSide(color: Color(0xFF21396C), width: 2),
+                        side: const BorderSide(
+                          color: Color(0xFF21396C),
+                          width: 2,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1359,31 +1469,6 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                 ],
               ),
-              if (kDebugMode) ...[
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: widget.onNext,
-                    icon: const Icon(Icons.skip_next_rounded),
-                    label: Text(
-                      '테스트용: 문제 건너뛰고 다음으로',
-                      style: TextStyle(
-                        fontSize: isCompact ? 14 : 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF355AA8),
-                      side: const BorderSide(color: Color(0xFF5C7EC5), width: 2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      minimumSize: const Size.fromHeight(42),
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -1442,7 +1527,11 @@ class _StarSymbolPainter extends CustomPainter {
       final radius = i.isEven ? r : r * 0.45;
       final x = cx + radius * math.cos(angle);
       final y = cy + radius * math.sin(angle);
-      if (i == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
     }
     path.close();
     canvas.drawPath(path, paint);
@@ -1487,17 +1576,13 @@ class _ShapeOptionSymbol extends StatelessWidget {
         return SizedBox(
           width: size,
           height: size,
-          child: CustomPaint(
-            painter: _StarSymbolPainter(color: color),
-          ),
+          child: CustomPaint(painter: _StarSymbolPainter(color: color)),
         );
       case _ShapeChoiceType.pentagon:
         return SizedBox(
           width: size,
           height: size,
-          child: CustomPaint(
-            painter: _PentagonSymbolPainter(color: color),
-          ),
+          child: CustomPaint(painter: _PentagonSymbolPainter(color: color)),
         );
       case _ShapeChoiceType.unknown:
         return Text(
@@ -1516,10 +1601,7 @@ class _ShapeOptionSymbol extends StatelessWidget {
 }
 
 class _TessellationFloorPreview extends StatelessWidget {
-  const _TessellationFloorPreview({
-    required this.height,
-    this.selectedShape,
-  });
+  const _TessellationFloorPreview({required this.height, this.selectedShape});
 
   final double height;
   final _ShapeChoiceType? selectedShape;
@@ -1556,7 +1638,8 @@ class _TessellationFloorPreview extends StatelessWidget {
             width: height,
             height: height,
             child: ClipRRect(
-              borderRadius: BorderRadius.zero, // Perfect rectangular boundary matching mathematical tessellation
+              borderRadius: BorderRadius
+                  .zero, // Perfect rectangular boundary matching mathematical tessellation
               child: CustomPaint(
                 painter: _TessellationFloorPainter(
                   selectedShape: selectedShape,
@@ -1571,17 +1654,18 @@ class _TessellationFloorPreview extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: selectedShape == null
-                  ? Colors.transparent // Soft natural caption styling without button confusion
+                  ? Colors
+                        .transparent // Soft natural caption styling without button confusion
                   : canTile
-                      ? const Color(0xFFDFF7EC)
-                      : const Color(0xFFFFEEEE),
+                  ? const Color(0xFFDFF7EC)
+                  : const Color(0xFFFFEEEE),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: selectedShape == null
                     ? Colors.transparent
                     : canTile
-                        ? const Color(0xFF4CAF50)
-                        : const Color(0xFFE57373),
+                    ? const Color(0xFF4CAF50)
+                    : const Color(0xFFE57373),
                 width: 1.5,
               ),
             ),
@@ -1594,8 +1678,8 @@ class _TessellationFloorPreview extends StatelessWidget {
                 color: selectedShape == null
                     ? const Color(0xFF6B7280) // Clean placeholder neutral text
                     : canTile
-                        ? const Color(0xFF2E7D32)
-                        : const Color(0xFFC62828),
+                    ? const Color(0xFF2E7D32)
+                    : const Color(0xFFC62828),
                 fontFamily: 'GangwonEduAll',
               ),
             ),
@@ -1607,10 +1691,7 @@ class _TessellationFloorPreview extends StatelessWidget {
 }
 
 class _TessellationFloorPainter extends CustomPainter {
-  const _TessellationFloorPainter({
-    this.selectedShape,
-    this.canTile = false,
-  });
+  const _TessellationFloorPainter({this.selectedShape, this.canTile = false});
 
   final _ShapeChoiceType? selectedShape;
   final bool canTile;
@@ -1622,16 +1703,10 @@ class _TessellationFloorPainter extends CustomPainter {
     // 벽면/테두리 영역 (수학적 테셀레이션 영역을 위한 직각형 바닥 처리)
     final bgPaint = Paint()..color = const Color(0xFFEAF1FF);
 
-    canvas.drawRect(
-      Offset.zero & size,
-      bgPaint,
-    );
+    canvas.drawRect(Offset.zero & size, bgPaint);
 
     // 바닥 영역을 꽉 채우도록 사각형 그림
-    canvas.drawRect(
-      Offset.zero & size,
-      floorPaint,
-    );
+    canvas.drawRect(Offset.zero & size, floorPaint);
 
     const rows = 5;
     const columns = 5;
@@ -1642,7 +1717,8 @@ class _TessellationFloorPainter extends CustomPainter {
     // 사각형(네모)이거나 선택 전일 때만 격자 격자선을 그립니다. (오각형/원/별 등은 격자 구조의 한계를 벗어나 수학적 일관성을 지키기 위함)
     if (selectedShape == null || selectedShape == _ShapeChoiceType.square) {
       final baseGridPaint = Paint()
-        ..color = const Color(0xFFC3CEF0) // 모눈종이 격자선 연청색
+        ..color =
+            const Color(0xFFC3CEF0) // 모눈종이 격자선 연청색
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.2;
 
@@ -1701,7 +1777,10 @@ class _TessellationFloorPainter extends CustomPainter {
       else if (selectedShape == _ShapeChoiceType.pentagon) {
         final double cx = size.width / 2;
         final double cy = size.height / 2;
-        final sharedVertex = Offset(cx - size.width * 0.05, cy + size.height * 0.04);
+        final sharedVertex = Offset(
+          cx - size.width * 0.05,
+          cy + size.height * 0.04,
+        );
         final side = math.min(size.width, size.height) / 4.6;
         final startAngle = math.pi / 10; // 18도. 36도 빈틈이 오른쪽에 보이도록 배치.
         final strokePaint = Paint()
@@ -1751,8 +1830,10 @@ class _TessellationFloorPainter extends CustomPainter {
           canvas,
           '36도 빈틈',
           Offset(
-            sharedVertex.dx + gapRadius * 0.74 * math.cos(gapStart + gapSweep / 2),
-            sharedVertex.dy + gapRadius * 0.74 * math.sin(gapStart + gapSweep / 2),
+            sharedVertex.dx +
+                gapRadius * 0.74 * math.cos(gapStart + gapSweep / 2),
+            sharedVertex.dy +
+                gapRadius * 0.74 * math.sin(gapStart + gapSweep / 2),
           ),
         );
         _drawWarningLabel(
@@ -1802,11 +1883,7 @@ class _TessellationFloorPainter extends CustomPainter {
           _drawStar(canvas, centers[i], r, strokePaint);
         }
 
-        _drawWarningLabel(
-          canvas,
-          '큰 빈틈!',
-          Offset(cx, cy),
-        );
+        _drawWarningLabel(canvas, '큰 빈틈!', Offset(cx, cy));
       }
       // 4. 원 (기타 테셀레이션 불가능한 도형 - 탄젠트 5x5 접합 렌더링)
       else {
@@ -1820,9 +1897,9 @@ class _TessellationFloorPainter extends CustomPainter {
 
             // 번갈아가며 색상 지정
             final currentPaint = (row + col).isEven ? tilePaintA : tilePaintB;
-            
+
             _drawShapeSymbol(canvas, center, shapeSize, currentPaint.color);
-            
+
             // 테두리선 그리기
             final strokePaint = Paint()
               ..color = gridPaint.color
@@ -1839,10 +1916,7 @@ class _TessellationFloorPainter extends CustomPainter {
       ..color = const Color(0xFF163988)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
-    canvas.drawRect(
-      Offset.zero & size,
-      borderPaint,
-    );
+    canvas.drawRect(Offset.zero & size, borderPaint);
 
     // 선택 안 됐을 때 중앙 안내 텍스트
     if (selectedShape == null) {
@@ -1869,7 +1943,11 @@ class _TessellationFloorPainter extends CustomPainter {
   }
 
   void _drawShapeSymbolBorder(
-      Canvas canvas, Offset center, double size, Paint paint) {
+    Canvas canvas,
+    Offset center,
+    double size,
+    Paint paint,
+  ) {
     switch (selectedShape) {
       case _ShapeChoiceType.square:
         canvas.drawRect(
@@ -1892,7 +1970,11 @@ class _TessellationFloorPainter extends CustomPainter {
   }
 
   void _drawShapeSymbol(
-      Canvas canvas, Offset center, double size, Color color) {
+    Canvas canvas,
+    Offset center,
+    double size,
+    Color color,
+  ) {
     final paint = Paint()..color = color;
     switch (selectedShape) {
       case _ShapeChoiceType.square:
@@ -1967,7 +2049,10 @@ class _TessellationFloorPainter extends CustomPainter {
     );
     textPainter.paint(
       canvas,
-      Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2),
+      Offset(
+        center.dx - textPainter.width / 2,
+        center.dy - textPainter.height / 2,
+      ),
     );
   }
 
@@ -1979,7 +2064,11 @@ class _TessellationFloorPainter extends CustomPainter {
       final radius = i.isEven ? r : r * 0.45;
       final x = center.dx + radius * math.cos(angle);
       final y = center.dy + radius * math.sin(angle);
-      if (i == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
     }
     path.close();
     canvas.drawPath(path, paint);
@@ -2066,8 +2155,22 @@ class _RodNumeralVisualPanel extends StatelessWidget {
       );
     }
 
-    final activeTens = tens ?? (tenThousands == null && thousands == null && hundreds == null && ones == null ? 2 : null);
-    final activeOnes = ones ?? (tenThousands == null && thousands == null && hundreds == null && tens == null ? 3 : null);
+    final activeTens =
+        tens ??
+        (tenThousands == null &&
+                thousands == null &&
+                hundreds == null &&
+                ones == null
+            ? 2
+            : null);
+    final activeOnes =
+        ones ??
+        (tenThousands == null &&
+                thousands == null &&
+                hundreds == null &&
+                tens == null
+            ? 3
+            : null);
 
     if (activeTens != null) {
       if (children.isNotEmpty) children.add(const SizedBox(width: 12));
@@ -2114,11 +2217,7 @@ class _RodNumeralVisualPanel extends StatelessWidget {
             ),
           ),
           SizedBox(height: isCompact ? 8 : 12),
-          Expanded(
-            child: Row(
-              children: children,
-            ),
-          ),
+          Expanded(child: Row(children: children)),
         ],
       ),
     );
