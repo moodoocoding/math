@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'bgm_controller.dart';
 import 'bgm_toggle_button.dart';
 
-
 class Chapter4StoryScreen extends StatelessWidget {
   const Chapter4StoryScreen({super.key});
 
@@ -52,6 +51,7 @@ class Chapter4StoryScreen extends StatelessWidget {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
       nextRouteName: '/mission_chapter4_q1',
+      finalButtonText: '문제 해결하기',
     );
   }
 }
@@ -82,6 +82,7 @@ class Chapter4Story2Screen extends StatelessWidget {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
       nextRouteName: '/mission_chapter4_quiz',
+      finalButtonText: '문제 해결하기',
     );
   }
 }
@@ -92,17 +93,17 @@ class Chapter4StoryBeforeRpsScreen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: '찾았다! 낱말들이 이어지면서 다음에 가야 할 곳이 보이기 시작했어!',
+      line: '찾았다! 낱말들이 하나로 맞춰지면서 새로운 길이 활짝 열렸어!',
       characterAsset: 'assets/images/chr_how_laughing.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '다음 체험은 수학융합실의 인공지능 가위바위보 로봇이야! 직접 해 보자!',
+      line: '이 길은 수학융합실의 가위바위보 로봇이 서 있는 곳으로 연결되어 있어! 얼른 가 보자!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '로봇 체험을 마치면 QR 인증을 받자. 체험을 완료했다는 표시가 될 거야!',
+      line: '로봇과의 대결을 통과한 뒤 마지막 QR 코드를 비추면, 반짝별을 깨울 마지막 빛을 얻을 수 있대!',
       characterAsset: 'assets/images/chr_how_running.png',
     ),
   ];
@@ -112,7 +113,7 @@ class Chapter4StoryBeforeRpsScreen extends StatelessWidget {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
       nextRouteName: '/mission_chapter4_rps_qr',
-      finalButtonText: 'QR 인증하기',
+      finalButtonText: '문제 해결하기',
     );
   }
 }
@@ -123,12 +124,12 @@ class Chapter4Story3Screen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: 'QR 인증이 완료됐어! 마지막 별 조각은 어디에 있지?',
+      line: '와! 마지막 QR 코드가 통과되면서 숨겨져 있던 별 조각이 솟아올랐어!',
       characterAsset: 'assets/images/chr_how_thumbs_up.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '마지막 별 조각을 찾았어! 이제 반짝별을 다시 하늘처럼 밝히자!',
+      line: '드디어 네 개의 별 조각을 모두 찾았어! 어서 반짝별로 달려가서 이 불빛을 전해주자!',
       characterAsset: 'assets/images/chr_play_heart_hands.png',
     ),
   ];
@@ -138,11 +139,10 @@ class Chapter4Story3Screen extends StatelessWidget {
     return const _Chapter4StoryFlow(
       scenes: _scenes,
       nextRouteName: '/ending_story',
-      finalButtonText: '엔딩 보기',
+      finalButtonText: '문제 해결하기',
     );
   }
 }
-
 
 class _Chapter4StoryFlow extends StatefulWidget {
   const _Chapter4StoryFlow({
@@ -295,7 +295,7 @@ class _Chapter4StoryFlowState extends State<_Chapter4StoryFlow> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? (widget.finalButtonText ?? '다음 화면으로') : '다음',
+                        isLast ? (widget.finalButtonText ?? '문제 해결하기') : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),

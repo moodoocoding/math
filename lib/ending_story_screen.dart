@@ -19,12 +19,12 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
   final List<_EndingScene> _scenes = [
     const _EndingScene(
       speaker: '하우',
-      line: '서둘러! 마지막 별 조각을 반짝별 앞으로 가져가자!',
+      line: '우리가 되찾은 네 개의 별 조각들이 반짝별의 품으로 날아가고 있어!',
       characterAsset: 'assets/images/chr_how_cheering.png', // 기본 캐릭터 사용
     ),
     const _EndingScene(
       speaker: '플레이',
-      line: '봐! 마지막 별 조각이 반짝별과 하나로 모이고 있어!',
+      line: '우와! 조각들이 하나로 맞춰지면서 반짝별이 다시 밤하늘처럼 눈부시게 빛나기 시작해!',
       characterAsset: 'assets/images/chr_play_happy.png', // 기본 캐릭터 사용
     ),
   ];
@@ -285,7 +285,7 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        isLast ? '엔딩 보기' : '다음',
+                        isLast ? '문제 해결하기' : '다음',
                         style: TextStyle(fontSize: buttonFontSize, fontWeight: FontWeight.w800),
                       ),
                     ),
