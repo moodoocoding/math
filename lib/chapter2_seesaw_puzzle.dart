@@ -863,101 +863,194 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
               ),
             ),
-            // 문제 안내 영역 (상세 지시문 및 서브 가이드 보강)
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(8, 12, 8, 8),
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(12)),
-                border: Border.all(color: const Color(0xFFDDE3F0), width: 1.5),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '⚖️ 시소 양쪽의 칸에 적힌 숫자의 합이 똑같아지도록 만들어 봐요!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: isMobile ? 18 : 25,
-                      fontWeight: FontWeight.w900,
-                      color: const Color(0xFF091F59),
-                      height: 1.25,
-                      fontFamily: 'GangwonEduAll',
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '👉 도형을 끌어다 놓고, 톡! 터치하면 돌릴 수 있어요.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: isMobile ? 14.0 : 17.0,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF3B82F6),
-                      fontFamily: 'GangwonEduAll',
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _SeesawStepChip(stepNo: '1', label: '왼쪽에 도형 놓기', isActive: !_leftPlaced),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF97B0E9)),
-                      const SizedBox(width: 8),
-                      _SeesawStepChip(stepNo: '2', label: '오른쪽에 도형 놓기', isActive: _leftPlaced && !_rightPlaced),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF97B0E9)),
-                      const SizedBox(width: 8),
-                      _SeesawStepChip(stepNo: '3', label: '균형 확인', isActive: _leftPlaced && _rightPlaced),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            
-            // 본문 영역: 가로 분할 구조 (기존 브릭 퍼즐 스타일 매칭)
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final double availWidth = constraints.maxWidth;
-                    final double storageWidth = availWidth * 0.28;
-                    final double gameAreaWidth = availWidth * 0.70;
+                    final double availHeight = constraints.maxHeight;
+                    
+                    // 가로 모드 여부 판단 (태블릿 가로 또는 모바일 가로)
+                    final bool isLandscape = mq.orientation == Orientation.landscape || availWidth > 750;
 
-                    // 우측 시소/그리드 영역을 위한 셀 크기 계산 (가로 세로 비율 모두 반영하여 화면 넘침 방지)
-                    final double cellSzWidth = gameAreaWidth / 12.5;
-                    final double cellSzHeight = (constraints.maxHeight - 190) / 4.8;
-                    final double cellSz = math.min(cellSzWidth, cellSzHeight).clamp(28.0, 48.0);
-                    final double gap = cellSz * 0.13;
-
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // [왼쪽] 도형 보관함 (28% 너비)
-                        SizedBox(
-                          width: storageWidth,
-                          child: _buildStorage(storageWidth, isMobile, cellSz),
-                        ),
-                        SizedBox(width: availWidth * 0.02),
-                        // [오른쪽] 시소 및 5x5 그리드 보드 (70% 너비)
-                        Expanded(
-                          child: Column(
-                            children: [
-                              _seesawWidget(gameAreaWidth, cellSz, gap),
-                              const SizedBox(height: 6),
-                              Expanded(child: _grid(cellSz, gap, isMobile)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
+                    if (isLandscape) {
+                      return _buildLandscapeLayout(availWidth, availHeight, isMobile, mq);
+                    } else {
+                      return _buildPortraitLayout(availWidth, availHeight, isMobile, mq);
+                    }
                   },
                 ),
               ),
             ),
             _bottomBar(mq),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────── 가로/세로 전용 레이아웃 위젯 빌더
+
+  Widget _buildLandscapeLayout(double availWidth, double availHeight, bool isMobile, MediaQueryData mq) {
+    // 가로 모드에서는 화면을 3개 영역으로 분할하여 세로 짤림을 완벽 예방합니다:
+    // 1. 좌측 (24%): 도형 보관함 (전체 높이 사용으로 잘림 방지)
+    // 2. 중앙 (45%): 시소 및 그리드 메인 게임 영역 (상단 마진 최소화로 시원하게 배치)
+    // 3. 우측 (27%): 설명 카드 패널 (상단에서 우측으로 이동하여 세로 공간 절약)
+    final double storageWidth = availWidth * 0.24;
+    final double gameAreaWidth = availWidth * 0.45;
+    
+    // 시소/그리드 셀 크기 계산 (전체 세로 높이 활용 가능하므로 넉넉하게 계산)
+    final double cellSzWidth = gameAreaWidth / 12.5;
+    final double cellSzHeight = (availHeight - 110) / 4.62; // 상단 바 없으므로 -110만 감산하여 크기 극대화
+    final double cellSz = math.min(cellSzWidth, cellSzHeight).clamp(28.0, 46.0);
+    final double gap = cellSz * 0.13;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // [좌측] 도형 보관함 (24% 너비)
+        SizedBox(
+          width: storageWidth,
+          child: _buildStorage(storageWidth, isMobile),
+        ),
+        SizedBox(width: availWidth * 0.02),
+        // [중앙] 시소 및 5x5 그리드 보드 (45% 너비)
+        SizedBox(
+          width: gameAreaWidth,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _seesawWidget(gameAreaWidth, cellSz, gap),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: _grid(cellSz, gap, isMobile),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: availWidth * 0.02),
+        // [우측] 우측 설명 및 스텝 가이드 카드 패널 (27% 너비)
+        Expanded(
+          child: _buildInstructionCard(isMobile, compact: true),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPortraitLayout(double availWidth, double availHeight, bool isMobile, MediaQueryData mq) {
+    // 세로 모드에서는 상단에 지시문이 위치하고, 아래에 도형 보관함과 시소 게임판이 차례로 위치합니다.
+    final double storageHeight = availHeight * 0.32;
+    final double gameHeight = availHeight * 0.52;
+
+    final double cellSzWidth = availWidth / 12.5;
+    final double cellSzHeight = (gameHeight - 90) / 4.8;
+    final double cellSz = math.min(cellSzWidth, cellSzHeight).clamp(26.0, 42.0);
+    final double gap = cellSz * 0.13;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildInstructionCard(isMobile, compact: false),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: storageHeight,
+          width: double.infinity,
+          child: _buildStorage(availWidth, isMobile),
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _seesawWidget(availWidth, cellSz, gap),
+              const SizedBox(height: 6),
+              Expanded(child: _grid(cellSz, gap, isMobile)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInstructionCard(bool isMobile, {required bool compact}) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: compact ? 12 : 18,
+        horizontal: compact ? 12 : 16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFBAC5E8), width: 2.0),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A1A367C),
+            blurRadius: 8,
+            offset: Offset(0, 3),
+          )
+        ],
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: compact ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: compact ? MainAxisAlignment.start : MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.scale_rounded, color: Color(0xFF133E97), size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  '시소 규칙',
+                  style: TextStyle(
+                    fontSize: compact ? 18 : 20,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF133E97),
+                    fontFamily: 'GangwonEduAll',
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 16, thickness: 1.5),
+            Text(
+              '⚖️ 시소 양쪽의 칸에 적힌 숫자의 합이 똑같아지도록 만들어 봐요!',
+              textAlign: compact ? TextAlign.start : TextAlign.center,
+              style: TextStyle(
+                fontSize: isMobile ? 15 : 17,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFF091F59),
+                height: 1.35,
+                fontFamily: 'GangwonEduAll',
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '👉 도형을 끌어다 놓고, 톡! 터치하면 돌릴 수 있어요.',
+              textAlign: compact ? TextAlign.start : TextAlign.center,
+              style: TextStyle(
+                fontSize: isMobile ? 12.0 : 13.5,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF3B82F6),
+                fontFamily: 'GangwonEduAll',
+              ),
+            ),
+            const SizedBox(height: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SeesawStepChip(stepNo: '1', label: '왼쪽 도형 배치', isActive: !_leftPlaced),
+                const SizedBox(height: 6),
+                _SeesawStepChip(stepNo: '2', label: '오른쪽 도형 배치', isActive: _leftPlaced && !_rightPlaced),
+                const SizedBox(height: 6),
+                _SeesawStepChip(stepNo: '3', label: '양쪽 균형 확인', isActive: _leftPlaced && _rightPlaced),
+              ],
+            ),
           ],
         ),
       ),
@@ -995,9 +1088,9 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   // ─────────────────────────────── 좌측 세로 도형 보관함
 
-  Widget _buildStorage(double width, bool isMobile, double cellSz) {
+  Widget _buildStorage(double width, bool isMobile) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.85),
         border: Border.all(color: const Color(0xFFBAC5E8), width: 2.5),
@@ -1012,16 +1105,31 @@ class _SeesawState extends State<SeesawPuzzleScreen>
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final double availHeight = constraints.maxHeight;
-          final double maxTileHeight = (availHeight - 20) / 3;
-          final double maxTileWidth = (width - 26) / 2;
+          final double boxHeight = constraints.maxHeight;
+          final double boxWidth = constraints.maxWidth;
+
+          // Padding/Margin 보정
+          final double netHeight = boxHeight - 20; // 10 top, 10 bottom padding
+          final double netWidth = boxWidth - 20;   // 10 left, 10 right padding
+
+          // 2열 3행 그리드
+          final double maxTileHeight = netHeight / 3;
+          final double maxTileWidth = netWidth / 2;
+
+          // childAspectRatio = 1.25 (가로/세로 = 1.25)
+          // 가로 크기(tileSize)와 세로 크기(tileHeight) 계산
           final double tileSize = math.min(maxTileHeight * 1.25, maxTileWidth).clamp(36.0, 110.0);
           final double tileHeight = tileSize / 1.25;
 
+          // GridView.builder가 overflow하지 않도록 딱 알맞는 크기의 SizedBox로 감싸줍니다.
+          // 가로 간격(spacing)은 6, 세로 간격(spacing)은 6
+          final double gridWidth = tileSize * 2 + 6;
+          final double gridHeight = tileHeight * 3 + 12; // 3 * tileHeight + 2 * 6 spacing = 3 * tileHeight + 12
+
           return Center(
             child: SizedBox(
-              width: tileSize * 2 + 12,
-              height: tileHeight * 3 + 12,
+              width: gridWidth.clamp(0.0, boxWidth),
+              height: gridHeight.clamp(0.0, boxHeight),
               child: GridView.builder(
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
@@ -1053,14 +1161,16 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                           builder: (context) {
                             final maxC = card.rotations[0].map((c) => c.$1).reduce(math.max) + 1;
                             final maxR = card.rotations[0].map((c) => c.$2).reduce(math.max) + 1;
+                            // 드래그 피드백 시에도 통일된 그리드 크기 유지
+                            final double feedbackCellSz = tileSize * 0.22;
                             return SizedBox(
-                              width: cellSz * maxC,
-                              height: cellSz * maxR,
+                              width: feedbackCellSz * maxC,
+                              height: feedbackCellSz * maxR,
                               child: CustomPaint(
                                 painter: _MiniShapePainter(
                                   cells: card.rotations[0],
                                   color: card.color,
-                                  fixedCellSize: cellSz,
+                                  fixedCellSize: feedbackCellSz,
                                 ),
                               ),
                             );
@@ -1076,8 +1186,10 @@ class _SeesawState extends State<SeesawPuzzleScreen>
                       setState(() {
                         _hoverLeftIdx = null;
                         _hoverLeftDist = null;
+                        _hoverLeftStartRow = null;
                         _hoverRightIdx = null;
                         _hoverRightDist = null;
+                        _hoverRightStartRow = null;
                       });
                     },
                     child: cardTile,
@@ -1093,10 +1205,15 @@ class _SeesawState extends State<SeesawPuzzleScreen>
 
   Widget _storageCardTile(int idx, double tileSize, bool isUsed) {
     final card = _kCards[idx];
+    final double tileHeight = tileSize / 1.25;
+
+    // 모든 카드 속 도형들의 두께를 완벽히 일치시키기 위한 고정 그리드 셀 크기 계산!
+    // 타일 가로 크기(tileSize)의 약 16%를 한 셀의 크기로 설정합니다.
+    final double cs = tileSize * 0.16;
 
     return Container(
       width: tileSize,
-      height: tileSize * 0.78,
+      height: tileHeight,
       decoration: BoxDecoration(
         color: isUsed
             ? Colors.black.withAlpha(100)
@@ -1108,6 +1225,15 @@ class _SeesawState extends State<SeesawPuzzleScreen>
               : card.color,
           width: 2,
         ),
+        boxShadow: isUsed
+            ? null
+            : [
+                BoxShadow(
+                  color: card.color.withValues(alpha: 0.15),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                )
+              ],
       ),
       child: Stack(
         children: [
@@ -1115,12 +1241,13 @@ class _SeesawState extends State<SeesawPuzzleScreen>
             padding: const EdgeInsets.all(6),
             child: Center(
               child: CustomPaint(
-                size: Size.square(tileSize * 0.55),
+                size: Size(tileSize - 12, tileHeight - 12),
                 painter: _MiniShapePainter(
                   cells: card.rotations[0],
                   color: isUsed
                       ? card.color.withValues(alpha: 0.3)
                       : card.color,
+                  fixedCellSize: cs, // 고정 셀 크기 전달로 크기 불일치 및 왜곡 원천 차단!
                 ),
               ),
             ),
@@ -1128,7 +1255,7 @@ class _SeesawState extends State<SeesawPuzzleScreen>
           if (isUsed)
             Center(
               child: Icon(Icons.lock_rounded,
-                  color: Colors.white.withAlpha(180), size: tileSize * 0.28)),
+                  color: Colors.white.withAlpha(180), size: tileSize * 0.26)),
         ],
       ),
     );
