@@ -1439,7 +1439,11 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
         elevation: 0,
         title: const Text(
           '미션! 수학체험센터의 반짝별을 찾아서',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 24,
+            fontFamily: 'GangwonEduAll',
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -1491,6 +1495,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF163988),
+                        fontFamily: 'GangwonEduAll',
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -1592,6 +1597,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                   .toDouble();
                                               return Container(
                                                 width: double.infinity,
+                                                height: sideC.maxHeight,
                                                 padding: const EdgeInsets.all(
                                                   8,
                                                 ),
@@ -1623,6 +1629,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                         color: Color(
                                                           0xFF7A5A00,
                                                         ),
+                                                        fontFamily: 'GangwonEduAll',
                                                       ),
                                                     ),
                                                     const SizedBox(
@@ -1666,6 +1673,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                   '조각 보관함',
                                                   style: TextStyle(
                                                     fontSize: 18,
+                                                    fontFamily: 'GangwonEduAll',
                                                     fontWeight: FontWeight.w900,
                                                     color: Color(0xFF355AA8),
                                                   ),
@@ -1816,6 +1824,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF355AA8),
+                              fontFamily: 'GangwonEduAll',
                             ),
                           ),
                         ),
@@ -1841,6 +1850,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF355AA8),
+                              fontFamily: 'GangwonEduAll',
                             ),
                           ),
                         ),
@@ -1862,6 +1872,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
+                              fontFamily: 'GangwonEduAll',
                             ),
                           ),
                         ),
