@@ -1128,7 +1128,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   }
 
   Widget _buildTargetPreview({required double side}) {
-    final double innerSide = side - 12;
+    final double innerSide = side - 16.0;
     final double totalSpacing = (_boardSize - 1) * 2; // (4 - 1) * 2px = 6px
     final double cellSize = (innerSide - totalSpacing) / _boardSize;
 
@@ -1392,7 +1392,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                     Expanded(
                                                       child: Center(
                                                         child: _buildTargetPreview(
-                                                          side: previewSide + 12,
+                                                          side: previewSide,
                                                         ),
                                                       ),
                                                     ),
