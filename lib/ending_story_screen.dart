@@ -15,6 +15,8 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
   bool _showVideo = false;
   late VideoPlayerController _videoController;
   bool _videoInitialized = false;
+  bool _playWhenInitialized = false;
+  bool _videoEnded = false;
 
   final List<_EndingScene> _scenes = [
     const _EndingScene(
@@ -40,24 +42,35 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
     _videoController = VideoPlayerController.asset('assets/video/ending_video.mp4');
     try {
       await _videoController.initialize();
-      _videoController.addListener(() {
-        if (_videoController.value.position >= _videoController.value.duration &&
-            _videoController.value.duration != Duration.zero) {
-          _onVideoEnd();
-        }
-      });
+      _videoController.addListener(_videoListener);
       if (mounted) {
         setState(() {
           _videoInitialized = true;
         });
+        if (_playWhenInitialized || _showVideo) {
+          _videoController.play();
+        }
       }
     } catch (e) {
       debugPrint('Video initialization failed: $e');
     }
   }
 
+  void _videoListener() {
+    if (_videoController.value.isInitialized &&
+        _videoController.value.position >= _videoController.value.duration &&
+        _videoController.value.duration != Duration.zero &&
+        _videoController.value.position > Duration.zero) {
+      if (!_videoEnded) {
+        _videoEnded = true;
+        _onVideoEnd();
+      }
+    }
+  }
+
   @override
   void dispose() {
+    _videoController.removeListener(_videoListener);
     _videoController.dispose();
     super.dispose();
   }
@@ -73,11 +86,15 @@ class _EndingStoryScreenState extends State<EndingStoryScreen> {
       _showVideo = true;
     });
     AppBgmController.stop(); // 비디오 재생 시 BGM 중지
-    _videoController.play();
+    if (_videoInitialized) {
+      _videoController.play();
+    } else {
+      _playWhenInitialized = true;
+    }
   }
 
   void _onVideoEnd() {
-    _videoController.removeListener(_onVideoEnd);
+    _videoController.removeListener(_videoListener);
     AppBgmController.playEnding(); // 엔딩곡 재생
     _showFinishDialog();
   }
