@@ -93,17 +93,17 @@ class Chapter4StoryBeforeRpsScreen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: '찾았다! 낱말들이 하나로 맞춰지면서 새로운 길이 활짝 열렸어!',
+      line: '낱말들이 밝게 빛나며 흩어지더니, 저기 진짜로 손가락을 움직이는 가위바위보 로봇이 서 있어!',
       characterAsset: 'assets/images/chr_how_laughing.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '이 길은 수학융합실의 가위바위보 로봇이 서 있는 곳으로 연결되어 있어! 얼른 가 보자!',
+      line: '와! 진짜 손 모양을 한 로봇이네? 로봇의 손동작을 잘 보면서 짜릿한 대결을 펼쳐보자!',
       characterAsset: 'assets/images/chr_play_thinking.png',
     ),
     _Chapter4Scene(
       speaker: '하우',
-      line: '로봇과의 대결을 통과한 뒤 마지막 QR 코드를 비추면, 반짝별을 깨울 마지막 빛을 얻을 수 있대!',
+      line: '대결에서 멋지게 이기고 안내데스크에 가면, 반짝별을 깨울 마지막 QR 코드를 받을 수 있대!',
       characterAsset: 'assets/images/chr_how_running.png',
     ),
   ];
@@ -124,12 +124,12 @@ class Chapter4Story3Screen extends StatelessWidget {
   static const List<_Chapter4Scene> _scenes = [
     _Chapter4Scene(
       speaker: '하우',
-      line: '와! 마지막 QR 코드가 통과되면서 숨겨져 있던 별 조각이 솟아올랐어!',
+      line: '안내데스크에서 받아온 QR 코드를 비추니까, 드디어 마지막 별 조각이 마법처럼 나타났어!',
       characterAsset: 'assets/images/chr_how_thumbs_up.png',
     ),
     _Chapter4Scene(
       speaker: '플레이',
-      line: '드디어 네 개의 별 조각을 모두 찾았어! 어서 반짝별로 달려가서 이 불빛을 전해주자!',
+      line: '정말 해냈구나! 흩어졌던 네 개의 별 조각이 모두 모였어! 얼른 반짝별에게 이 온기를 전해주자!',
       characterAsset: 'assets/images/chr_play_heart_hands.png',
     ),
   ];
