@@ -1165,7 +1165,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   }
 
   Widget _buildTargetPreview({required double side}) {
-    final double outerSide = side.clamp(40.0, 260.0).toDouble();
+    final double outerSide = side.clamp(20.0, 260.0).toDouble();
     const double baseSide = 168;
 
     return SizedBox.square(
@@ -1580,7 +1580,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                   20.0;
                                               final previewSide = math
                                                   .max(
-                                                    40.0,
+                                                    20.0,
                                                     math.min(
                                                       sideC.maxWidth -
                                                           (cardPadding * 2),
@@ -1588,7 +1588,7 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                                           chromeHeight,
                                                     ),
                                                   )
-                                                  .clamp(40.0, 260.0)
+                                                  .clamp(20.0, 260.0)
                                                   .toDouble();
                                               return Container(
                                                 width: double.infinity,
