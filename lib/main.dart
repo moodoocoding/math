@@ -1162,15 +1162,27 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
   }
 
   Widget _buildTargetPreview({required double side}) {
-    final double outerSide = side.clamp(72.0, 260.0);
+    final double outerSide = side.clamp(40.0, 260.0).toDouble();
+    const double baseSide = 168;
+
+    return SizedBox.square(
+      dimension: outerSide,
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: _buildTargetPreviewGrid(side: baseSide),
+      ),
+    );
+  }
+
+  Widget _buildTargetPreviewGrid({required double side}) {
     const double previewPadding = 6;
     const double cellGap = 2;
-    final double innerSide = outerSide - previewPadding * 2;
+    final double innerSide = side - previewPadding * 2;
     final double cellSize =
         (innerSide - (_boardSize - 1) * cellGap) / _boardSize;
 
     return SizedBox.square(
-      dimension: outerSide,
+      dimension: side,
       child: Container(
         padding: const EdgeInsets.all(previewPadding),
         decoration: BoxDecoration(
@@ -1415,11 +1427,14 @@ class _Chapter2PuzzleQ2ScreenState extends State<Chapter2PuzzleQ2Screen> {
                                           child: LayoutBuilder(
                                             builder: (ctx, sideC) {
                                               final previewSide = math
-                                                  .min(
-                                                    sideC.maxWidth - 18,
-                                                    sideC.maxHeight - 42,
+                                                  .max(
+                                                    48.0,
+                                                    math.min(
+                                                      sideC.maxWidth - 18,
+                                                      sideC.maxHeight - 44,
+                                                    ),
                                                   )
-                                                  .clamp(120.0, 260.0)
+                                                  .clamp(48.0, 260.0)
                                                   .toDouble();
                                               return Container(
                                                 width: double.infinity,

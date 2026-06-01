@@ -41,3 +41,21 @@ Examples: chapter 4 QR verification.
 1. Chapter 2 seesaw puzzle: restore a clear left-side stage guide, reduce the feeling of a tiny storage drawer, and keep score information close to the board.
 2. Chapter 4 hidden word puzzle: place all eight words in a left column and allocate the remaining space to a larger 10x10 board.
 3. Common bottom bars: keep debug skip secondary and prevent it from increasing the bar height too much.
+
+## Implementation Matrix
+
+| Chapter | Route | Screen | Type | Status |
+| --- | --- | --- | --- | --- |
+| 1 | `/mission_low` | `MissionLowScreen` | tessellation shape choice | Needs full SM-T595N pass |
+| 1 | `/mission_ch1_q2` | `MissionLowScreen` | Hanoi / choice | Needs full SM-T595N pass |
+| 2 | `/mission_chapter2_q1` | `SeesawPuzzleScreen` | board / balance | Updated |
+| 2 | `/mission_chapter2_q2` | `Chapter2PuzzleQ2Screen` | board / pattern puzzle | Partially updated; target preview fixed |
+| 2 | `/mission_chapter2_q3_qr` | `Chapter2QrVerificationScreen` | QR | Needs full SM-T595N pass |
+| 3 | `/mission_chapter3_q1` | `MissionLowScreen` | rod numeral / choice | Needs full SM-T595N pass |
+| 3 | `/mission_chapter3_quiz` | `Chapter3MathQuizScreen` | choice quiz | Partially updated |
+| 3 | `/mission_chapter3_word_search` | `Chapter3WordSearchScreen` | hidden word board | Needs side-list layout |
+| 3 | `/mission_chapter3_q2` | `MissionLowScreen` | magic square | Needs full SM-T595N pass |
+| 4 | `/mission_chapter4_q1` | `BrickPuzzleScreen` | board / brick puzzle | Partially updated |
+| 4 | `/mission_chapter4_quiz` | `Chapter4CodingQuizScreen` | choice quiz | Partially updated |
+| 4 | `/mission_chapter4_q2` | `HiddenWordPuzzleScreen` | hidden word board | Updated |
+| 4 | `/mission_chapter4_rps_qr` | `Chapter4RpsQrScreen` | QR | Partially updated |

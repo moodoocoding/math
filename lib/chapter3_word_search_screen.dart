@@ -861,6 +861,8 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
     final screenSize = MediaQuery.of(context).size;
     final isCompact = screenSize.height < 600;
     final isMobile = screenSize.width < 600;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F8FF),
@@ -903,8 +905,8 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
           children: [
             Container(
               width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-              padding: EdgeInsets.symmetric(vertical: isCompact ? 8 : 12),
+              margin: const EdgeInsets.fromLTRB(8, 4, 8, 3),
+              padding: EdgeInsets.symmetric(vertical: isCompact ? 7 : 10),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -922,12 +924,12 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                       fontFamily: 'GangwonEduAll',
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     '(가이드: 글자판의 글자들을 드래그하여 단어를 연결해 보세요.)',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: isCompact ? 15 : 18,
+                      fontSize: isCompact ? 14 : 16,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF3B82F6),
                       fontFamily: 'GangwonEduAll',
@@ -936,40 +938,114 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenSize.width * 0.04,
-                vertical: screenSize.height * 0.01,
-              ),
-              child: SizedBox(
-                height: isCompact ? 50 : 66,
-                child: Center(
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    children: [
-                      for (var word in words)
-                        _buildWordCard(
-                          word.word,
-                          foundWords.contains(word.word),
-                          isCompact,
-                          screenSize,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
             Expanded(
-              child: Center(child: _buildGameBoard(screenSize, isCompact)),
+              child: isLandscape
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        final wordPanelWidth = (constraints.maxWidth * 0.22)
+                            .clamp(240.0, 300.0)
+                            .toDouble();
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                width: wordPanelWidth,
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.65),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: const Color(0xFFD8E0F3),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    const Text(
+                                      '찾을 이름 6개',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFF133E97),
+                                        fontFamily: 'GangwonEduAll',
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Expanded(
+                                      child: ListView.separated(
+                                        itemCount: words.length,
+                                        separatorBuilder: (context, index) =>
+                                            const SizedBox(height: 6),
+                                        itemBuilder: (context, i) =>
+                                            _buildWordCard(
+                                              words[i].word,
+                                              foundWords.contains(
+                                                words[i].word,
+                                              ),
+                                              true,
+                                              screenSize,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Center(
+                                  child: _buildGameBoard(screenSize, isCompact),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    )
+                  : Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenSize.width * 0.04,
+                            vertical: screenSize.height * 0.01,
+                          ),
+                          child: SizedBox(
+                            height: isCompact ? 50 : 66,
+                            child: Center(
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                children: [
+                                  for (var word in words)
+                                    _buildWordCard(
+                                      word.word,
+                                      foundWords.contains(word.word),
+                                      isCompact,
+                                      screenSize,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: _buildGameBoard(screenSize, isCompact),
+                          ),
+                        ),
+                      ],
+                    ),
             ),
 
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(
                 horizontal: screenSize.width * 0.03,
-                vertical: isCompact ? 10 : 14,
+                vertical: isCompact ? 8 : 10,
               ),
               decoration: const BoxDecoration(
                 color: Colors.white,
@@ -999,7 +1075,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                               color: Color(0xFF6F63D1),
                               width: 2,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 11),
                           ),
                         ),
                       ),
@@ -1015,7 +1091,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF8A8A8A),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 11),
                           ),
                         ),
                       ),
@@ -1034,7 +1110,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF123E97),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 11),
                           ),
                         ),
                       ),
@@ -1056,11 +1132,14 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
     Size screenSize,
   ) {
     return Container(
-      margin: EdgeInsets.only(right: screenSize.width * 0.02),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.only(right: isCompact ? 0 : screenSize.width * 0.02),
+      padding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 12 : 16,
+        vertical: isCompact ? 7 : 8,
+      ),
       decoration: BoxDecoration(
         color: found ? const Color(0xFFE2F9E5) : const Color(0xFFEBF0FF),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: found ? const Color(0xFF78DB8F) : const Color(0xFF9FB2EB),
           width: 2,
@@ -1073,7 +1152,7 @@ class _Chapter3WordSearchScreenState extends State<Chapter3WordSearchScreen> {
             Text(
               word,
               style: TextStyle(
-                fontSize: isCompact ? 16 : 20,
+                fontSize: isCompact ? 18 : 20,
                 fontWeight: FontWeight.w800,
                 color: found
                     ? const Color(0xFF1D6B30)
